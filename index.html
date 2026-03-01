@@ -102,174 +102,155 @@ img{width:100%;border-radius:15px;margin-bottom:8px;}
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<script>
-
-let superadminID="companyadmin";
-let superadminPass="admin123";
-let currentSociety=null;
-
-function login(){
-    let userid=document.getElementById("userid").value;
-    let password=document.getElementById("password").value;
-
-    if(userid===superadminID && password===superadminPass){
-        document.getElementById("loginPage").style.display="none";
-        document.getElementById("superadminPage").style.display="block";
-        loadSocieties();
-        return;
-    }
-
-    let societies=JSON.parse(localStorage.getItem("societies"))||[];
-    let found=societies.find(s=>s.userid===userid && s.password===password);
-
-    if(found){
-        currentSociety=found.name;
-        document.getElementById("loginPage").style.display="none";
-        document.getElementById("memberPage").style.display="block";
-        document.getElementById("uploadBtn").style.display="block";
-        document.getElementById("memberSocName").innerText=currentSociety;
-        loadUploads();
-    }else{
-        alert("Invalid Login");
-    }
-}
-
-function createSociety(){
-    let name=document.getElementById("socName").value.toLowerCase();
-    let date=document.getElementById("socDate").value;
-
-    if(!name||!date){ alert("Fill all fields"); return; }
-
-    let userid=name.substring(0,3)+Math.random().toString(36).substring(2,6);
-    let password=name.substring(0,4)+"321";
-
-    let societies=JSON.parse(localStorage.getItem("societies"))||[];
-    societies.push({name,date,userid,password});
-    localStorage.setItem("societies",JSON.stringify(societies));
-
-    alert("Created!\nUserID: "+userid+"\nPassword: "+password);
-    loadSocieties();
-}
-
-function loadSocieties(){
-    let list=document.getElementById("socList");
-    list.innerHTML="";
-    let societies=JSON.parse(localStorage.getItem("societies"))||[];
-    societies.forEach(s=>{
-        let div=document.createElement("div");
-        div.className="card";
-        div.innerHTML="<b>"+s.name+"</b><br><small>UserID: "+s.userid+"</small>";
-        div.onclick=function(){
-            currentSociety=s.name;
-            viewSocUploads();
-        }
-        list.appendChild(div);
-    });
-}
-
-function viewSocUploads(){
-    document.getElementById("memberPage").style.display="block";
-    document.getElementById("superadminPage").style.display="none";
-    document.getElementById("uploadBtn").style.display="none";
-    document.getElementById("backBtn").style.display="block";
-    document.getElementById("memberSocName").innerText=currentSociety+" (View Only)";
-    loadUploads();
-}
-
-function goBack(){
-    document.getElementById("memberPage").style.display="none";
-    document.getElementById("superadminPage").style.display="block";
-}
-
-function openUpload(){
-    document.getElementById("uploadForm").style.display="block";
-}
-
-function saveUpload(){
-    let file=document.getElementById("photo").files[0];
-    let date=document.getElementById("date").value;
-    let head=document.getElementById("head").value;
-    let amount=document.getElementById("amount").value;
-    let narration=document.getElementById("narration").value;
-
-    if(!file||!date||!head||!amount){ alert("Fill all fields"); return; }
-
-    let reader=new FileReader();
-
-    reader.onload=function(e){
-        let uploads=JSON.parse(localStorage.getItem("uploads"))||[];
-        uploads.push({
-            society:currentSociety,
-            image:e.target.result,
-            date,head,amount,narration
-        });
-        localStorage.setItem("uploads",JSON.stringify(uploads));
-        alert("Saved successfully");
-        document.getElementById("uploadForm").style.display="none";
-        loadUploads();
-    }
-    reader.readAsDataURL(file);
-}
-
-function loadUploads(){
-    let uploads=JSON.parse(localStorage.getItem("uploads"))||[];
-    let area=document.getElementById("uploads");
-    area.innerHTML="";
-    let filtered=uploads.filter(u=>u.society===currentSociety);
-
-    filtered.forEach(u=>{
-        let div=document.createElement("div");
-        div.className="card";
-        div.innerHTML=
-        "<img src='"+u.image+"'>"+
-        "<b>Date:</b> "+u.date+"<br>"+
-        "<b>Head:</b> "+u.head+"<br>"+
-        "<b>Amount:</b> "+u.amount+"<br>"+
-        "<b>Narration:</b> "+u.narration;
-        area.appendChild(div);
-    });
-}
-
-function exportSocietyData(){
-    if(!currentSociety){ alert("Select society first"); return; }
-
-    let uploads=JSON.parse(localStorage.getItem("uploads"))||[];
-    let filtered=uploads.filter(u=>u.society===currentSociety);
-
-    if(filtered.length===0){ alert("No records found"); return; }
-
-    let data=filtered.map(u=>({
-        "Society Name":u.society,
-        "Date":u.date,
-        "Expense Head":u.head,
-        "Amount":u.amount,
-        "Narration":u.narration
-    }));
-
-    let worksheet=XLSX.utils.json_to_sheet(data);
-    let workbook=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook,worksheet,"Society Records");
-    XLSX.writeFile(workbook,currentSociety+"_Records.xlsx");
-}
-
-</script>
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
-    authDomain: "society-management-d19f9.firebaseapp.com",
-    projectId: "society-management-d19f9",
-    storageBucket: "society-management-d19f9.firebasestorage.app",
-    messagingSenderId: "145344389199",
-    appId: "1:145344389199:web:a32affa5732fc825460a3a"
-  };
 
-  firebase.initializeApp(firebaseConfig);
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "society-management-d19f9.firebaseapp.com",
+  projectId: "society-management-d19f9",
+  storageBucket: "society-management-d19f9.firebasestorage.app",
+  messagingSenderId: "145344389199",
+  appId: "1:145344389199:web:a32affa5732fc825460a3a"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentSociety = null;
+
+/* LOGIN */
+function login(){
+  let email = document.getElementById("userid").value.trim();
+  let password = document.getElementById("password").value.trim();
+
+  auth.signInWithEmailAndPassword(email,password)
+  .then((userCredential)=>{
+      let user = userCredential.user;
+
+      if(user.email === "companyadmin@gmail.com"){
+          document.getElementById("loginPage").style.display="none";
+          document.getElementById("superadminPage").style.display="block";
+          loadSocieties();
+      }else{
+          db.collection("societies").doc(user.uid).get().then(doc=>{
+              if(doc.exists){
+                  currentSociety = doc.data().name;
+                  document.getElementById("loginPage").style.display="none";
+                  document.getElementById("memberPage").style.display="block";
+                  document.getElementById("uploadBtn").style.display="block";
+                  document.getElementById("memberSocName").innerText=currentSociety;
+                  loadUploads();
+              }
+          });
+      }
+  })
+  .catch(error=>{
+      alert("Invalid Login");
+  });
+}
+
+/* CREATE SOCIETY */
+function createSociety(){
+  let name=document.getElementById("socName").value.toLowerCase();
+  let date=document.getElementById("socDate").value;
+
+  if(!name||!date){ alert("Fill all fields"); return; }
+
+  let randomPart=Math.random().toString(36).substring(2,6);
+  let email=name.replace(/\s/g,"")+randomPart+"@society.com";
+  let password=name.substring(0,4)+"@123";
+
+  auth.createUserWithEmailAndPassword(email,password)
+  .then((userCredential)=>{
+      let uid=userCredential.user.uid;
+
+      db.collection("societies").doc(uid).set({
+          name:name,
+          date:date,
+          email:email
+      });
+
+      alert("Society Created!\nEmail: "+email+"\nPassword: "+password);
+      loadSocieties();
+  })
+  .catch(error=>{
+      alert(error.message);
+  });
+}
+
+/* LOAD SOCIETIES */
+function loadSocieties(){
+  let list=document.getElementById("socList");
+  list.innerHTML="";
+  db.collection("societies").get().then(snapshot=>{
+      snapshot.forEach(doc=>{
+          let s=doc.data();
+          let div=document.createElement("div");
+          div.className="card";
+          div.innerHTML="<b>"+s.name+"</b><br><small>"+s.email+"</small>";
+          list.appendChild(div);
+      });
+  });
+}
+
+/* UPLOAD DATA */
+function openUpload(){
+  document.getElementById("uploadForm").style.display="block";
+}
+
+function saveUpload(){
+  let file=document.getElementById("photo").files[0];
+  let date=document.getElementById("date").value;
+  let head=document.getElementById("head").value;
+  let amount=document.getElementById("amount").value;
+  let narration=document.getElementById("narration").value;
+
+  if(!file||!date||!head||!amount){ alert("Fill all fields"); return; }
+
+  let reader=new FileReader();
+  reader.onload=function(e){
+      db.collection("uploads").add({
+          society:currentSociety,
+          image:e.target.result,
+          date,head,amount,narration
+      }).then(()=>{
+          alert("Saved Successfully");
+          document.getElementById("uploadForm").style.display="none";
+          loadUploads();
+      });
+  }
+  reader.readAsDataURL(file);
+}
+
+/* LOAD UPLOADS */
+function loadUploads(){
+  let area=document.getElementById("uploads");
+  area.innerHTML="";
+  db.collection("uploads").where("society","==",currentSociety)
+  .get().then(snapshot=>{
+      snapshot.forEach(doc=>{
+          let u=doc.data();
+          let div=document.createElement("div");
+          div.className="card";
+          div.innerHTML=
+          "<img src='"+u.image+"'>"+
+          "<b>Date:</b> "+u.date+"<br>"+
+          "<b>Head:</b> "+u.head+"<br>"+
+          "<b>Amount:</b> "+u.amount+"<br>"+
+          "<b>Narration:</b> "+u.narration;
+          area.appendChild(div);
+      });
+  });
+}
+
 </script>
 </body>
 
 </html>
+
