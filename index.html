@@ -126,7 +126,7 @@ let currentSociety = null;
 
 /* LOGIN */
 function login(){
-  let email = document.getElementById("userid").value.trim();
+  let email = document.getElementById("email").value.trim();
   let password = document.getElementById("password").value.trim();
 
   auth.signInWithEmailAndPassword(email,password)
@@ -166,18 +166,23 @@ function createSociety(){
   let email=name.replace(/\s/g,"")+randomPart+"@society.com";
   let password=name.substring(0,4)+"@123";
 
+  let adminEmail = "companyadmin@gmail.com";
+  let adminPassword = "Admin@123";
+
   auth.createUserWithEmailAndPassword(email,password)
   .then((userCredential)=>{
       let uid=userCredential.user.uid;
 
-      db.collection("societies").doc(uid).set({
+      return db.collection("societies").doc(uid).set({
           name:name,
           date:date,
           email:email
-      });
+      }).then(()=>{
+          alert("Society Created!\nEmail: "+email+"\nPassword: "+password);
 
-      alert("Society Created!\nEmail: "+email+"\nPassword: "+password);
-      loadSocieties();
+          // Log back in as admin
+          return auth.signInWithEmailAndPassword(adminEmail, adminPassword);
+      });
   })
   .catch(error=>{
       alert(error.message);
@@ -253,5 +258,6 @@ function loadUploads(){
 </body>
 
 </html>
+
 
 
