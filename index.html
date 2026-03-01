@@ -126,7 +126,7 @@ let currentSociety = null;
 
 /* LOGIN */
 function login(){
-  let email = document.getElementById("email").value.trim();
+  let email = document.getElementById("userid").value.trim();
   let password = document.getElementById("password").value.trim();
 
   auth.signInWithEmailAndPassword(email,password)
@@ -151,7 +151,7 @@ function login(){
       }
   })
   .catch(error=>{
-      alert("Invalid Login");
+      alert(error.message);
   });
 }
 
@@ -258,6 +258,7 @@ function loadUploads(){
 </body>
 
 </html>
+
 
 
 
