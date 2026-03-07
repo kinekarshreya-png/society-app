@@ -212,10 +212,22 @@ const d = doc.data();
 
 html += `
 <div class="card">
-<b>${d.name}</b> (${d.userid})
+<b onclick="openSociety('${d.userid}')" style="cursor:pointer;">
+${d.name}
+</b> 
+(${d.userid})
+
 <br><br>
+
+<button onclick="openSociety('${d.userid}')">
+Open
+</button>
+
 <button onclick="deleteSociety('${doc.id}','${d.userid}')"
-style="background:red;">Delete</button>
+style="background:red;">
+Delete
+</button>
+
 </div>
 `;
 
@@ -302,6 +314,7 @@ alert(error.message);
 </body>
 
 </html>
+
 
 
 
