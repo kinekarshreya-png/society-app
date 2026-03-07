@@ -156,7 +156,7 @@ function login(){
 }
 
 /* CREATE SOCIETY */
-window.createSociety = async function(){
+function createSociety(){
 
 const name = document.getElementById("socName").value.trim().toLowerCase();
 const date = document.getElementById("socDate").value;
@@ -171,59 +171,61 @@ const userid = name.substring(0,3) + randomPart;
 
 const password = name.substring(0,4) + "321";
 
-try{
+auth.createUserWithEmailAndPassword(userid+"@society.com", password)
+.then((userCredential)=>{
 
-await createUserWithEmailAndPassword(auth, userid+"@society.com", password);
+let uid = userCredential.user.uid;
 
-await addDoc(collection(db,"societies"),{
-name,
-date,
-userid
-});
+db.collection("societies").doc(uid).set({
+name:name,
+date:date,
+userid:userid
+}).then(()=>{
 
-await auth.signOut();
+auth.signOut();
 
 alert(
 "Society Created!\n\n"+
-"UserID: "+userid+"\n"+
+"Login Email: "+userid+"@society.com\n"+
 "Password: "+password
 );
 
 loadSocieties();
 
-}catch(error){
+});
 
+})
+.catch(error=>{
 alert(error.message);
+});
 
 }
 
-};
-
 /* LOAD SOCIETIES */
-async function loadSocieties(){
+function loadSocieties(){
 
-const querySnapshot = await getDocs(collection(db,"societies"));
+db.collection("societies").get().then(snapshot=>{
 
-let html = "";
+let html="";
 
-querySnapshot.forEach(doc => {
+snapshot.forEach(doc=>{
 
 const d = doc.data();
 
 html += `
 <div class="card">
-<b onclick="openSociety('${d.userid}')" style="cursor:pointer;">
+<b onclick="openSociety('${d.name}')" style="cursor:pointer;">
 ${d.name}
-</b> 
+</b>
 (${d.userid})
 
 <br><br>
 
-<button onclick="openSociety('${d.userid}')">
+<button onclick="openSociety('${d.name}')">
 Open
 </button>
 
-<button onclick="deleteSociety('${doc.id}','${d.userid}')"
+<button onclick="deleteSociety('${doc.id}')"
 style="background:red;">
 Delete
 </button>
@@ -235,8 +237,22 @@ Delete
 
 document.getElementById("societyList").innerHTML = html;
 
-}
+});
 
+}
+    /* OPEN SOCIETY */
+function openSociety(name){
+
+currentSociety = name;
+
+document.getElementById("superadminPage").style.display="none";
+document.getElementById("memberPage").style.display="block";
+document.getElementById("backBtn").style.display="block";
+document.getElementById("memberSocName").innerText=name;
+
+loadUploads();
+
+}
 /* UPLOAD DATA */
 function openUpload(){
   document.getElementById("uploadForm").style.display="block";
@@ -292,21 +308,17 @@ const confirmDelete = confirm(
 "Deleting this society will also delete its data.\n\nDo you want to delete?"
 );
 
-if(!confirmDelete){
-return;
-}
+if(!confirmDelete){ return; }
 
 db.collection("societies").doc(docId).delete()
-.then(() => {
+.then(()=>{
 
 alert("Society Deleted");
 loadSocieties();
 
 })
-.catch((error) => {
-
+.catch(error=>{
 alert(error.message);
-
 });
 
 }
@@ -314,6 +326,7 @@ alert(error.message);
 </body>
 
 </html>
+
 
 
 
