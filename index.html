@@ -129,29 +129,31 @@ function login(){
   let email = document.getElementById("userid").value.trim();
   let password = document.getElementById("password").value.trim();
 
-  auth.signInWithEmailAndPassword(email,password)
-  .then((userCredential)=>{
-      let user = userCredential.user;
+  if(email==="companyadmin@gmail.com" && password==="admin123"){
+      document.getElementById("loginPage").style.display="none";
+      document.getElementById("superadminPage").style.display="block";
+      loadSocieties();
+      return;
+  }
 
-      if(user.email === "companyadmin@gmail.com"){
-          document.getElementById("loginPage").style.display="none";
-          document.getElementById("superadminPage").style.display="block";
-          loadSocieties();
-      }else{
-          db.collection("societies").doc(user.uid).get().then(doc=>{
-              if(doc.exists){
-                  currentSociety = doc.data().name;
-                  document.getElementById("loginPage").style.display="none";
-                  document.getElementById("memberPage").style.display="block";
-                  document.getElementById("uploadBtn").style.display="block";
-                  document.getElementById("memberSocName").innerText=currentSociety;
-                  loadUploads();
-              }
-          });
+  db.collection("societies").where("email","==",email)
+  .where("password","==",password)
+  .get()
+  .then(snapshot=>{
+      if(snapshot.empty){
+          alert("Invalid Login");
+          return;
       }
-  })
-  .catch(error=>{
-      alert(error.message);
+
+      snapshot.forEach(doc=>{
+          currentSociety = doc.data().name;
+      });
+
+      document.getElementById("loginPage").style.display="none";
+      document.getElementById("memberPage").style.display="block";
+      document.getElementById("uploadBtn").style.display="block";
+      document.getElementById("memberSocName").innerText=currentSociety;
+      loadUploads();
   });
 }
 
@@ -170,35 +172,29 @@ let randomPart = Math.random().toString(36).substring(2,6);
 let userid = name.substring(0,3) + randomPart;
 let password = name.substring(0,4) + "321";
 
-auth.createUserWithEmailAndPassword(userid+"@society.com", password)
+let email = userid+"@society.com";
 
-.then((userCredential)=>{
-
-let uid = userCredential.user.uid;
-
-db.collection("societies").doc(uid).set({
+db.collection("societies").add({
 name:name,
 date:date,
-userid:userid
+userid:userid,
+email:email,
+password:password
 })
 
 .then(()=>{
 
-auth.signOut();
-
 alert(
 "Society Created!\n\n"+
-"Email: "+userid+"@society.com\n"+
+"Email: "+email+"\n"+
 "Password: "+password
 );
 
 loadSocieties();
 
-});
-
 })
 
-.catch((error)=>{
+.catch(error=>{
 alert(error.message);
 });
 
@@ -329,6 +325,7 @@ alert(error.message);
 </body>
 
 </html>
+
 
 
 
