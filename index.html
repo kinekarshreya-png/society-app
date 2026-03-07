@@ -158,20 +158,20 @@ function login(){
 /* CREATE SOCIETY */
 function createSociety(){
 
-const name = document.getElementById("socName").value.trim().toLowerCase();
-const date = document.getElementById("socDate").value;
+let name = document.getElementById("socName").value.trim().toLowerCase();
+let date = document.getElementById("socDate").value;
 
 if(!name || !date){
 alert("Enter society name and date");
 return;
 }
 
-const randomPart = Math.random().toString(36).substring(2,6);
-const userid = name.substring(0,3) + randomPart;
-
-const password = name.substring(0,4) + "321";
+let randomPart = Math.random().toString(36).substring(2,6);
+let userid = name.substring(0,3) + randomPart;
+let password = name.substring(0,4) + "321";
 
 auth.createUserWithEmailAndPassword(userid+"@society.com", password)
+
 .then((userCredential)=>{
 
 let uid = userCredential.user.uid;
@@ -180,13 +180,15 @@ db.collection("societies").doc(uid).set({
 name:name,
 date:date,
 userid:userid
-}).then(()=>{
+})
+
+.then(()=>{
 
 auth.signOut();
 
 alert(
 "Society Created!\n\n"+
-"Login Email: "+userid+"@society.com\n"+
+"Email: "+userid+"@society.com\n"+
 "Password: "+password
 );
 
@@ -195,7 +197,8 @@ loadSocieties();
 });
 
 })
-.catch(error=>{
+
+.catch((error)=>{
 alert(error.message);
 });
 
@@ -326,6 +329,7 @@ alert(error.message);
 </body>
 
 </html>
+
 
 
 
