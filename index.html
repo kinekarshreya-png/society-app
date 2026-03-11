@@ -2,104 +2,357 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Society Management Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-body{
-    font-family:"Palatino Linotype", Palatino, serif;
-    margin:0;
-    background:#e6c9a8;
-}
-.container{
-    width:90%;
-    max-width:550px;
-    margin:auto;
-    margin-top:50px;
-    background:white;
-    padding:25px;
-    border-radius:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
-}
-h2{text-align:center;color:#5a3825;margin-bottom:20px;}
-h3{color:#5a3825;}
-input,button{
-    width:100%;
-    padding:12px;
-    margin:6px 0;
-    border-radius:12px;
-    border:1px solid #ccc;
-    font-family:inherit;
-}
-button{
-    background:#8b5e3c;
-    color:white;
-    border:none;
-    cursor:pointer;
-}
-button:hover{background:#6e452c;}
-.card{
-    background:#f9f4ef;
-    padding:12px;
-    margin:12px 0;
-    border-radius:15px;
-    box-shadow:0 5px 10px rgba(0,0,0,0.1);
-}
-img{width:100%;border-radius:15px;margin-bottom:8px;}
-#uploadBtn{
-    position:fixed;
-    bottom:25px;
-    right:25px;
-    background:#8b5e3c;
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    font-size:32px;
-    color:white;
-    border:none;
-    box-shadow:0 6px 15px rgba(0,0,0,0.3);
-}
+  :root {
+    --brown-dark: #5a3825;
+    --brown-mid: #8b5e3c;
+    --brown-light: #c49a6c;
+    --cream: #f9f4ef;
+    --bg: #e6c9a8;
+    --white: #ffffff;
+    --red: #c0392b;
+    --red-hover: #a93226;
+    --shadow: 0 10px 30px rgba(90,56,37,0.15);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    background-image: radial-gradient(ellipse at top left, #d4a96a 0%, #e6c9a8 50%, #c9a882 100%);
+  }
+
+  /* ── Pages ── */
+  .page {
+    display: none;
+    width: 90%;
+    max-width: 560px;
+    margin: 50px auto 80px;
+    background: var(--white);
+    padding: 32px 28px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Typography ── */
+  h2 {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    color: var(--brown-dark);
+    margin: 0 0 24px;
+    font-size: 1.7rem;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--brown-dark);
+    margin: 22px 0 10px;
+    font-size: 1.15rem;
+    border-bottom: 2px solid var(--bg);
+    padding-bottom: 6px;
+  }
+
+  /* ── Inputs ── */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="file"] {
+    width: 100%;
+    padding: 11px 14px;
+    margin: 6px 0;
+    border-radius: 10px;
+    border: 1.5px solid #ddd;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: var(--cream);
+    transition: border 0.2s;
+    display: block;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--brown-light);
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--brown-mid);
+    color: white;
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    font-size: 1rem;
+  }
+
+  .btn-primary:hover { background: var(--brown-dark); }
+
+  .btn-sm {
+    padding: 7px 14px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+
+  .btn-open {
+    background: var(--brown-mid);
+    color: white;
+  }
+
+  .btn-open:hover { background: var(--brown-dark); }
+
+  .btn-delete {
+    background: var(--red);
+    color: white;
+  }
+
+  .btn-delete:hover { background: var(--red-hover); }
+
+  .btn-export {
+    background: #2e7d32;
+    color: white;
+  }
+
+  .btn-export:hover { background: #1b5e20; }
+
+  .btn-back {
+    background: transparent;
+    color: var(--brown-mid);
+    border: 1.5px solid var(--brown-mid);
+    margin-bottom: 16px;
+    padding: 8px 16px;
+  }
+
+  .btn-back:hover {
+    background: var(--brown-mid);
+    color: white;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--cream);
+    padding: 14px 16px;
+    margin: 10px 0;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+  }
+
+  .society-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .society-card .name {
+    font-weight: 700;
+    color: var(--brown-dark);
+    font-size: 0.95rem;
+    flex: 1;
+  }
+
+  .society-card .uid {
+    color: #888;
+    font-size: 0.8rem;
+  }
+
+  .society-card .actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .upload-card img {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    max-height: 260px;
+    object-fit: cover;
+  }
+
+  .upload-card .detail-row {
+    display: flex;
+    gap: 6px;
+    margin: 4px 0;
+    font-size: 0.9rem;
+  }
+
+  .upload-card .label {
+    font-weight: 700;
+    color: var(--brown-dark);
+    min-width: 80px;
+  }
+
+  /* ── Society list scroll ── */
+  #societyList {
+    max-height: 340px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  #societyList::-webkit-scrollbar { width: 5px; }
+  #societyList::-webkit-scrollbar-thumb { background: var(--brown-light); border-radius: 4px; }
+
+  /* ── FAB Upload Button ── */
+  #uploadBtn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--brown-mid);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    font-size: 30px;
+    color: white;
+    border: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    cursor: pointer;
+    display: none;
+    transition: background 0.2s, transform 0.2s;
+    line-height: 1;
+  }
+
+  #uploadBtn:hover {
+    background: var(--brown-dark);
+    transform: scale(1.08) rotate(45deg);
+  }
+
+  /* ── Upload Modal ── */
+  #uploadModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #uploadModal.open { display: flex; }
+
+  #uploadModal .modal-box {
+    background: white;
+    border-radius: 20px;
+    padding: 28px 26px;
+    width: 90%;
+    max-width: 440px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    animation: fadeIn 0.25s ease;
+  }
+
+  #uploadModal h3 {
+    margin-top: 0;
+    border: none;
+  }
+
+  .modal-close {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #888;
+    line-height: 1;
+  }
+
+  .modal-close:hover { color: var(--brown-dark); }
+
+  /* ── Empty state ── */
+  .empty-state {
+    text-align: center;
+    color: #aaa;
+    padding: 30px 0;
+    font-style: italic;
+  }
+
+  /* ── Badge ── */
+  .badge {
+    background: var(--brown-light);
+    color: white;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
 </style>
 </head>
 <body>
 
-<div class="container" id="loginPage">
-    <h2>Society Expense Portal</h2>
-    <input type="email" id="userid" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+<!-- ════════ LOGIN PAGE ════════ -->
+<div class="page" id="loginPage" style="display:block;">
+  <h2>🏘️ Society Expense Portal</h2>
+  <input type="email" id="userid" placeholder="Email Address">
+  <input type="password" id="password" placeholder="Password">
+  <button class="btn btn-primary" onclick="login()">Login</button>
 </div>
 
-<div class="container" id="superadminPage" style="display:none;">
-    <h2>Super Admin Dashboard</h2>
+<!-- ════════ SUPER ADMIN PAGE ════════ -->
+<div class="page" id="superadminPage">
+  <h2>Super Admin Dashboard</h2>
 
-    <h3>Create Society</h3>
-    <input type="text" id="socName" placeholder="Society Name">
-    <input type="date" id="socDate">
-    <button onclick="createSociety()">Create Society</button>
+  <h3>➕ Create New Society</h3>
+  <input type="text" id="socName" placeholder="Society Name">
+  <input type="date" id="socDate">
+  <button class="btn btn-primary" onclick="createSociety()">Create Society</button>
 
-    <h3>Existing Societies</h3>
-    <div id="societyList" style="max-height:300px; overflow-y:auto; padding:10px;"></div>
-    <button onclick="exportSocietyData()">Export Selected Society to Excel</button>
+  <h3>🏢 Existing Societies</h3>
+  <div id="societyList"></div>
 </div>
 
-<div class="container" id="memberPage" style="display:none;">
-    <h2 id="memberSocName"></h2>
-    <button id="backBtn" style="display:none;" onclick="goBack()">← Back to Dashboard</button>
-    <div id="uploads"></div>
+<!-- ════════ MEMBER / SOCIETY VIEW PAGE ════════ -->
+<div class="page" id="memberPage">
+  <button class="btn btn-back" id="backBtn" style="display:none;" onclick="goBack()">← Back to Dashboard</button>
+  <h2 id="memberSocName"></h2>
+  <div id="uploads"></div>
+  <div id="uploadsEmpty" class="empty-state" style="display:none;">No bills uploaded yet.</div>
 </div>
 
-<button id="uploadBtn" style="display:none;" onclick="openUpload()">+</button>
+<!-- ════════ FLOATING UPLOAD BUTTON ════════ -->
+<button id="uploadBtn" onclick="openUpload()">+</button>
 
-<div class="container" id="uploadForm" style="display:none;">
-    <h3>Upload Bill / Voucher</h3>
-    <input type="file" id="photo">
+<!-- ════════ UPLOAD MODAL ════════ -->
+<div id="uploadModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeUpload()">✕</button>
+    <h3>📎 Upload Bill / Voucher</h3>
+    <input type="file" id="photo" accept="image/*">
     <input type="date" id="date">
-    <input type="text" id="head" placeholder="Expense Head">
-    <input type="number" id="amount" placeholder="Amount">
+    <input type="text" id="head" placeholder="Expense Head (e.g. Maintenance)">
+    <input type="number" id="amount" placeholder="Amount (₹)">
     <input type="text" id="narration" placeholder="Short Narration">
-    <button onclick="saveUpload()">Upload</button>
+    <button class="btn btn-primary" onclick="saveUpload()" style="margin-top:14px;">Upload</button>
+  </div>
 </div>
 
+<!-- ════════ SCRIPTS ════════ -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <!-- Firebase -->
@@ -108,7 +361,9 @@ img{width:100%;border-radius:15px;margin-bottom:8px;}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-
+// ════════════════════════════════════════════
+//  FIREBASE CONFIG  —  DO NOT CHANGE
+// ════════════════════════════════════════════
 const firebaseConfig = {
   apiKey: "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
   authDomain: "society-management-d19f9.firebaseapp.com",
@@ -119,229 +374,261 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
 
 let currentSociety = null;
+let isSuperAdmin    = false;
 
-/* LOGIN */
-function login(){
-  let email = document.getElementById("userid").value.trim();
-  let password = document.getElementById("password").value.trim();
+// ════════════════════════════════════════════
+//  LOGIN
+// ════════════════════════════════════════════
+function login() {
+  const email    = document.getElementById("userid").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-  if(email==="companyadmin@gmail.com" && password==="admin123"){
-      document.getElementById("loginPage").style.display="none";
-      document.getElementById("superadminPage").style.display="block";
-      loadSocieties();
-      return;
+  // FIX 3: corrected super-admin password to admin@123
+  if (email === "companyadmin@gmail.com" && password === "admin@123") {
+    isSuperAdmin = true;
+    showPage("superadminPage");
+    loadSocieties();
+    return;
   }
 
-  db.collection("societies").where("email","==",email)
-  .where("password","==",password)
-  .get()
-  .then(snapshot=>{
-      if(snapshot.empty){
-          alert("Invalid Login");
-          return;
-      }
+  db.collection("societies")
+    .where("email", "==", email)
+    .where("password", "==", password)
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) { alert("Invalid Login. Please check your email and password."); return; }
 
-      snapshot.forEach(doc=>{
-          currentSociety = doc.data().name;
-      });
+      snapshot.forEach(doc => { currentSociety = doc.data().name; });
 
-      document.getElementById("loginPage").style.display="none";
-      document.getElementById("memberPage").style.display="block";
-      document.getElementById("uploadBtn").style.display="block";
-      document.getElementById("memberSocName").innerText=currentSociety;
+      isSuperAdmin = false;
+      showPage("memberPage");
+      document.getElementById("uploadBtn").style.display = "block";
+      document.getElementById("memberSocName").innerText = currentSociety;
+      document.getElementById("backBtn").style.display   = "none";  // members have no back button
       loadUploads();
+    })
+    .catch(err => alert("Error: " + err.message));
+}
+
+// ════════════════════════════════════════════
+//  PAGE HELPER
+// ════════════════════════════════════════════
+function showPage(id) {
+  ["loginPage", "superadminPage", "memberPage"].forEach(p => {
+    document.getElementById(p).style.display = "none";
+  });
+  document.getElementById(id).style.display = "block";
+}
+
+// ════════════════════════════════════════════
+//  CREATE SOCIETY
+// ════════════════════════════════════════════
+function createSociety() {
+  const name = document.getElementById("socName").value.trim().toLowerCase();
+  const date = document.getElementById("socDate").value;
+
+  if (!name || !date) { alert("Please enter society name and start date."); return; }
+
+  const randomPart = Math.random().toString(36).substring(2, 6);
+  const userid     = name.substring(0, 3) + randomPart;
+  const password   = name.substring(0, 4) + "@123";
+  const email      = userid + "@society.com";
+
+  db.collection("societies").add({ name, date, userid, email, password })
+    .then(() => {
+      alert("Society Created!\n\nEmail: " + email + "\nPassword: " + password);
+      document.getElementById("socName").value = "";
+      document.getElementById("socDate").value = "";
+      loadSocieties();
+    })
+    .catch(err => alert(err.message));
+}
+
+// ════════════════════════════════════════════
+//  LOAD SOCIETIES  (FIX 1 + FIX 2)
+// ════════════════════════════════════════════
+function loadSocieties() {
+  db.collection("societies").get().then(snapshot => {
+    let html = "";
+
+    if (snapshot.empty) {
+      html = "<div class='empty-state'>No societies created yet.</div>";
+    } else {
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        html += `
+          <div class="card society-card">
+            <div>
+              <div class="name">${d.name}</div>
+              <div class="uid">${d.email}</div>
+            </div>
+            <div class="actions">
+              <!-- FIX 2: Export button is now INSIDE each society row -->
+              <button class="btn btn-sm btn-export" onclick="exportSocietyData('${d.name}')">⬇ Excel</button>
+              <!-- FIX 1: Only the Open button opens the society, name is NOT clickable -->
+              <button class="btn btn-sm btn-open" onclick="openSociety('${d.name}')">Open</button>
+              <button class="btn btn-sm btn-delete" onclick="deleteSociety('${doc.id}')">Delete</button>
+            </div>
+          </div>`;
+      });
+    }
+
+    document.getElementById("societyList").innerHTML = html;
   });
 }
 
-/* CREATE SOCIETY */
-function createSociety(){
-
-let name = document.getElementById("socName").value.trim().toLowerCase();
-let date = document.getElementById("socDate").value;
-
-if(!name || !date){
-alert("Enter society name and date");
-return;
+// ════════════════════════════════════════════
+//  OPEN SOCIETY  (FIX 1: Back button works correctly)
+// ════════════════════════════════════════════
+function openSociety(name) {
+  currentSociety = name;
+  showPage("memberPage");
+  document.getElementById("backBtn").style.display     = "block";   // show back for admin
+  document.getElementById("uploadBtn").style.display   = "none";    // admin only views, no upload
+  document.getElementById("memberSocName").innerText   = name;
+  loadUploads();
 }
 
-let randomPart = Math.random().toString(36).substring(2,6);
-let userid = name.substring(0,3) + randomPart;
-let password = name.substring(0,4) + "@123";
+// ════════════════════════════════════════════
+//  GO BACK  (FIX 1: properly returns to admin dashboard)
+// ════════════════════════════════════════════
+function goBack() {
+  currentSociety = null;
+  document.getElementById("uploads").innerHTML = "";
+  showPage("superadminPage");
+  document.getElementById("uploadBtn").style.display = "none";
+  loadSocieties();
+}
 
-let email = userid+"@society.com";
+// ════════════════════════════════════════════
+//  UPLOAD MODAL
+// ════════════════════════════════════════════
+function openUpload()  { document.getElementById("uploadModal").classList.add("open"); }
+function closeUpload() { document.getElementById("uploadModal").classList.remove("open"); }
 
-db.collection("societies").add({
-name:name,
-date:date,
-userid:userid,
-email:email,
-password:password
-})
-
-.then(()=>{
-
-alert(
-"Society Created!\n\n"+
-"Email: "+email+"\n"+
-"Password: "+password
-);
-
-loadSocieties();
-
-})
-
-.catch(error=>{
-alert(error.message);
+// Close modal if clicking outside the box
+document.getElementById("uploadModal").addEventListener("click", function(e) {
+  if (e.target === this) closeUpload();
 });
 
-}
+// ════════════════════════════════════════════
+//  SAVE UPLOAD
+// ════════════════════════════════════════════
+function saveUpload() {
+  const file      = document.getElementById("photo").files[0];
+  const date      = document.getElementById("date").value;
+  const head      = document.getElementById("head").value.trim();
+  const amount    = document.getElementById("amount").value.trim();
+  const narration = document.getElementById("narration").value.trim();
 
-/* LOAD SOCIETIES */
-function loadSocieties(){
+  if (!file || !date || !head || !amount) { alert("Please fill all required fields."); return; }
 
-db.collection("societies").get().then(snapshot=>{
-
-let html="";
-
-snapshot.forEach(doc=>{
-
-const d = doc.data();
-
-html += `
-<div class="card">
-<b onclick="openSociety('${d.name}')" style="cursor:pointer;">
-${d.name}
-</b>
-(${d.userid})
-
-<br><br>
-
-<button onclick="openSociety('${d.name}')">
-Open
-</button>
-
-<button onclick="deleteSociety('${doc.id}')"
-style="background:red;">
-Delete
-</button>
-
-</div>
-`;
-
-});
-
-document.getElementById("societyList").innerHTML = html;
-
-});
-
-}
-    /* OPEN SOCIETY */
-function openSociety(name){
-
-currentSociety = name;
-
-document.getElementById("superadminPage").style.display="none";
-document.getElementById("memberPage").style.display="block";
-document.getElementById("backBtn").style.display="block";
-document.getElementById("memberSocName").innerText=name;
-
-loadUploads();
-
-}
-/* UPLOAD DATA */
-function openUpload(){
-  document.getElementById("uploadForm").style.display="block";
-}
-
-function saveUpload(){
-  let file=document.getElementById("photo").files[0];
-  let date=document.getElementById("date").value;
-  let head=document.getElementById("head").value;
-  let amount=document.getElementById("amount").value;
-  let narration=document.getElementById("narration").value;
-
-  if(!file||!date||!head||!amount){ alert("Fill all fields"); return; }
-
-  let reader=new FileReader();
-  reader.onload=function(e){
-      db.collection("uploads").add({
-          society:currentSociety,
-          image:e.target.result,
-          date,head,amount,narration
-      }).then(()=>{
-          alert("Saved Successfully");
-          document.getElementById("uploadForm").style.display="none";
-          loadUploads();
-      });
-  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    db.collection("uploads").add({
+      society: currentSociety,
+      image: e.target.result,
+      date, head, amount, narration,
+      timestamp: Date.now()
+    }).then(() => {
+      alert("Bill uploaded successfully!");
+      closeUpload();
+      // Clear form
+      document.getElementById("photo").value    = "";
+      document.getElementById("date").value     = "";
+      document.getElementById("head").value     = "";
+      document.getElementById("amount").value   = "";
+      document.getElementById("narration").value = "";
+      loadUploads();
+    }).catch(err => alert("Upload failed: " + err.message));
+  };
   reader.readAsDataURL(file);
 }
 
-/* LOAD UPLOADS */
-function loadUploads(){
-  let area=document.getElementById("uploads");
-  area.innerHTML="";
-  db.collection("uploads").where("society","==",currentSociety)
-  .get().then(snapshot=>{
-      snapshot.forEach(doc=>{
-          let u=doc.data();
-          let div=document.createElement("div");
-          div.className="card";
-          div.innerHTML=
-          "<img src='"+u.image+"'>"+
-          "<b>Date:</b> "+u.date+"<br>"+
-          "<b>Head:</b> "+u.head+"<br>"+
-          "<b>Amount:</b> "+u.amount+"<br>"+
-          "<b>Narration:</b> "+u.narration;
-          area.appendChild(div);
+// ════════════════════════════════════════════
+//  LOAD UPLOADS
+// ════════════════════════════════════════════
+function loadUploads() {
+  const area  = document.getElementById("uploads");
+  const empty = document.getElementById("uploadsEmpty");
+  area.innerHTML = "<div class='empty-state'>Loading...</div>";
+
+  db.collection("uploads")
+    .where("society", "==", currentSociety)
+    .get()
+    .then(snapshot => {
+      area.innerHTML = "";
+      if (snapshot.empty) {
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+
+      snapshot.forEach(doc => {
+        const u   = doc.data();
+        const div = document.createElement("div");
+        div.className = "card upload-card";
+        div.innerHTML = `
+          <img src="${u.image}" alt="Bill Image">
+          <div class="detail-row"><span class="label">📅 Date</span><span>${u.date}</span></div>
+          <div class="detail-row"><span class="label">🗂 Head</span><span>${u.head}</span></div>
+          <div class="detail-row"><span class="label">💰 Amount</span><span>₹${u.amount}</span></div>
+          <div class="detail-row"><span class="label">📝 Note</span><span>${u.narration || "—"}</span></div>`;
+        area.appendChild(div);
       });
-  });
+    });
 }
-function deleteSociety(docId){
 
-const confirmDelete = confirm(
-"Deleting this society will also delete its data.\n\nDo you want to delete?"
-);
+// ════════════════════════════════════════════
+//  DELETE SOCIETY
+// ════════════════════════════════════════════
+function deleteSociety(docId) {
+  if (!confirm("Deleting this society will remove it from the list.\n\nContinue?")) return;
 
-if(!confirmDelete){ return; }
-
-db.collection("societies").doc(docId).delete()
-.then(()=>{
-
-alert("Society Deleted");
-loadSocieties();
-
-})
-.catch(error=>{
-alert(error.message);
-});
-
+  db.collection("societies").doc(docId).delete()
+    .then(() => { alert("Society deleted."); loadSocieties(); })
+    .catch(err => alert(err.message));
 }
-    function goBack(){
 
-document.getElementById("memberPage").style.display="none";
-document.getElementById("superadminPage").style.display="block";
-document.getElementById("uploadBtn").style.display="none";
+// ════════════════════════════════════════════
+//  EXPORT TO EXCEL  (FIX 2: exports correct society with proper headings)
+// ════════════════════════════════════════════
+function exportSocietyData(societyName) {
+  db.collection("uploads")
+    .where("society", "==", societyName)
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        alert("No data found for: " + societyName);
+        return;
+      }
 
-loadSocieties();
+      // Build rows with proper headings
+      const rows = [["Sr No", "Date", "Expense Head", "Amount (₹)", "Narration", "Society"]];
+      let sr = 1;
+      snapshot.forEach(doc => {
+        const u = doc.data();
+        rows.push([sr++, u.date, u.head, u.amount, u.narration || "", u.society]);
+      });
 
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+
+      // Column widths
+      ws['!cols'] = [
+        { wch: 8 }, { wch: 14 }, { wch: 22 },
+        { wch: 14 }, { wch: 30 }, { wch: 20 }
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, societyName.substring(0, 31));
+      XLSX.writeFile(wb, societyName + "_expenses.xlsx");
+    })
+    .catch(err => alert("Export failed: " + err.message));
 }
 </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
