@@ -864,7 +864,7 @@ async function saveIncome(){
       setIncTab('list');loadIncomeList();loadMDashboard();
     }).catch(e=>alert(e.message));
   };
-  if(file){const r=new FileReader();r.onload=e=>doSave(e.target.result);r.readAsDataURL(file);}
+  if(file){ compressImage(file).then(img=>doSave(img)); }
   else doSave('');
 }
 
@@ -915,7 +915,7 @@ async function saveExpense(){
       setExpTab('list');loadExpenseList();loadMDashboard();
     }).catch(e=>alert(e.message));
   };
-  if(file){const r=new FileReader();r.onload=e=>doSave(e.target.result);r.readAsDataURL(file);}
+  if(file){ compressImage(file).then(img=>doSave(img)); }
   else doSave('');
 }
 
@@ -1326,6 +1326,41 @@ function exportBS(){
     ['TOTAL',d.corpus+d.sinkFund,'TOTAL',d.cashBal+d.totalDue]];
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'Balance Sheet');
   XLSX.writeFile(wb,tc(S.socData.displayName||S.socData.name||'').replace(/\s+/g,'-')+'-balance-sheet-'+d.asOn+'.xlsx');
+}
+
+// ═══════════ IMAGE COMPRESSION ═══════════
+// Compresses any image to under ~400KB before saving to Firestore
+function compressImage(file, maxWidth=1024, quality=0.65){
+  return new Promise((resolve)=>{
+    // If not an image or already tiny, just read as-is but still compress
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const img=new Image();
+      img.onload=function(){
+        const canvas=document.createElement('canvas');
+        let w=img.width, h=img.height;
+        // Scale down if too large
+        if(w>maxWidth){ h=Math.round(h*maxWidth/w); w=maxWidth; }
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        // Start with given quality, reduce further if still too big
+        let dataUrl=canvas.toDataURL('image/jpeg', quality);
+        // If still over 700KB base64 (~524KB actual), compress more
+        if(dataUrl.length > 716800){
+          dataUrl=canvas.toDataURL('image/jpeg', 0.45);
+        }
+        if(dataUrl.length > 716800){
+          dataUrl=canvas.toDataURL('image/jpeg', 0.3);
+        }
+        resolve(dataUrl);
+      };
+      img.onerror=()=>resolve(''); // if image fails, save without photo
+      img.src=e.target.result;
+    };
+    reader.onerror=()=>resolve('');
+    reader.readAsDataURL(file);
+  });
 }
 
 // ═══════════ HELPERS ═══════════
