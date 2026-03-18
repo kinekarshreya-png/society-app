@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Society Management Portal</title>
-  <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
@@ -269,10 +268,40 @@
   <div class="modal-box">
     <button class="modal-close" onclick="closeUpload()">✕</button>
     <h3>📎 Upload Bill / Voucher</h3>
-    <input type="file" id="photo" accept="image/*" onchange="onPhotoSelected(this)">
+    <div style="display:flex;gap:10px;margin:6px 0;">
+      <button type="button" class="btn btn-primary" style="flex:1;margin-top:0;padding:11px 8px;font-size:0.88rem;" onclick="document.getElementById('photo_camera').click()">📷 Camera</button>
+      <button type="button" class="btn btn-primary" style="flex:1;margin-top:0;padding:11px 8px;font-size:0.88rem;background:#6d4c41;" onclick="document.getElementById('photo_gallery').click()">🖼 Gallery</button>
+    </div>
+    <!-- Camera: capture=environment opens rear camera directly -->
+    <input type="file" id="photo_camera"  accept="image/*" capture="environment" onchange="onPhotoSelected(this)" style="display:none;">
+    <!-- Gallery: no capture attribute = opens file picker / gallery -->
+    <input type="file" id="photo_gallery" accept="image/*" onchange="onPhotoSelected(this)" style="display:none;">
     <div id="compressStatus"></div>
     <input type="date" id="date">
-    <input type="text" id="head" placeholder="Expense Head (e.g. Maintenance)">
+    <select id="head" style="width:100%;padding:11px 14px;margin:6px 0;border-radius:10px;border:1.5px solid #ddd;font-family:inherit;font-size:0.95rem;background:var(--cream);transition:border 0.2s;display:block;appearance:auto;color:#333">
+      <option value="">-- Select Expense Head --</option>
+      <option>Electricity</option>
+      <option>Water Charges</option>
+      <option>Maintenance &amp; Repairs</option>
+      <option>Housekeeping / Cleaning</option>
+      <option>Security / Watchman</option>
+      <option>Salaries</option>
+      <option>Lift Maintenance</option>
+      <option>Garden / Landscaping</option>
+      <option>Pest Control</option>
+      <option>Generator / Fuel</option>
+      <option>Printing &amp; Stationery</option>
+      <option>Plumbing</option>
+      <option>Painting &amp; Whitewash</option>
+      <option>Bank Charges</option>
+      <option>Insurance</option>
+      <option>Audit / Legal Fees</option>
+      <option>Telephone / Internet</option>
+      <option>Conveyance</option>
+      <option>Miscellaneous</option>
+      <option value="__other__">Other (type manually)</option>
+    </select>
+    <input type="text" id="head_other" placeholder="Enter expense head name" style="display:none;width:100%;padding:11px 14px;margin:6px 0;border-radius:10px;border:1.5px solid #ddd;font-family:inherit;font-size:0.95rem;background:var(--cream);">
     <input type="number" id="amount" placeholder="Amount (₹)">
     <input type="text" id="narration" placeholder="Short Narration">
     <button class="btn btn-primary" id="uploadSubmitBtn" onclick="saveUpload()" style="margin-top:14px;">Upload</button>
@@ -404,6 +433,21 @@ function onPhotoSelected(input) {
 }
 
 // ════════════════════════════════════════════
+//  HEAD DROPDOWN — show/hide "Other" text box
+// ════════════════════════════════════════════
+function onHeadChange() {
+  const sel   = document.getElementById('head');
+  const other = document.getElementById('head_other');
+  if (sel.value === '__other__') {
+    other.style.display = 'block';
+    other.focus();
+  } else {
+    other.style.display = 'none';
+    other.value = '';
+  }
+}
+
+// ════════════════════════════════════════════
 //  LOGIN
 // ════════════════════════════════════════════
 function login() {
@@ -482,7 +526,7 @@ function loadSocieties() {
       html += `
         <div class="card society-card">
           <div>
-            <div class="name">${d.name}</div>
+            <div class="name">${d.name.toUpperCase()}</div>
             <div class="uid">${d.email}</div>
           </div>
           <div class="actions">
@@ -504,7 +548,7 @@ function openSociety(name) {
   showPage('memberPage');
   document.getElementById('backBtn').style.display   = 'block';
   document.getElementById('uploadBtn').style.display = 'none';
-  document.getElementById('memberSocName').innerText = name;
+  document.getElementById('memberSocName').innerText = name.toUpperCase();
   loadUploads();
 }
 
@@ -529,9 +573,13 @@ function openUpload() {
 function closeUpload() {
   document.getElementById('uploadModal').classList.remove('open');
   // Reset form
-  ['photo','date','head','amount','narration'].forEach(id => {
+  ['date','head','amount','narration'].forEach(id => {
     document.getElementById(id).value = '';
   });
+  document.getElementById('head_other').value = '';
+  document.getElementById('head_other').style.display = 'none';
+  document.getElementById('photo_camera').value  = '';
+  document.getElementById('photo_gallery').value = '';
   document.getElementById('compressStatus').textContent = '';
   _compressedImg = '';
 }
@@ -545,11 +593,15 @@ document.getElementById('uploadModal').addEventListener('click', function(e) {
 // ════════════════════════════════════════════
 function saveUpload() {
   const date      = document.getElementById('date').value;
-  const head      = document.getElementById('head').value.trim();
+  // Get head — if "Other" selected, use typed value
+  const headSel   = document.getElementById('head').value;
+  const head      = headSel === '__other__'
+                    ? document.getElementById('head_other').value.trim()
+                    : headSel;
   const amount    = document.getElementById('amount').value.trim();
   const narration = document.getElementById('narration').value.trim();
 
-  if (!_compressedImg) { alert('Please select a photo first.'); return; }
+  if (!_compressedImg) { alert('Please select a photo first.\n\nTap 📷 Camera or 🖼 Gallery above.'); return; }
   if (!date || !head || !amount) { alert('Please fill Date, Expense Head and Amount.'); return; }
 
   const btn = document.getElementById('uploadSubmitBtn');
@@ -642,22 +694,62 @@ function exportSocietyData(societyName) {
     .get()
     .then(snapshot => {
       if (snapshot.empty) { alert('No uploads found for: ' + societyName); return; }
-      const rows = [['Sr No', 'Date', 'Expense Head', 'Amount (₹)', 'Narration', 'Society']];
+      const rows = [['Sr No', 'Date', 'Expense Head', 'Amount (₹)', 'Narration', 'Society', 'View Image']];
       let sr = 1;
       const docs = [];
       snapshot.forEach(doc => docs.push(doc.data()));
       docs.sort((a, b) => a.date > b.date ? 1 : -1);
-      docs.forEach(u => rows.push([sr++, u.date, u.head, u.amount, u.narration || '', u.society]));
+
+      // Save images as separate HTML file for viewing, and put links in Excel
+      // Since base64 images can't be clicked directly in Excel, we create
+      // a companion HTML viewer and put a note in the cell
+      docs.forEach(u => {
+        rows.push([sr++, u.date, u.head, u.amount, u.narration || '', u.society, u.image ? 'IMAGE_' + sr : '']);
+      });
 
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols'] = [{wch:8},{wch:14},{wch:22},{wch:14},{wch:30},{wch:20}];
+
+      // Add hyperlink-style image viewer: embed all images in a separate sheet
+      const imgRows = [['Sr No', 'Date', 'Head', 'Amount', 'Image (Base64 - copy to browser address bar to view)']];
+      let imgSr = 1;
+      docs.forEach(u => {
+        if (u.image) imgRows.push([imgSr++, u.date, u.head, u.amount, u.image]);
+      });
+
+      ws['!cols'] = [{wch:8},{wch:14},{wch:22},{wch:14},{wch:30},{wch:20},{wch:16}];
       XLSX.utils.book_append_sheet(wb, ws, societyName.substring(0, 31));
-      XLSX.writeFile(wb, societyName + '_expenses.xlsx');
+
+      // Generate a standalone HTML image viewer file
+      let htmlViewer = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${societyName} — Bill Images</title>
+      <style>body{font-family:sans-serif;background:#f5f5f5;padding:20px}
+      .bill{background:white;border-radius:12px;padding:16px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+      .bill img{width:100%;max-width:500px;border-radius:8px;display:block;margin-top:10px}
+      h1{color:#5a3825}p{margin:4px 0;font-size:.9rem;color:#555}</style></head><body>
+      <h1>📋 ${societyName.toUpperCase()} — Bill Images</h1>`;
+      docs.forEach((u, i) => {
+        if (u.image) {
+          htmlViewer += `<div class="bill"><p><b>Sr:</b> ${i+1} &nbsp; <b>Date:</b> ${u.date} &nbsp; <b>Head:</b> ${u.head} &nbsp; <b>Amount:</b> ₹${u.amount}</p>
+          <p><b>Note:</b> ${u.narration || '—'}</p><img src="${u.image}" alt="Bill"></div>`;
+        }
+      });
+      htmlViewer += '</body></html>';
+
+      // Download the HTML viewer
+      const blob = new Blob([htmlViewer], {type: 'text/html'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = societyName + '_bill_images.html';
+      a.click();
+
+      // Small delay then download Excel
+      setTimeout(() => {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(imgRows), 'Image Data');
+        XLSX.writeFile(wb, societyName + '_expenses.xlsx');
+      }, 500);
     })
     .catch(err => alert('Export failed: ' + err.message));
 }
 </script>
 </body>
 </html>
-
