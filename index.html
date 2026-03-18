@@ -278,12 +278,11 @@
 
   <h3>➕ Create New Society</h3>
 
-  <input type="text"  id="socName"  placeholder="Society Name (e.g. Sunrise Apartments)">
+  <input type="text"  id="socName"  placeholder="Society Name (e.g. Sunrise Apartments)" oninput="previewPassword()">
   <input type="date"  id="socDate"  placeholder="Start Date">
 
   <!-- CHANGE 2: Admin enters real society email; password is auto-generated -->
-  <input type="email" id="socEmail" placeholder="Society Email (e.g. sunrise@gmail.com)"
-         oninput="previewPassword()">
+  <input type="email" id="socEmail" placeholder="Society Email (e.g. sunrise@gmail.com)">
   <div class="pwd-hint" id="pwdPreview"></div>
 
   <button class="btn btn-primary" onclick="createSociety()">Create Society</button>
@@ -394,20 +393,21 @@ let _compressedImg = '';   // compressed image ready to save
 //  simple memorable password from it
 //  e.g. sunrise@gmail.com → Sunrise@2025
 // ════════════════════════════════════════════
-function generatePassword(email) {
-  if (!email || !email.includes('@')) return '';
-  const part = email.split('@')[0];                      // e.g. "sunrise"
-  const cap  = part.charAt(0).toUpperCase() + part.slice(1); // "Sunrise"
-  const yr   = new Date().getFullYear();                 // e.g. 2025
-  return cap + '@' + yr;                                 // "Sunrise@2025"
+function generatePassword(socName) {
+  if (!socName) return '';
+  // Take first 4 letters of society name, lowercase, + @123
+  // e.g. "Sunrise Apartments" → "sunr@123"
+  const clean = socName.trim().toLowerCase().replace(/[^a-z]/g, ''); // letters only
+  const part  = clean.substring(0, 4);                               // first 4 letters
+  return part + '@123';
 }
 
 // Show preview under the email field as admin types
 function previewPassword() {
-  const email = document.getElementById('socEmail').value.trim();
-  const hint  = document.getElementById('pwdPreview');
-  if (email && email.includes('@')) {
-    hint.textContent = '🔑 Auto password will be: ' + generatePassword(email);
+  const name = document.getElementById('socName').value.trim();
+  const hint = document.getElementById('pwdPreview');
+  if (name.length >= 1) {
+    hint.textContent = '🔑 Auto password will be: ' + generatePassword(name);
   } else {
     hint.textContent = '';
   }
@@ -556,7 +556,7 @@ function createSociety() {
   }
 
   // Auto-generate password from email
-  const password = generatePassword(email);
+  const password = generatePassword(name);
 
   // Check if email already used
   db.collection('societies').where('email', '==', email).get()
