@@ -9,14 +9,14 @@
 <style>
   :root {
     --brown-dark: #5a3825;
-    --brown-mid: #8b5e3c;
-    --brown-light: #c49a6c;
-    --cream: #f9f4ef;
-    --bg: #e6c9a8;
-    --white: #ffffff;
-    --red: #c0392b;
-    --red-hover: #a93226;
-    --shadow: 0 10px 30px rgba(90,56,37,0.15);
+    --brown-mid:  #8b5e3c;
+    --brown-light:#c49a6c;
+    --cream:      #f9f4ef;
+    --bg:         #e6c9a8;
+    --white:      #ffffff;
+    --red:        #c0392b;
+    --red-hover:  #a93226;
+    --shadow:     0 10px 30px rgba(90,56,37,0.15);
   }
 
   * { box-sizing: border-box; }
@@ -29,6 +29,7 @@
     background-image: radial-gradient(ellipse at top left, #d4a96a 0%, #e6c9a8 50%, #c9a882 100%);
   }
 
+  /* ── Pages ── */
   .page {
     display: none;
     width: 90%;
@@ -40,12 +41,12 @@
     box-shadow: var(--shadow);
     animation: fadeIn 0.3s ease;
   }
-
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
   }
 
+  /* ── Typography ── */
   h2 {
     font-family: 'Playfair Display', serif;
     text-align: center;
@@ -53,7 +54,6 @@
     margin: 0 0 24px;
     font-size: 1.7rem;
   }
-
   h3 {
     font-family: 'Playfair Display', serif;
     color: var(--brown-dark);
@@ -63,12 +63,12 @@
     padding-bottom: 6px;
   }
 
+  /* ── Inputs ── */
   input[type="text"],
   input[type="email"],
   input[type="password"],
   input[type="number"],
-  input[type="date"],
-  input[type="file"] {
+  input[type="date"] {
     width: 100%;
     padding: 11px 14px;
     margin: 6px 0;
@@ -80,9 +80,35 @@
     transition: border 0.2s;
     display: block;
   }
-
   input:focus { outline: none; border-color: var(--brown-light); }
 
+  /* select styled same as input */
+  select.inp {
+    width: 100%;
+    padding: 11px 14px;
+    margin: 6px 0;
+    border-radius: 10px;
+    border: 1.5px solid #ddd;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: var(--cream);
+    color: #333;
+    transition: border 0.2s;
+    display: block;
+    appearance: auto;
+  }
+  select.inp:focus { outline: none; border-color: var(--brown-light); }
+
+  /* password preview hint */
+  .pwd-hint {
+    font-size: 0.8rem;
+    color: var(--brown-mid);
+    margin: 2px 0 6px 2px;
+    min-height: 18px;
+    font-style: italic;
+  }
+
+  /* ── Buttons ── */
   .btn {
     display: inline-block;
     padding: 10px 18px;
@@ -94,9 +120,7 @@
     font-weight: 700;
     transition: background 0.2s, transform 0.1s;
   }
-
   .btn:active { transform: scale(0.97); }
-
   .btn-primary {
     background: var(--brown-mid);
     color: white;
@@ -105,11 +129,10 @@
     margin-top: 8px;
     font-size: 1rem;
   }
-
   .btn-primary:hover { background: var(--brown-dark); }
   .btn-sm { padding: 7px 14px; font-size: 0.82rem; border-radius: 8px; }
-  .btn-open { background: var(--brown-mid); color: white; }
-  .btn-open:hover { background: var(--brown-dark); }
+  .btn-open   { background: var(--brown-mid); color: white; }
+  .btn-open:hover   { background: var(--brown-dark); }
   .btn-delete { background: var(--red); color: white; }
   .btn-delete:hover { background: var(--red-hover); }
   .btn-export { background: #2e7d32; color: white; }
@@ -123,6 +146,22 @@
   }
   .btn-back:hover { background: var(--brown-mid); color: white; }
 
+  /* camera / gallery split */
+  .photo-btns { display: flex; gap: 10px; margin: 6px 0; }
+  .photo-btns .btn {
+    flex: 1;
+    padding: 11px 8px;
+    font-size: 0.88rem;
+    text-align: center;
+    margin-top: 0;
+    background: var(--brown-mid);
+    color: white;
+    width: auto;
+  }
+  .photo-btns .btn.gallery { background: #6d4c41; }
+  .photo-btns .btn:hover   { background: var(--brown-dark); }
+
+  /* ── Cards ── */
   .card {
     background: var(--cream);
     padding: 14px 16px;
@@ -130,7 +169,6 @@
     border-radius: 14px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.07);
   }
-
   .society-card {
     display: flex;
     align-items: center;
@@ -138,10 +176,9 @@
     gap: 8px;
     flex-wrap: wrap;
   }
-
-  .society-card .name { font-weight: 700; color: var(--brown-dark); font-size: 0.95rem; flex: 1; }
-  .society-card .uid { color: #888; font-size: 0.8rem; }
-  .society-card .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .society-card .name { font-weight:700; color:var(--brown-dark); font-size:0.95rem; flex:1; }
+  .society-card .uid  { color:#888; font-size:0.8rem; }
+  .society-card .actions { display:flex; gap:6px; flex-wrap:wrap; }
 
   .upload-card img {
     width: 100%;
@@ -151,21 +188,20 @@
     object-fit: cover;
     cursor: zoom-in;
   }
+  .upload-card .detail-row { display:flex; gap:6px; margin:4px 0; font-size:0.9rem; }
+  .upload-card .label { font-weight:700; color:var(--brown-dark); min-width:80px; }
 
-  .upload-card .detail-row { display: flex; gap: 6px; margin: 4px 0; font-size: 0.9rem; }
-  .upload-card .label { font-weight: 700; color: var(--brown-dark); min-width: 80px; }
+  /* ── Society list scroll ── */
+  #societyList { max-height:340px; overflow-y:auto; padding-right:4px; }
+  #societyList::-webkit-scrollbar { width:5px; }
+  #societyList::-webkit-scrollbar-thumb { background:var(--brown-light); border-radius:4px; }
 
-  #societyList { max-height: 340px; overflow-y: auto; padding-right: 4px; }
-  #societyList::-webkit-scrollbar { width: 5px; }
-  #societyList::-webkit-scrollbar-thumb { background: var(--brown-light); border-radius: 4px; }
-
+  /* ── FAB Upload Button ── */
   #uploadBtn {
     position: fixed;
-    bottom: 28px;
-    right: 28px;
+    bottom: 28px; right: 28px;
     background: var(--brown-mid);
-    width: 58px;
-    height: 58px;
+    width: 58px; height: 58px;
     border-radius: 50%;
     font-size: 30px;
     color: white;
@@ -176,9 +212,9 @@
     transition: background 0.2s, transform 0.2s;
     line-height: 1;
   }
+  #uploadBtn:hover { background:var(--brown-dark); transform:scale(1.08) rotate(45deg); }
 
-  #uploadBtn:hover { background: var(--brown-dark); transform: scale(1.08) rotate(45deg); }
-
+  /* ── Upload Modal ── */
   #uploadModal {
     display: none;
     position: fixed;
@@ -188,97 +224,106 @@
     align-items: center;
     justify-content: center;
   }
-
-  #uploadModal.open { display: flex; }
-
+  #uploadModal.open { display:flex; }
   #uploadModal .modal-box {
     background: white;
     border-radius: 20px;
     padding: 28px 26px;
     width: 90%;
     max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
     animation: fadeIn 0.25s ease;
   }
+  #uploadModal h3 { margin-top:0; border:none; }
+  .modal-close { float:right; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#888; line-height:1; }
+  .modal-close:hover { color:var(--brown-dark); }
 
-  #uploadModal h3 { margin-top: 0; border: none; }
+  /* ── Status / compress ── */
+  #compressStatus { font-size:0.8rem; color:var(--brown-mid); margin-top:4px; min-height:18px; }
 
-  .modal-close { float: right; background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #888; line-height: 1; }
-  .modal-close:hover { color: var(--brown-dark); }
-
-  .empty-state { text-align: center; color: #aaa; padding: 30px 0; font-style: italic; }
-
-  /* Image lightbox */
+  /* ── Lightbox ── */
   #lightbox {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.88);
     z-index: 200;
     align-items: center;
     justify-content: center;
     cursor: zoom-out;
   }
-  #lightbox.open { display: flex; }
-  #lightbox img { max-width: 94vw; max-height: 90vh; border-radius: 10px; box-shadow: 0 0 40px rgba(0,0,0,.5); }
+  #lightbox.open { display:flex; }
+  #lightbox img { max-width:94vw; max-height:90vh; border-radius:10px; box-shadow:0 0 40px rgba(0,0,0,.5); }
 
-  /* Compress progress */
-  #compressStatus {
-    font-size: 0.8rem;
-    color: var(--brown-mid);
-    margin-top: 4px;
-    min-height: 18px;
-  }
+  /* ── Empty state ── */
+  .empty-state { text-align:center; color:#aaa; padding:30px 0; font-style:italic; }
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ════════ LOGIN ════════ -->
 <div class="page" id="loginPage" style="display:block;">
   <h2>🏘️ Society Expense Portal</h2>
-  <input type="email" id="userid" placeholder="Email Address">
-  <input type="password" id="password" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
+  <input type="email"    id="userid"   placeholder="Email Address">
+  <input type="password" id="password" placeholder="Password"
+         onkeydown="if(event.key==='Enter')login()">
   <button class="btn btn-primary" onclick="login()">Login</button>
 </div>
 
-<!-- SUPER ADMIN -->
+<!-- ════════ SUPER ADMIN ════════ -->
 <div class="page" id="superadminPage">
   <h2>Super Admin Dashboard</h2>
+
   <h3>➕ Create New Society</h3>
-  <input type="text" id="socName" placeholder="Society Name">
-  <input type="date" id="socDate">
+
+  <input type="text"  id="socName"  placeholder="Society Name (e.g. Sunrise Apartments)">
+  <input type="date"  id="socDate"  placeholder="Start Date">
+
+  <!-- CHANGE 2: Admin enters real society email; password is auto-generated -->
+  <input type="email" id="socEmail" placeholder="Society Email (e.g. sunrise@gmail.com)"
+         oninput="previewPassword()">
+  <div class="pwd-hint" id="pwdPreview"></div>
+
   <button class="btn btn-primary" onclick="createSociety()">Create Society</button>
+
   <h3>🏢 Existing Societies</h3>
   <div id="societyList"></div>
 </div>
 
-<!-- MEMBER / SOCIETY VIEW -->
+<!-- ════════ MEMBER / SOCIETY VIEW ════════ -->
 <div class="page" id="memberPage">
-  <button class="btn btn-back" id="backBtn" style="display:none;" onclick="goBack()">← Back to Dashboard</button>
+  <button class="btn btn-back" id="backBtn" style="display:none;" onclick="goBack()">← Back</button>
   <h2 id="memberSocName"></h2>
   <div id="uploads"></div>
   <div id="uploadsEmpty" class="empty-state" style="display:none;">No bills uploaded yet.</div>
 </div>
 
-<!-- FLOATING UPLOAD BUTTON -->
+<!-- ════════ FLOATING UPLOAD BUTTON ════════ -->
 <button id="uploadBtn" onclick="openUpload()">+</button>
 
-<!-- UPLOAD MODAL -->
+<!-- ════════ UPLOAD MODAL ════════ -->
 <div id="uploadModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeUpload()">✕</button>
     <h3>📎 Upload Bill / Voucher</h3>
-    <div style="display:flex;gap:10px;margin:6px 0;">
-      <button type="button" class="btn btn-primary" style="flex:1;margin-top:0;padding:11px 8px;font-size:0.88rem;" onclick="document.getElementById('photo_camera').click()">📷 Camera</button>
-      <button type="button" class="btn btn-primary" style="flex:1;margin-top:0;padding:11px 8px;font-size:0.88rem;background:#6d4c41;" onclick="document.getElementById('photo_gallery').click()">🖼 Gallery</button>
+
+    <!-- CHANGE 1: Camera / Gallery buttons -->
+    <div class="photo-btns">
+      <button type="button" class="btn" onclick="document.getElementById('photo_camera').click()">📷 Camera</button>
+      <button type="button" class="btn gallery"  onclick="document.getElementById('photo_gallery').click()">🖼 Gallery</button>
     </div>
-    <!-- Camera: capture=environment opens rear camera directly -->
-    <input type="file" id="photo_camera"  accept="image/*" capture="environment" onchange="onPhotoSelected(this)" style="display:none;">
-    <!-- Gallery: no capture attribute = opens file picker / gallery -->
-    <input type="file" id="photo_gallery" accept="image/*" onchange="onPhotoSelected(this)" style="display:none;">
+    <!-- capture=environment → opens rear camera directly on mobile -->
+    <input type="file" id="photo_camera"  accept="image/*" capture="environment" style="display:none" onchange="onPhotoSelected(this)">
+    <!-- no capture → opens gallery / file picker -->
+    <input type="file" id="photo_gallery" accept="image/*"                        style="display:none" onchange="onPhotoSelected(this)">
     <div id="compressStatus"></div>
+
     <input type="date" id="date">
-    <select id="head" style="width:100%;padding:11px 14px;margin:6px 0;border-radius:10px;border:1.5px solid #ddd;font-family:inherit;font-size:0.95rem;background:var(--cream);transition:border 0.2s;display:block;appearance:auto;color:#333">
+
+    <!-- CHANGE: Head dropdown with 19 options + Other -->
+    <select class="inp" id="head" onchange="onHeadChange()">
       <option value="">-- Select Expense Head --</option>
       <option>Electricity</option>
       <option>Water Charges</option>
@@ -299,21 +344,26 @@
       <option>Telephone / Internet</option>
       <option>Conveyance</option>
       <option>Miscellaneous</option>
-      <option value="__other__">Other (type manually)</option>
+      <option value="__other__">Other (type below)</option>
     </select>
-    <input type="text" id="head_other" placeholder="Enter expense head name" style="display:none;width:100%;padding:11px 14px;margin:6px 0;border-radius:10px;border:1.5px solid #ddd;font-family:inherit;font-size:0.95rem;background:var(--cream);">
-    <input type="number" id="amount" placeholder="Amount (₹)">
-    <input type="text" id="narration" placeholder="Short Narration">
-    <button class="btn btn-primary" id="uploadSubmitBtn" onclick="saveUpload()" style="margin-top:14px;">Upload</button>
+    <!-- shown only when Other is picked -->
+    <input type="text" id="head_other" placeholder="Type expense head name" style="display:none;">
+
+    <input type="number" id="amount"    placeholder="Amount (₹)">
+    <input type="text"   id="narration" placeholder="Short Narration (optional)">
+
+    <button class="btn btn-primary" id="uploadSubmitBtn" onclick="saveUpload()" style="margin-top:14px;">
+      Upload
+    </button>
   </div>
 </div>
 
-<!-- IMAGE LIGHTBOX -->
-<div id="lightbox" onclick="document.getElementById('lightbox').classList.remove('open')">
+<!-- ════════ IMAGE LIGHTBOX ════════ -->
+<div id="lightbox" onclick="this.classList.remove('open')">
   <img id="lightbox-img" src="" alt="Bill">
 </div>
 
-<!-- SCRIPTS -->
+<!-- ════════ SCRIPTS ════════ -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -324,75 +374,79 @@
 //  FIREBASE CONFIG — DO NOT CHANGE
 // ════════════════════════════════════════════
 const firebaseConfig = {
-  apiKey: "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
-  authDomain: "society-management-d19f9.firebaseapp.com",
-  projectId: "society-management-d19f9",
-  storageBucket: "society-management-d19f9.firebasestorage.app",
+  apiKey:            "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
+  authDomain:        "society-management-d19f9.firebaseapp.com",
+  projectId:         "society-management-d19f9",
+  storageBucket:     "society-management-d19f9.firebasestorage.app",
   messagingSenderId: "145344389199",
-  appId: "1:145344389199:web:a32affa5732fc825460a3a"
+  appId:             "1:145344389199:web:a32affa5732fc825460a3a"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 let currentSociety = null;
 let isSuperAdmin   = false;
-let _compressedImg = '';   // stores compressed image ready to save
+let _compressedImg = '';   // compressed image ready to save
 
 // ════════════════════════════════════════════
-//  IMAGE COMPRESSION  ← THE MAIN FIX
-//  Resizes to max 900px wide, quality 60%
-//  If still big → retries at 40% → 25%
-//  Result is always well under 700KB
+//  PASSWORD AUTO-GENERATOR
+//  Takes the email entered by admin, makes a
+//  simple memorable password from it
+//  e.g. sunrise@gmail.com → Sunrise@2025
+// ════════════════════════════════════════════
+function generatePassword(email) {
+  if (!email || !email.includes('@')) return '';
+  const part = email.split('@')[0];                      // e.g. "sunrise"
+  const cap  = part.charAt(0).toUpperCase() + part.slice(1); // "Sunrise"
+  const yr   = new Date().getFullYear();                 // e.g. 2025
+  return cap + '@' + yr;                                 // "Sunrise@2025"
+}
+
+// Show preview under the email field as admin types
+function previewPassword() {
+  const email = document.getElementById('socEmail').value.trim();
+  const hint  = document.getElementById('pwdPreview');
+  if (email && email.includes('@')) {
+    hint.textContent = '🔑 Auto password will be: ' + generatePassword(email);
+  } else {
+    hint.textContent = '';
+  }
+}
+
+// ════════════════════════════════════════════
+//  IMAGE COMPRESSION
+//  Resizes to max 900px, JPEG quality stepped
+//  down until safely under 700KB
 // ════════════════════════════════════════════
 function compressImage(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error('Could not read file'));
-    reader.onload = (e) => {
+    reader.onload  = e => {
       const img = new Image();
       img.onerror = () => reject(new Error('Could not load image'));
-      img.onload = () => {
-        // Step 1: calculate new dimensions (max 900px wide)
+      img.onload  = () => {
         const MAX_W = 900;
-        let w = img.width;
-        let h = img.height;
-        if (w > MAX_W) {
-          h = Math.round(h * MAX_W / w);
-          w = MAX_W;
-        }
+        let w = img.width, h = img.height;
+        if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
 
-        // Step 2: draw on canvas
         const canvas = document.createElement('canvas');
-        canvas.width  = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
 
-        // Step 3: try quality 60% first
+        const SAFE = 700 * 1024;   // 700 KB in base64 chars
         let data = canvas.toDataURL('image/jpeg', 0.60);
-
-        // Step 4: if still too big, reduce quality further
-        // Firestore limit is ~1MB = 1,048,487 bytes for the whole doc
-        // base64 string of 700KB = safe
-        const SAFE_LEN = 700 * 1024; // ~700KB in base64 chars
-
-        if (data.length > SAFE_LEN) {
-          data = canvas.toDataURL('image/jpeg', 0.40);
+        if (data.length > SAFE) data = canvas.toDataURL('image/jpeg', 0.40);
+        if (data.length > SAFE) data = canvas.toDataURL('image/jpeg', 0.25);
+        if (data.length > SAFE) {
+          // Last resort — shrink to 600px
+          const c2 = document.createElement('canvas');
+          const r  = 600 / w;
+          c2.width  = 600;
+          c2.height = Math.round(h * r);
+          c2.getContext('2d').drawImage(canvas, 0, 0, c2.width, c2.height);
+          data = c2.toDataURL('image/jpeg', 0.30);
         }
-        if (data.length > SAFE_LEN) {
-          data = canvas.toDataURL('image/jpeg', 0.25);
-        }
-        if (data.length > SAFE_LEN) {
-          // Last resort: shrink to 600px
-          const canvas2 = document.createElement('canvas');
-          const ratio = 600 / w;
-          canvas2.width  = 600;
-          canvas2.height = Math.round(h * ratio);
-          canvas2.getContext('2d').drawImage(canvas, 0, 0, canvas2.width, canvas2.height);
-          data = canvas2.toDataURL('image/jpeg', 0.30);
-        }
-
         resolve(data);
       };
       img.src = e.target.result;
@@ -401,18 +455,12 @@ function compressImage(file) {
   });
 }
 
-// ════════════════════════════════════════════
-//  CALLED WHEN USER PICKS A PHOTO
-//  Compresses immediately so upload is instant
-// ════════════════════════════════════════════
+// Called when user picks a photo — compress immediately
 function onPhotoSelected(input) {
   const file = input.files[0];
   if (!file) return;
-
   const status = document.getElementById('compressStatus');
   const btn    = document.getElementById('uploadSubmitBtn');
-
-  // Show file size to user
   const origKB = (file.size / 1024).toFixed(0);
   status.textContent = `⏳ Compressing photo (${origKB} KB)…`;
   btn.disabled = true;
@@ -421,24 +469,23 @@ function onPhotoSelected(input) {
   compressImage(file)
     .then(data => {
       _compressedImg = data;
-      const newKB = Math.round(data.length * 0.75 / 1024); // base64 → actual bytes approx
-      status.textContent = `✔ Photo ready — compressed to ~${newKB} KB`;
+      const newKB = Math.round(data.length * 0.75 / 1024);
+      status.textContent = `✔ Photo ready — ~${newKB} KB`;
       btn.disabled = false;
     })
     .catch(err => {
-      status.textContent = '⚠ Could not process image. Try another photo.';
+      status.textContent = '⚠ Could not process image. Try another.';
       btn.disabled = false;
       console.error(err);
     });
 }
 
 // ════════════════════════════════════════════
-//  HEAD DROPDOWN — show/hide "Other" text box
+//  HEAD DROPDOWN — show/hide "Other" box
 // ════════════════════════════════════════════
 function onHeadChange() {
-  const sel   = document.getElementById('head');
   const other = document.getElementById('head_other');
-  if (sel.value === '__other__') {
+  if (document.getElementById('head').value === '__other__') {
     other.style.display = 'block';
     other.focus();
   } else {
@@ -451,28 +498,29 @@ function onHeadChange() {
 //  LOGIN
 // ════════════════════════════════════════════
 function login() {
-  const email    = document.getElementById('userid').value.trim();
-  const password = document.getElementById('password').value.trim();
+  const email = document.getElementById('userid').value.trim();
+  const pwd   = document.getElementById('password').value.trim();
 
-  if (email === 'companyadmin@gmail.com' && password === 'admin@123') {
+  if (email === 'companyadmin@gmail.com' && pwd === 'admin@123') {
     isSuperAdmin = true;
     showPage('superadminPage');
     loadSocieties();
     return;
   }
 
+  // Society login — check email AND password in Firestore
   db.collection('societies')
     .where('email', '==', email)
-    .where('password', '==', password)
+    .where('password', '==', pwd)
     .get()
-    .then(snapshot => {
-      if (snapshot.empty) { alert('Invalid email or password.'); return; }
-      snapshot.forEach(doc => { currentSociety = doc.data().name; });
+    .then(snap => {
+      if (snap.empty) { alert('Invalid email or password.'); return; }
+      snap.forEach(doc => { currentSociety = doc.data().name; });
       isSuperAdmin = false;
       showPage('memberPage');
-      document.getElementById('uploadBtn').style.display = 'block';
-      document.getElementById('memberSocName').innerText = currentSociety;
-      document.getElementById('backBtn').style.display   = 'none';
+      document.getElementById('uploadBtn').style.display    = 'block';
+      document.getElementById('memberSocName').innerText    = currentSociety.toUpperCase();
+      document.getElementById('backBtn').style.display      = 'none';
       loadUploads();
     })
     .catch(err => alert('Error: ' + err.message));
@@ -490,39 +538,72 @@ function showPage(id) {
 
 // ════════════════════════════════════════════
 //  CREATE SOCIETY
+//  Admin enters: name + date + society's real email
+//  Password is auto-generated from the email
 // ════════════════════════════════════════════
 function createSociety() {
-  const name = document.getElementById('socName').value.trim().toLowerCase();
-  const date = document.getElementById('socDate').value;
-  if (!name || !date) { alert('Enter society name and start date.'); return; }
+  const name  = document.getElementById('socName').value.trim();
+  const date  = document.getElementById('socDate').value;
+  const email = document.getElementById('socEmail').value.trim().toLowerCase();
 
-  const rnd      = Math.random().toString(36).substring(2, 6);
-  const userid   = name.substring(0, 3) + rnd;
-  const password = name.substring(0, 4) + '@123';
-  const email    = userid + '@society.com';
+  if (!name || !date || !email) {
+    alert('Please fill:\n• Society Name\n• Start Date\n• Society Email');
+    return;
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    alert('Please enter a valid email address.');
+    return;
+  }
 
-  db.collection('societies').add({ name, date, userid, email, password })
-    .then(() => {
-      alert('Society Created!\n\nEmail:    ' + email + '\nPassword: ' + password);
-      document.getElementById('socName').value = '';
-      document.getElementById('socDate').value = '';
+  // Auto-generate password from email
+  const password = generatePassword(email);
+
+  // Check if email already used
+  db.collection('societies').where('email', '==', email).get()
+    .then(existing => {
+      if (!existing.empty) {
+        alert('This email is already registered for another society!');
+        return;
+      }
+      return db.collection('societies').add({
+        name: name.toLowerCase(),
+        date,
+        email,
+        password
+      });
+    })
+    .then(ref => {
+      if (!ref) return; // was blocked above
+      alert(
+        '✔ Society Created!\n\n' +
+        'Society : ' + name + '\n' +
+        'Email   : ' + email + '\n' +
+        'Password: ' + password + '\n\n' +
+        'Share these login details with the society.'
+      );
+      document.getElementById('socName').value  = '';
+      document.getElementById('socDate').value  = '';
+      document.getElementById('socEmail').value = '';
+      document.getElementById('pwdPreview').textContent = '';
       loadSocieties();
     })
-    .catch(err => alert(err.message));
+    .catch(err => alert('Error: ' + err.message));
 }
 
 // ════════════════════════════════════════════
 //  LOAD SOCIETIES
 // ════════════════════════════════════════════
 function loadSocieties() {
-  db.collection('societies').get().then(snapshot => {
-    if (snapshot.empty) {
-      document.getElementById('societyList').innerHTML = "<div class='empty-state'>No societies yet.</div>";
+  db.collection('societies').get().then(snap => {
+    if (snap.empty) {
+      document.getElementById('societyList').innerHTML =
+        "<div class='empty-state'>No societies yet. Create one above!</div>";
       return;
     }
     let html = '';
-    snapshot.forEach(doc => {
+    snap.forEach(doc => {
       const d = doc.data();
+      // CHANGE 4: society name in ALL CAPS
       html += `
         <div class="card society-card">
           <div>
@@ -530,7 +611,7 @@ function loadSocieties() {
             <div class="uid">${d.email}</div>
           </div>
           <div class="actions">
-            <button class="btn btn-sm btn-export" onclick="exportSocietyData('${d.name}')">⬇ Excel</button>
+            <button class="btn btn-sm btn-export" onclick="exportSocietyData('${d.name}','${doc.id}')">⬇ Excel</button>
             <button class="btn btn-sm btn-open"   onclick="openSociety('${d.name}')">Open</button>
             <button class="btn btn-sm btn-delete" onclick="deleteSociety('${doc.id}')">Delete</button>
           </div>
@@ -541,14 +622,14 @@ function loadSocieties() {
 }
 
 // ════════════════════════════════════════════
-//  OPEN / BACK
+//  OPEN SOCIETY / BACK
 // ════════════════════════════════════════════
 function openSociety(name) {
   currentSociety = name;
   showPage('memberPage');
-  document.getElementById('backBtn').style.display   = 'block';
-  document.getElementById('uploadBtn').style.display = 'none';
-  document.getElementById('memberSocName').innerText = name.toUpperCase();
+  document.getElementById('backBtn').style.display    = 'block';
+  document.getElementById('uploadBtn').style.display  = 'none';   // admin = view only
+  document.getElementById('memberSocName').innerText  = name.toUpperCase();
   loadUploads();
 }
 
@@ -561,56 +642,65 @@ function goBack() {
 }
 
 // ════════════════════════════════════════════
-//  UPLOAD MODAL
+//  UPLOAD MODAL OPEN / CLOSE
 // ════════════════════════════════════════════
 function openUpload() {
   _compressedImg = '';
   document.getElementById('compressStatus').textContent = '';
-  document.getElementById('uploadSubmitBtn').disabled = false;
+  document.getElementById('uploadSubmitBtn').disabled   = false;
   document.getElementById('uploadModal').classList.add('open');
 }
 
 function closeUpload() {
   document.getElementById('uploadModal').classList.remove('open');
-  // Reset form
-  ['date','head','amount','narration'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('head_other').value = '';
+  // Reset all fields
+  ['date', 'amount', 'narration'].forEach(id =>
+    document.getElementById(id).value = '');
+  document.getElementById('head').value           = '';
+  document.getElementById('head_other').value     = '';
   document.getElementById('head_other').style.display = 'none';
-  document.getElementById('photo_camera').value  = '';
-  document.getElementById('photo_gallery').value = '';
+  document.getElementById('photo_camera').value   = '';
+  document.getElementById('photo_gallery').value  = '';
   document.getElementById('compressStatus').textContent = '';
   _compressedImg = '';
 }
 
+// Close modal when tapping outside the box
 document.getElementById('uploadModal').addEventListener('click', function(e) {
   if (e.target === this) closeUpload();
 });
 
 // ════════════════════════════════════════════
-//  SAVE UPLOAD  ← uses pre-compressed image
+//  SAVE UPLOAD
 // ════════════════════════════════════════════
 function saveUpload() {
-  const date      = document.getElementById('date').value;
-  // Get head — if "Other" selected, use typed value
-  const headSel   = document.getElementById('head').value;
-  const head      = headSel === '__other__'
-                    ? document.getElementById('head_other').value.trim()
-                    : headSel;
+  const date = document.getElementById('date').value;
+
+  // Head — use typed value if "Other" selected
+  const headSel = document.getElementById('head').value;
+  const head    = headSel === '__other__'
+                  ? document.getElementById('head_other').value.trim()
+                  : headSel;
+
   const amount    = document.getElementById('amount').value.trim();
   const narration = document.getElementById('narration').value.trim();
 
-  if (!_compressedImg) { alert('Please select a photo first.\n\nTap 📷 Camera or 🖼 Gallery above.'); return; }
-  if (!date || !head || !amount) { alert('Please fill Date, Expense Head and Amount.'); return; }
+  if (!_compressedImg) {
+    alert('Please select a photo first.\nTap 📷 Camera or 🖼 Gallery.');
+    return;
+  }
+  if (!date || !head || !amount) {
+    alert('Please fill:\n• Date\n• Expense Head\n• Amount');
+    return;
+  }
 
   const btn = document.getElementById('uploadSubmitBtn');
   btn.textContent = 'Uploading…';
-  btn.disabled = true;
+  btn.disabled    = true;
 
   db.collection('uploads').add({
     society: currentSociety,
-    image: _compressedImg,
+    image:   _compressedImg,
     date, head, amount, narration,
     timestamp: Date.now()
   })
@@ -618,18 +708,18 @@ function saveUpload() {
     alert('✔ Bill uploaded successfully!');
     closeUpload();
     btn.textContent = 'Upload';
-    btn.disabled = false;
+    btn.disabled    = false;
     loadUploads();
   })
   .catch(err => {
     alert('Upload failed: ' + err.message);
     btn.textContent = 'Upload';
-    btn.disabled = false;
+    btn.disabled    = false;
   });
 }
 
 // ════════════════════════════════════════════
-//  LOAD UPLOADS  (with click-to-enlarge)
+//  LOAD UPLOADS
 // ════════════════════════════════════════════
 function loadUploads() {
   const area  = document.getElementById('uploads');
@@ -639,21 +729,22 @@ function loadUploads() {
   db.collection('uploads')
     .where('society', '==', currentSociety)
     .get()
-    .then(snapshot => {
+    .then(snap => {
       area.innerHTML = '';
-      if (snapshot.empty) { empty.style.display = 'block'; return; }
+      if (snap.empty) { empty.style.display = 'block'; return; }
       empty.style.display = 'none';
 
-      // Sort newest first
       const docs = [];
-      snapshot.forEach(doc => docs.push(doc.data()));
-      docs.sort((a, b) => b.timestamp - a.timestamp);
+      snap.forEach(doc => docs.push(doc.data()));
+      docs.sort((a, b) => b.timestamp - a.timestamp);   // newest first
 
       docs.forEach(u => {
         const div = document.createElement('div');
         div.className = 'card upload-card';
         div.innerHTML = `
-          <img src="${u.image}" alt="Bill" onclick="openLightbox('${u.image}')" title="Click to enlarge">
+          <img src="${u.image}" alt="Bill"
+               onclick="openLightbox('${u.image}')"
+               title="Click to enlarge">
           <div class="detail-row"><span class="label">📅 Date</span><span>${u.date}</span></div>
           <div class="detail-row"><span class="label">🗂 Head</span><span>${u.head}</span></div>
           <div class="detail-row"><span class="label">💰 Amount</span><span>₹${u.amount}</span></div>
@@ -668,7 +759,7 @@ function loadUploads() {
 }
 
 // ════════════════════════════════════════════
-//  LIGHTBOX — click image to enlarge
+//  LIGHTBOX
 // ════════════════════════════════════════════
 function openLightbox(src) {
   document.getElementById('lightbox-img').src = src;
@@ -679,7 +770,7 @@ function openLightbox(src) {
 //  DELETE SOCIETY
 // ════════════════════════════════════════════
 function deleteSociety(docId) {
-  if (!confirm('Delete this society from the list?\n\nUploaded bills will remain in database.')) return;
+  if (!confirm('Delete this society?\n\nUploaded bills remain in database.')) return;
   db.collection('societies').doc(docId).delete()
     .then(() => { alert('Society deleted.'); loadSocieties(); })
     .catch(err => alert(err.message));
@@ -687,66 +778,115 @@ function deleteSociety(docId) {
 
 // ════════════════════════════════════════════
 //  EXPORT TO EXCEL
+//  CHANGE 1: Image link in SAME row as each entry
+//  Each row: Sr | Date | Head | Amount | Narration | Society | View Image
+//  "View Image" column = a data: URL link that
+//  opens directly in any browser — just click it!
+//  Also downloads a companion HTML viewer for
+//  easy browsing of all bill photos.
 // ════════════════════════════════════════════
 function exportSocietyData(societyName) {
   db.collection('uploads')
     .where('society', '==', societyName)
     .get()
-    .then(snapshot => {
-      if (snapshot.empty) { alert('No uploads found for: ' + societyName); return; }
-      const rows = [['Sr No', 'Date', 'Expense Head', 'Amount (₹)', 'Narration', 'Society', 'View Image']];
-      let sr = 1;
-      const docs = [];
-      snapshot.forEach(doc => docs.push(doc.data()));
-      docs.sort((a, b) => a.date > b.date ? 1 : -1);
+    .then(snap => {
+      if (snap.empty) { alert('No uploads found for: ' + societyName); return; }
 
-      // Save images as separate HTML file for viewing, and put links in Excel
-      // Since base64 images can't be clicked directly in Excel, we create
-      // a companion HTML viewer and put a note in the cell
-      docs.forEach(u => {
-        rows.push([sr++, u.date, u.head, u.amount, u.narration || '', u.society, u.image ? 'IMAGE_' + sr : '']);
+      const docs = [];
+      snap.forEach(doc => docs.push(doc.data()));
+      docs.sort((a, b) => a.date > b.date ? 1 : -1);   // sort by date asc
+
+      // ── Step 1: Build Excel rows ──────────────────────────────
+      // "View Image" cell = the data:image/jpeg;base64,... URL
+      // When someone copies this value and pastes in browser address
+      // bar → image opens. Or double-click cell in Excel → nothing
+      // (Excel can't open base64 natively), so we also build an HTML file.
+      //
+      // BETTER approach for Excel: we store a short label "Open_1",
+      // "Open_2" etc. and write a HYPERLINK formula pointing to the
+      // companion HTML file (same folder). User clicks the cell in
+      // Excel → HTML file opens in browser → they see that photo.
+      // ─────────────────────────────────────────────────────────
+      const htmlFileName = societyName + '_images.html';
+
+      const rows = [
+        ['Sr No', 'Date', 'Expense Head', 'Amount (₹)', 'Narration', 'Society', 'View Image (click link)']
+      ];
+
+      docs.forEach((u, i) => {
+        const sr = i + 1;
+        // HYPERLINK formula: clicking opens the HTML file at anchor #img{sr}
+        const linkFormula = u.image
+          ? { f: `HYPERLINK("${htmlFileName}#img${sr}","📷 View Photo ${sr}")` }
+          : '—';
+        rows.push([sr, u.date, u.head, u.amount, u.narration || '', u.society, linkFormula]);
       });
 
+      // ── Step 2: Build Excel workbook ─────────────────────────
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(rows);
-
-      // Add hyperlink-style image viewer: embed all images in a separate sheet
-      const imgRows = [['Sr No', 'Date', 'Head', 'Amount', 'Image (Base64 - copy to browser address bar to view)']];
-      let imgSr = 1;
-      docs.forEach(u => {
-        if (u.image) imgRows.push([imgSr++, u.date, u.head, u.amount, u.image]);
-      });
-
-      ws['!cols'] = [{wch:8},{wch:14},{wch:22},{wch:14},{wch:30},{wch:20},{wch:16}];
+      ws['!cols'] = [
+        {wch:7}, {wch:13}, {wch:22}, {wch:13},
+        {wch:28}, {wch:20}, {wch:22}
+      ];
       XLSX.utils.book_append_sheet(wb, ws, societyName.substring(0, 31));
 
-      // Generate a standalone HTML image viewer file
-      let htmlViewer = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${societyName} — Bill Images</title>
-      <style>body{font-family:sans-serif;background:#f5f5f5;padding:20px}
-      .bill{background:white;border-radius:12px;padding:16px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-      .bill img{width:100%;max-width:500px;border-radius:8px;display:block;margin-top:10px}
-      h1{color:#5a3825}p{margin:4px 0;font-size:.9rem;color:#555}</style></head><body>
-      <h1>📋 ${societyName.toUpperCase()} — Bill Images</h1>`;
-      docs.forEach((u, i) => {
-        if (u.image) {
-          htmlViewer += `<div class="bill"><p><b>Sr:</b> ${i+1} &nbsp; <b>Date:</b> ${u.date} &nbsp; <b>Head:</b> ${u.head} &nbsp; <b>Amount:</b> ₹${u.amount}</p>
-          <p><b>Note:</b> ${u.narration || '—'}</p><img src="${u.image}" alt="Bill"></div>`;
-        }
-      });
-      htmlViewer += '</body></html>';
+      // ── Step 3: Build companion HTML image viewer ─────────────
+      // Each bill gets an anchor #img1, #img2 etc so the Excel
+      // HYPERLINK goes straight to the right photo.
+      let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${societyName.toUpperCase()} — Bill Photos</title>
+<style>
+  body{font-family:sans-serif;background:#f0ece4;margin:0;padding:20px}
+  h1{color:#5a3825;text-align:center;margin-bottom:24px}
+  .bill{background:white;border-radius:14px;padding:18px;margin:18px auto;
+        max-width:560px;box-shadow:0 3px 12px rgba(0,0,0,.1)}
+  .bill img{width:100%;border-radius:10px;margin-top:12px;display:block}
+  .meta{font-size:.9rem;color:#555;margin:3px 0}
+  .meta b{color:#5a3825}
+  .sr{font-size:1.1rem;font-weight:700;color:#8b5e3c;border-bottom:1px solid #e6c9a8;padding-bottom:6px;margin-bottom:8px}
+  .back{display:block;text-align:center;margin-bottom:20px;color:#8b5e3c;font-size:.9rem}
+</style>
+</head>
+<body>
+<h1>📋 ${societyName.toUpperCase()} — Bill Photos</h1>
+<p class="back">Open this file in your browser. Click any link in Excel to jump to that photo.</p>`;
 
-      // Download the HTML viewer
-      const blob = new Blob([htmlViewer], {type: 'text/html'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = societyName + '_bill_images.html';
+      docs.forEach((u, i) => {
+        const sr = i + 1;
+        html += `
+<div class="bill" id="img${sr}">
+  <div class="sr">Sr. ${sr}</div>
+  <div class="meta"><b>Date:</b> ${u.date}</div>
+  <div class="meta"><b>Head:</b> ${u.head}</div>
+  <div class="meta"><b>Amount:</b> ₹${u.amount}</div>
+  <div class="meta"><b>Note:</b> ${u.narration || '—'}</div>
+  ${u.image ? `<img src="${u.image}" alt="Bill Photo ${sr}">` : '<p style="color:#aaa;font-style:italic">No image</p>'}
+</div>`;
+      });
+
+      html += '</body></html>';
+
+      // ── Step 4: Download HTML file first ─────────────────────
+      const blob = new Blob([html], { type: 'text/html' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = htmlFileName;
       a.click();
 
-      // Small delay then download Excel
+      // ── Step 5: Download Excel after short delay ──────────────
       setTimeout(() => {
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(imgRows), 'Image Data');
         XLSX.writeFile(wb, societyName + '_expenses.xlsx');
-      }, 500);
+        alert(
+          '✔ Two files downloaded:\n\n' +
+          '1. ' + societyName + '_expenses.xlsx  ← open in Excel\n' +
+          '2. ' + htmlFileName + '  ← keep in SAME folder as Excel\n\n' +
+          'In Excel, click any "📷 View Photo" link → it opens the image in your browser!'
+        );
+      }, 600);
     })
     .catch(err => alert('Export failed: ' + err.message));
 }
