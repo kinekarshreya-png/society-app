@@ -777,13 +777,20 @@ function deleteSociety(docId) {
 }
 
 // ════════════════════════════════════════════
-//  EXPORT TO EXCEL
-//  CHANGE 1: Image link in SAME row as each entry
-//  Each row: Sr | Date | Head | Amount | Narration | Society | View Image
-//  "View Image" column = a data: URL link that
-//  opens directly in any browser — just click it!
-//  Also downloads a companion HTML viewer for
-//  easy browsing of all bill photos.
+//  EXPORT TO EXCEL + HTML VIEWER
+//
+//  Excel has NO way to show images or open links
+//  without security warnings. So the approach is:
+//
+//  Excel column "View Photo" = plain text "Click Me"
+//  + a separate HTML file is downloaded that has
+//  ALL photos in a clean table — each row matches
+//  the Excel row exactly (same Sr No, Date, Head etc.)
+//  Each photo row has a "Back to List" button.
+//
+//  The HTML file IS the photo viewer. No warnings,
+//  no security prompts, no extra steps. Just open
+//  the HTML file alongside Excel and click away.
 // ════════════════════════════════════════════
 function exportSocietyData(societyName) {
   db.collection('uploads')
@@ -794,99 +801,240 @@ function exportSocietyData(societyName) {
 
       const docs = [];
       snap.forEach(doc => docs.push(doc.data()));
-      docs.sort((a, b) => a.date > b.date ? 1 : -1);   // sort by date asc
+      docs.sort((a, b) => a.date > b.date ? 1 : -1);
 
-      // ── Step 1: Build Excel rows ──────────────────────────────
-      // "View Image" cell = the data:image/jpeg;base64,... URL
-      // When someone copies this value and pastes in browser address
-      // bar → image opens. Or double-click cell in Excel → nothing
-      // (Excel can't open base64 natively), so we also build an HTML file.
-      //
-      // BETTER approach for Excel: we store a short label "Open_1",
-      // "Open_2" etc. and write a HYPERLINK formula pointing to the
-      // companion HTML file (same folder). User clicks the cell in
-      // Excel → HTML file opens in browser → they see that photo.
-      // ─────────────────────────────────────────────────────────
-      const htmlFileName = societyName + '_images.html';
-
+      // ── EXCEL: plain text "Click Me" — no formula, no warning ──
       const rows = [
-        ['Sr No', 'Date', 'Expense Head', 'Amount (₹)', 'Narration', 'Society', 'View Image (click link)']
+        ['Sr No', 'Date', 'Expense Head', 'Amount (₹)', 'Narration', 'Society', 'View Photo']
       ];
-
       docs.forEach((u, i) => {
-        const sr = i + 1;
-        // HYPERLINK formula: clicking opens the HTML file at anchor #img{sr}
-        const linkFormula = u.image
-          ? { f: `HYPERLINK("${htmlFileName}#img${sr}","📷 View Photo ${sr}")` }
-          : '—';
-        rows.push([sr, u.date, u.head, u.amount, u.narration || '', u.society, linkFormula]);
+        rows.push([
+          i + 1,
+          u.date,
+          u.head,
+          u.amount,
+          u.narration || '',
+          u.society,
+          u.image ? 'Click Me' : 'No photo'   // plain text, zero warnings
+        ]);
       });
 
-      // ── Step 2: Build Excel workbook ─────────────────────────
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols'] = [
-        {wch:7}, {wch:13}, {wch:22}, {wch:13},
-        {wch:28}, {wch:20}, {wch:22}
-      ];
+      ws['!cols'] = [{wch:7},{wch:13},{wch:22},{wch:13},{wch:28},{wch:20},{wch:12}];
       XLSX.utils.book_append_sheet(wb, ws, societyName.substring(0, 31));
 
-      // ── Step 3: Build companion HTML image viewer ─────────────
-      // Each bill gets an anchor #img1, #img2 etc so the Excel
-      // HYPERLINK goes straight to the right photo.
-      let html = `<!DOCTYPE html>
+      // ── HTML VIEWER ────────────────────────────────────────────
+      // Layout: left side = scrollable list of all entries as rows
+      //         right side (or overlay) = photo of selected entry
+      //
+      // Actually simpler and more useful:
+      // A clean TABLE matching Excel exactly.
+      // Last column = "Click Me" button for each row.
+      // Clicking opens that photo in an overlay with Back button.
+      // ─────────────────────────────────────────────────────────
+      const htmlFileName = societyName + '_photos.html';
+
+      // Embed all images as JS array so no external files needed
+      let imgArray = 'const IMGS = [
+';
+      docs.forEach(u => {
+        imgArray += '  ' + JSON.stringify(u.image || '') + ',
+';
+      });
+      imgArray += '];';
+
+      let tableRows = '';
+      docs.forEach((u, i) => {
+        tableRows += `
+          <tr id="row${i+1}">
+            <td>${i+1}</td>
+            <td>${u.date}</td>
+            <td>${u.head}</td>
+            <td>₹${u.amount}</td>
+            <td>${u.narration || '—'}</td>
+            <td>${u.society}</td>
+            <td>${u.image
+              ? `<button class="view-btn" onclick="openPhoto(${i})">Click Me</button>`
+              : '<span style="color:#aaa">No photo</span>'}
+            </td>
+          </tr>`;
+      });
+
+      const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>${societyName.toUpperCase()} — Bill Photos</title>
 <style>
-  body{font-family:sans-serif;background:#f0ece4;margin:0;padding:20px}
-  h1{color:#5a3825;text-align:center;margin-bottom:24px}
-  .bill{background:white;border-radius:14px;padding:18px;margin:18px auto;
-        max-width:560px;box-shadow:0 3px 12px rgba(0,0,0,.1)}
-  .bill img{width:100%;border-radius:10px;margin-top:12px;display:block}
-  .meta{font-size:.9rem;color:#555;margin:3px 0}
-  .meta b{color:#5a3825}
-  .sr{font-size:1.1rem;font-weight:700;color:#8b5e3c;border-bottom:1px solid #e6c9a8;padding-bottom:6px;margin-bottom:8px}
-  .back{display:block;text-align:center;margin-bottom:20px;color:#8b5e3c;font-size:.9rem}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:sans-serif;background:#f0ece4;padding:20px;min-height:100vh}
+  h1{color:#5a3825;text-align:center;margin-bottom:6px;font-size:1.4rem}
+  .subtitle{text-align:center;color:#888;font-size:.82rem;margin-bottom:20px}
+
+  /* TABLE */
+  .tbl-wrap{overflow-x:auto;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+  table{width:100%;border-collapse:collapse;background:white;font-size:.88rem}
+  thead th{background:#5a3825;color:white;padding:10px 12px;text-align:left;white-space:nowrap}
+  tbody td{padding:9px 12px;border-bottom:1px solid #e6c9a8;vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover td{background:#fdf8f3}
+  .view-btn{
+    background:#8b5e3c;color:white;border:none;
+    padding:6px 14px;border-radius:8px;cursor:pointer;
+    font-size:.82rem;font-weight:700;white-space:nowrap;
+  }
+  .view-btn:hover{background:#5a3825}
+
+  /* OVERLAY */
+  #overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,0.82);z-index:100;
+    align-items:center;justify-content:center;
+    flex-direction:column;padding:20px;
+  }
+  #overlay.open{display:flex}
+  #overlay-box{
+    background:white;border-radius:16px;
+    width:100%;max-width:520px;max-height:90vh;
+    overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4);
+  }
+  #overlay-head{
+    background:#5a3825;color:white;
+    padding:14px 18px;border-radius:16px 16px 0 0;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  #overlay-head h3{font-size:1rem;margin:0}
+  #back-btn{
+    background:rgba(255,255,255,0.2);color:white;border:none;
+    padding:6px 14px;border-radius:8px;cursor:pointer;
+    font-size:.85rem;font-weight:700;
+  }
+  #back-btn:hover{background:rgba(255,255,255,0.35)}
+  #overlay-body{padding:16px 18px}
+  #overlay-body img{width:100%;border-radius:10px;margin-top:12px;display:block}
+  .o-row{display:flex;gap:8px;padding:5px 0;font-size:.9rem;border-bottom:1px solid #f0ece4}
+  .o-row:last-of-type{border-bottom:none}
+  .o-lbl{font-weight:700;color:#5a3825;min-width:70px}
+  .nav-row{display:flex;gap:8px;padding:14px 18px;border-top:1px solid #f0ece4;justify-content:center}
+  .nav-btn{background:#e6c9a8;color:#5a3825;border:none;padding:7px 16px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.85rem}
+  .nav-btn:hover{background:#c49a6c;color:white}
+  .nav-btn:disabled{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 <body>
 <h1>📋 ${societyName.toUpperCase()} — Bill Photos</h1>
-<p class="back">Open this file in your browser. Click any link in Excel to jump to that photo.</p>`;
+<p class="subtitle">This file matches your Excel exactly. Click "Click Me" on any row to view that bill photo.</p>
 
-      docs.forEach((u, i) => {
-        const sr = i + 1;
-        html += `
-<div class="bill" id="img${sr}">
-  <div class="sr">Sr. ${sr}</div>
-  <div class="meta"><b>Date:</b> ${u.date}</div>
-  <div class="meta"><b>Head:</b> ${u.head}</div>
-  <div class="meta"><b>Amount:</b> ₹${u.amount}</div>
-  <div class="meta"><b>Note:</b> ${u.narration || '—'}</div>
-  ${u.image ? `<img src="${u.image}" alt="Bill Photo ${sr}">` : '<p style="color:#aaa;font-style:italic">No image</p>'}
-</div>`;
-      });
+<div class="tbl-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Sr</th><th>Date</th><th>Expense Head</th>
+        <th>Amount</th><th>Narration</th><th>Society</th><th>Photo</th>
+      </tr>
+    </thead>
+    <tbody>${tableRows}</tbody>
+  </table>
+</div>
 
-      html += '</body></html>';
+<!-- PHOTO OVERLAY -->
+<div id="overlay">
+  <div id="overlay-box">
+    <div id="overlay-head">
+      <h3 id="overlay-title">Bill Photo</h3>
+      <button id="back-btn" onclick="closePhoto()">← Back to List</button>
+    </div>
+    <div id="overlay-body">
+      <div id="overlay-details"></div>
+      <img id="overlay-img" src="" alt="Bill Photo">
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" id="btn-prev" onclick="navPhoto(-1)">◀ Previous</button>
+      <span id="nav-label" style="align-self:center;font-size:.85rem;color:#888"></span>
+      <button class="nav-btn" id="btn-next" onclick="navPhoto(+1)">Next ▶</button>
+    </div>
+  </div>
+</div>
 
-      // ── Step 4: Download HTML file first ─────────────────────
-      const blob = new Blob([html], { type: 'text/html' });
+<script>
+${imgArray}
+
+const DATA = ${repr_data};
+
+let _cur = 0;
+
+function openPhoto(idx) {
+  _cur = idx;
+  renderOverlay();
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('overlay-box').scrollTop = 0;
+}
+
+function closePhoto() {
+  document.getElementById('overlay').classList.remove('open');
+  // scroll Excel-matching row into view
+  const row = document.getElementById('row' + (_cur + 1));
+  if (row) row.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function navPhoto(dir) {
+  _cur = Math.max(0, Math.min(DATA.length - 1, _cur + dir));
+  renderOverlay();
+  document.getElementById('overlay-box').scrollTop = 0;
+}
+
+function renderOverlay() {
+  const u = DATA[_cur];
+  const total = DATA.length;
+  document.getElementById('overlay-title').textContent = 'Sr. ' + (_cur+1) + ' of ' + total;
+  document.getElementById('nav-label').textContent = (_cur+1) + ' / ' + total;
+  document.getElementById('btn-prev').disabled = _cur === 0;
+  document.getElementById('btn-next').disabled = _cur === total - 1;
+  document.getElementById('overlay-details').innerHTML =
+    '<div class="o-row"><span class="o-lbl">📅 Date</span><span>' + u.date + '</span></div>' +
+    '<div class="o-row"><span class="o-lbl">🗂 Head</span><span>' + u.head + '</span></div>' +
+    '<div class="o-row"><span class="o-lbl">💰 Amount</span><span>₹' + u.amount + '</span></div>' +
+    '<div class="o-row"><span class="o-lbl">📝 Note</span><span>' + (u.narration||'—') + '</span></div>';
+  document.getElementById('overlay-img').src = IMGS[_cur] || '';
+}
+
+// Close overlay on background click
+document.getElementById('overlay').addEventListener('click', function(e){
+  if(e.target === this) closePhoto();
+});
+<\/script>
+</body>
+</html>`;
+
+      // Replace placeholder with real data
+      const dataJson = JSON.stringify(docs.map(u => ({
+        date: u.date, head: u.head,
+        amount: u.amount, narration: u.narration || ''
+      })));
+      const finalHtml = html.replace('${repr_data}', dataJson);
+
+      // ── Download HTML first ───────────────────────────────────
+      const blob = new Blob([finalHtml], { type: 'text/html' });
       const a    = document.createElement('a');
       a.href     = URL.createObjectURL(blob);
       a.download = htmlFileName;
       a.click();
 
-      // ── Step 5: Download Excel after short delay ──────────────
+      // ── Download Excel after short delay ─────────────────────
       setTimeout(() => {
         XLSX.writeFile(wb, societyName + '_expenses.xlsx');
         alert(
-          '✔ Two files downloaded:\n\n' +
-          '1. ' + societyName + '_expenses.xlsx  ← open in Excel\n' +
-          '2. ' + htmlFileName + '  ← keep in SAME folder as Excel\n\n' +
-          'In Excel, click any "📷 View Photo" link → it opens the image in your browser!'
+          '✔ Two files downloaded!\n\n' +
+          '1. ' + societyName + '_expenses.xlsx\n' +
+          '   → Your main Excel file\n\n' +
+          '2. ' + htmlFileName + '\n' +
+          '   → Open this in browser\n' +
+          '   → Same rows as Excel\n' +
+          '   → Click "Click Me" to view photo\n' +
+          '   → "← Back to List" returns you to the table'
         );
-      }, 600);
+      }, 700);
     })
     .catch(err => alert('Export failed: ' + err.message));
 }
