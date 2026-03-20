@@ -269,7 +269,7 @@
   <input type="email"    id="userid"   placeholder="Email Address">
   <input type="password" id="password" placeholder="Password"
          onkeydown="if(event.key==='Enter')login()">
-  <button class="btn btn-primary" onclick="login()">Login</button>
+  <button class="btn btn-primary" id="loginBtn" onclick="login()">Login</button>
 </div>
 
 <!-- ════════ SUPER ADMIN ════════ -->
@@ -498,9 +498,12 @@ function onHeadChange() {
 //  LOGIN
 // ════════════════════════════════════════════
 function login() {
-  const email = document.getElementById('userid').value.trim();
+  const email = document.getElementById('userid').value.trim().toLowerCase();
   const pwd   = document.getElementById('password').value.trim();
 
+  if (!email || !pwd) { alert('Please enter email and password.'); return; }
+
+  // Super admin check
   if (email === 'companyadmin@gmail.com' && pwd === 'admin@123') {
     isSuperAdmin = true;
     showPage('superadminPage');
@@ -508,22 +511,77 @@ function login() {
     return;
   }
 
-  // Society login — check email AND password in Firestore
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'Logging in…';
+  btn.disabled = true;
+
+  // Step 1: check by email + password (new societies created with real email)
   db.collection('societies')
     .where('email', '==', email)
     .where('password', '==', pwd)
     .get()
     .then(snap => {
-      if (snap.empty) { alert('Invalid email or password.'); return; }
-      snap.forEach(doc => { currentSociety = doc.data().name; });
-      isSuperAdmin = false;
-      showPage('memberPage');
-      document.getElementById('uploadBtn').style.display    = 'block';
-      document.getElementById('memberSocName').innerText    = currentSociety.toUpperCase();
-      document.getElementById('backBtn').style.display      = 'none';
-      loadUploads();
+      if (!snap.empty) {
+        // Found by email — login success
+        snap.forEach(doc => { currentSociety = doc.data().name; });
+        doSocietyLogin();
+        return;
+      }
+
+      // Step 2: NOT found by email — check old-style fake email
+      // (for societies created before the email update)
+      // Old email format was: xxx####@society.com
+      // Try matching by old email field too
+      return db.collection('societies')
+        .where('password', '==', pwd)
+        .get()
+        .then(snap2 => {
+          let found = false;
+          snap2.forEach(doc => {
+            const d = doc.data();
+            // match if typed email equals stored email (case-insensitive)
+            if (d.email && d.email.toLowerCase() === email) {
+              currentSociety = d.name;
+              found = true;
+            }
+          });
+          if (found) {
+            doSocietyLogin();
+          } else {
+            alert(
+              'Login failed!
+
+' +
+              'Possible reasons:
+' +
+              '• Wrong email or password
+' +
+              '• Society was created with old system
+
+' +
+              'Ask admin to check your login details.'
+            );
+            btn.textContent = 'Login';
+            btn.disabled = false;
+          }
+        });
     })
-    .catch(err => alert('Error: ' + err.message));
+    .catch(err => {
+      alert('Error: ' + err.message);
+      btn.textContent = 'Login';
+      btn.disabled = false;
+    });
+}
+
+function doSocietyLogin() {
+  isSuperAdmin = false;
+  showPage('memberPage');
+  document.getElementById('uploadBtn').style.display = 'block';
+  document.getElementById('memberSocName').innerText = currentSociety.toUpperCase();
+  document.getElementById('backBtn').style.display   = 'none';
+  document.getElementById('loginBtn').textContent    = 'Login';
+  document.getElementById('loginBtn').disabled       = false;
+  loadUploads();
 }
 
 // ════════════════════════════════════════════
