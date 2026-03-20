@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Society Management Portal</title>
+<title>Society Expense Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
   :root {
     --brown-dark: #5a3825;
@@ -15,314 +14,184 @@
     --bg:         #e6c9a8;
     --white:      #ffffff;
     --red:        #c0392b;
-    --red-hover:  #a93226;
     --shadow:     0 10px 30px rgba(90,56,37,0.15);
   }
-
-  * { box-sizing: border-box; }
-
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: 'Lato', sans-serif;
-    margin: 0;
     min-height: 100vh;
     background: var(--bg);
     background-image: radial-gradient(ellipse at top left, #d4a96a 0%, #e6c9a8 50%, #c9a882 100%);
   }
-
   /* ── Pages ── */
   .page {
     display: none;
-    width: 90%;
+    width: 92%;
     max-width: 560px;
-    margin: 50px auto 80px;
+    margin: 44px auto 80px;
     background: var(--white);
-    padding: 32px 28px;
+    padding: 30px 26px;
     border-radius: 20px;
     box-shadow: var(--shadow);
     animation: fadeIn 0.3s ease;
   }
-  @keyframes fadeIn {
-    from { opacity:0; transform:translateY(12px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
   /* ── Typography ── */
-  h2 {
-    font-family: 'Playfair Display', serif;
-    text-align: center;
-    color: var(--brown-dark);
-    margin: 0 0 24px;
-    font-size: 1.7rem;
-  }
-  h3 {
-    font-family: 'Playfair Display', serif;
-    color: var(--brown-dark);
-    margin: 22px 0 10px;
-    font-size: 1.15rem;
-    border-bottom: 2px solid var(--bg);
-    padding-bottom: 6px;
-  }
+  h2 { font-family:'Playfair Display',serif; text-align:center; color:var(--brown-dark); margin-bottom:22px; font-size:1.65rem; }
+  h3 { font-family:'Playfair Display',serif; color:var(--brown-dark); margin:20px 0 10px; font-size:1.1rem; border-bottom:2px solid var(--bg); padding-bottom:5px; }
 
   /* ── Inputs ── */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="date"] {
-    width: 100%;
-    padding: 11px 14px;
-    margin: 6px 0;
-    border-radius: 10px;
-    border: 1.5px solid #ddd;
-    font-family: inherit;
-    font-size: 0.95rem;
-    background: var(--cream);
-    transition: border 0.2s;
-    display: block;
+  input[type=text], input[type=email], input[type=password], input[type=number], input[type=date] {
+    width:100%; padding:11px 14px; margin:5px 0; border-radius:10px;
+    border:1.5px solid #ddd; font-family:inherit; font-size:0.94rem;
+    background:var(--cream); display:block; transition:border .2s;
   }
-  input:focus { outline: none; border-color: var(--brown-light); }
-
-  /* select styled same as input */
+  input:focus { outline:none; border-color:var(--brown-light); }
   select.inp {
-    width: 100%;
-    padding: 11px 14px;
-    margin: 6px 0;
-    border-radius: 10px;
-    border: 1.5px solid #ddd;
-    font-family: inherit;
-    font-size: 0.95rem;
-    background: var(--cream);
-    color: #333;
-    transition: border 0.2s;
-    display: block;
-    appearance: auto;
+    width:100%; padding:11px 14px; margin:5px 0; border-radius:10px;
+    border:1.5px solid #ddd; font-family:inherit; font-size:0.94rem;
+    background:var(--cream); display:block; color:#333;
   }
-  select.inp:focus { outline: none; border-color: var(--brown-light); }
-
-  /* password preview hint */
-  .pwd-hint {
-    font-size: 0.8rem;
-    color: var(--brown-mid);
-    margin: 2px 0 6px 2px;
-    min-height: 18px;
-    font-style: italic;
-  }
+  select.inp:focus { outline:none; border-color:var(--brown-light); }
+  .hint { font-size:0.78rem; color:var(--brown-mid); margin:2px 0 5px 2px; min-height:16px; font-style:italic; }
 
   /* ── Buttons ── */
   .btn {
-    display: inline-block;
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 700;
-    transition: background 0.2s, transform 0.1s;
+    display:inline-block; padding:10px 18px; border-radius:10px;
+    border:none; cursor:pointer; font-family:inherit;
+    font-size:0.9rem; font-weight:700; transition:background .2s, transform .1s;
   }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary {
-    background: var(--brown-mid);
-    color: white;
-    width: 100%;
-    padding: 12px;
-    margin-top: 8px;
-    font-size: 1rem;
-  }
-  .btn-primary:hover { background: var(--brown-dark); }
-  .btn-sm { padding: 7px 14px; font-size: 0.82rem; border-radius: 8px; }
-  .btn-open   { background: var(--brown-mid); color: white; }
-  .btn-open:hover   { background: var(--brown-dark); }
-  .btn-delete { background: var(--red); color: white; }
-  .btn-delete:hover { background: var(--red-hover); }
-  .btn-export { background: #2e7d32; color: white; }
-  .btn-export:hover { background: #1b5e20; }
-  .btn-back {
-    background: transparent;
-    color: var(--brown-mid);
-    border: 1.5px solid var(--brown-mid);
-    margin-bottom: 16px;
-    padding: 8px 16px;
-  }
-  .btn-back:hover { background: var(--brown-mid); color: white; }
+  .btn:active { transform:scale(0.97); }
+  .btn-primary { background:var(--brown-mid); color:white; width:100%; padding:12px; margin-top:8px; font-size:1rem; }
+  .btn-primary:hover { background:var(--brown-dark); }
+  .btn-primary:disabled { background:#bbb; cursor:not-allowed; }
+  .btn-sm { padding:6px 13px; font-size:0.81rem; border-radius:8px; }
+  .btn-open   { background:var(--brown-mid); color:white; }
+  .btn-open:hover   { background:var(--brown-dark); }
+  .btn-delete { background:var(--red); color:white; }
+  .btn-delete:hover { background:#a93226; }
+  .btn-export { background:#2e7d32; color:white; }
+  .btn-export:hover { background:#1b5e20; }
+  .btn-back   { background:transparent; color:var(--brown-mid); border:1.5px solid var(--brown-mid); margin-bottom:14px; padding:7px 15px; }
+  .btn-back:hover { background:var(--brown-mid); color:white; }
 
-  /* camera / gallery split */
-  .photo-btns { display: flex; gap: 10px; margin: 6px 0; }
-  .photo-btns .btn {
-    flex: 1;
-    padding: 11px 8px;
-    font-size: 0.88rem;
-    text-align: center;
-    margin-top: 0;
-    background: var(--brown-mid);
-    color: white;
-    width: auto;
-  }
-  .photo-btns .btn.gallery { background: #6d4c41; }
-  .photo-btns .btn:hover   { background: var(--brown-dark); }
+  /* photo buttons */
+  .photo-btns { display:flex; gap:10px; margin:5px 0; }
+  .photo-btns .btn { flex:1; margin-top:0; background:var(--brown-mid); color:white; padding:11px 8px; font-size:0.87rem; }
+  .photo-btns .btn.gal { background:#6d4c41; }
+  .photo-btns .btn:hover { background:var(--brown-dark); }
 
   /* ── Cards ── */
-  .card {
-    background: var(--cream);
-    padding: 14px 16px;
-    margin: 10px 0;
-    border-radius: 14px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.07);
-  }
-  .society-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .society-card .name { font-weight:700; color:var(--brown-dark); font-size:0.95rem; flex:1; }
-  .society-card .uid  { color:#888; font-size:0.8rem; }
-  .society-card .actions { display:flex; gap:6px; flex-wrap:wrap; }
+  .card { background:var(--cream); padding:13px 15px; margin:9px 0; border-radius:13px; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+  .soc-card { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .soc-card .sname { font-weight:700; color:var(--brown-dark); font-size:0.94rem; flex:1; }
+  .soc-card .semail { color:#888; font-size:0.78rem; }
+  .soc-card .spass  { color:var(--brown-mid); font-size:0.78rem; font-style:italic; }
+  .soc-card .acts   { display:flex; gap:6px; flex-wrap:wrap; }
 
-  .upload-card img {
-    width: 100%;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    max-height: 260px;
-    object-fit: cover;
-    cursor: zoom-in;
-  }
-  .upload-card .detail-row { display:flex; gap:6px; margin:4px 0; font-size:0.9rem; }
-  .upload-card .label { font-weight:700; color:var(--brown-dark); min-width:80px; }
+  .upload-card img { width:100%; border-radius:11px; margin-bottom:9px; max-height:250px; object-fit:cover; cursor:zoom-in; }
+  .drow { display:flex; gap:6px; margin:3px 0; font-size:0.88rem; }
+  .dlbl { font-weight:700; color:var(--brown-dark); min-width:78px; }
 
-  /* ── Society list scroll ── */
-  #societyList { max-height:340px; overflow-y:auto; padding-right:4px; }
-  #societyList::-webkit-scrollbar { width:5px; }
-  #societyList::-webkit-scrollbar-thumb { background:var(--brown-light); border-radius:4px; }
+  /* ── Society list ── */
+  #socList { max-height:340px; overflow-y:auto; padding-right:3px; }
+  #socList::-webkit-scrollbar { width:4px; }
+  #socList::-webkit-scrollbar-thumb { background:var(--brown-light); border-radius:4px; }
 
-  /* ── FAB Upload Button ── */
+  /* ── FAB ── */
   #uploadBtn {
-    position: fixed;
-    bottom: 28px; right: 28px;
-    background: var(--brown-mid);
-    width: 58px; height: 58px;
-    border-radius: 50%;
-    font-size: 30px;
-    color: white;
-    border: none;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
-    cursor: pointer;
-    display: none;
-    transition: background 0.2s, transform 0.2s;
-    line-height: 1;
+    position:fixed; bottom:26px; right:26px;
+    background:var(--brown-mid); width:56px; height:56px;
+    border-radius:50%; font-size:28px; color:white; border:none;
+    box-shadow:0 5px 16px rgba(0,0,0,.28); cursor:pointer; display:none;
+    transition:background .2s, transform .2s; line-height:1;
   }
   #uploadBtn:hover { background:var(--brown-dark); transform:scale(1.08) rotate(45deg); }
 
-  /* ── Upload Modal ── */
+  /* ── Modal ── */
   #uploadModal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.46); z-index:100;
+    align-items:center; justify-content:center;
   }
   #uploadModal.open { display:flex; }
-  #uploadModal .modal-box {
-    background: white;
-    border-radius: 20px;
-    padding: 28px 26px;
-    width: 90%;
-    max-width: 440px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-    animation: fadeIn 0.25s ease;
+  .modal-box {
+    background:white; border-radius:18px; padding:26px 24px;
+    width:92%; max-width:430px; max-height:92vh; overflow-y:auto;
+    box-shadow:0 18px 50px rgba(0,0,0,.25); animation:fadeIn .22s ease;
   }
-  #uploadModal h3 { margin-top:0; border:none; }
-  .modal-close { float:right; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#888; line-height:1; }
-  .modal-close:hover { color:var(--brown-dark); }
+  .modal-box h3 { margin-top:0; border:none; }
+  .mclose { float:right; background:none; border:none; font-size:1.35rem; cursor:pointer; color:#888; }
+  .mclose:hover { color:var(--brown-dark); }
 
-  /* ── Status / compress ── */
-  #compressStatus { font-size:0.8rem; color:var(--brown-mid); margin-top:4px; min-height:18px; }
+  /* ── Status ── */
+  #compStat { font-size:0.78rem; color:var(--brown-mid); margin-top:3px; min-height:16px; }
 
   /* ── Lightbox ── */
-  #lightbox {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.88);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    cursor: zoom-out;
-  }
+  #lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:200; align-items:center; justify-content:center; cursor:zoom-out; }
   #lightbox.open { display:flex; }
-  #lightbox img { max-width:94vw; max-height:90vh; border-radius:10px; box-shadow:0 0 40px rgba(0,0,0,.5); }
+  #lightbox img { max-width:94vw; max-height:90vh; border-radius:10px; }
 
-  /* ── Empty state ── */
-  .empty-state { text-align:center; color:#aaa; padding:30px 0; font-style:italic; }
+  /* ── Misc ── */
+  .empty { text-align:center; color:#aaa; padding:28px 0; font-style:italic; }
+  .err   { color:var(--red); font-size:0.82rem; text-align:center; margin-top:6px; min-height:18px; }
 </style>
 </head>
 <body>
 
-<!-- ════════ LOGIN ════════ -->
-<div class="page" id="loginPage" style="display:block;">
+<!-- ══ LOGIN ══ -->
+<div class="page" id="pgLogin" style="display:block">
   <h2>🏘️ Society Expense Portal</h2>
-  <input type="email"    id="userid"   placeholder="Email Address">
-  <input type="password" id="password" placeholder="Password"
+  <input type="email"    id="inEmail" placeholder="Email Address" autocomplete="username">
+  <input type="password" id="inPass"  placeholder="Password" autocomplete="current-password"
          onkeydown="if(event.key==='Enter')login()">
+  <div class="err" id="loginErr"></div>
   <button class="btn btn-primary" id="loginBtn" onclick="login()">Login</button>
 </div>
 
-<!-- ════════ SUPER ADMIN ════════ -->
-<div class="page" id="superadminPage">
+<!-- ══ SUPER ADMIN ══ -->
+<div class="page" id="pgAdmin">
   <h2>Super Admin Dashboard</h2>
 
   <h3>➕ Create New Society</h3>
+  <input type="text"  id="cName"  placeholder="Society Name  (e.g. Sunrise Apartments)" oninput="showPwdHint()">
+  <input type="email" id="cEmail" placeholder="Society Email  (e.g. sunrise@gmail.com)">
+  <input type="date"  id="cDate">
+  <div class="hint" id="pwdHint"></div>
+  <button class="btn btn-primary" id="createBtn" onclick="createSociety()">Create Society</button>
 
-  <input type="text"  id="socName"  placeholder="Society Name (e.g. Sunrise Apartments)" oninput="previewPassword()">
-  <input type="date"  id="socDate"  placeholder="Start Date">
-
-  <!-- CHANGE 2: Admin enters real society email; password is auto-generated -->
-  <input type="email" id="socEmail" placeholder="Society Email (e.g. sunrise@gmail.com)">
-  <div class="pwd-hint" id="pwdPreview"></div>
-
-  <button class="btn btn-primary" onclick="createSociety()">Create Society</button>
-
-  <h3>🏢 Existing Societies</h3>
-  <div id="societyList"></div>
+  <h3>🏢 All Societies</h3>
+  <div id="socList"><div class="empty">Loading…</div></div>
 </div>
 
-<!-- ════════ MEMBER / SOCIETY VIEW ════════ -->
-<div class="page" id="memberPage">
-  <button class="btn btn-back" id="backBtn" style="display:none;" onclick="goBack()">← Back</button>
-  <h2 id="memberSocName"></h2>
+<!-- ══ SOCIETY VIEW ══ -->
+<div class="page" id="pgSociety">
+  <button class="btn btn-back" id="backBtn" style="display:none" onclick="goBack()">← Back</button>
+  <h2 id="socTitle"></h2>
   <div id="uploads"></div>
-  <div id="uploadsEmpty" class="empty-state" style="display:none;">No bills uploaded yet.</div>
+  <div class="empty" id="emptyMsg" style="display:none">No bills uploaded yet.</div>
 </div>
 
-<!-- ════════ FLOATING UPLOAD BUTTON ════════ -->
-<button id="uploadBtn" onclick="openUpload()">+</button>
+<!-- ══ FAB ══ -->
+<button id="uploadBtn" onclick="openModal()">+</button>
 
-<!-- ════════ UPLOAD MODAL ════════ -->
+<!-- ══ UPLOAD MODAL ══ -->
 <div id="uploadModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeUpload()">✕</button>
+    <button class="mclose" onclick="closeModal()">✕</button>
     <h3>📎 Upload Bill / Voucher</h3>
 
-    <!-- CHANGE 1: Camera / Gallery buttons -->
     <div class="photo-btns">
-      <button type="button" class="btn" onclick="document.getElementById('photo_camera').click()">📷 Camera</button>
-      <button type="button" class="btn gallery"  onclick="document.getElementById('photo_gallery').click()">🖼 Gallery</button>
+      <button type="button" class="btn" onclick="document.getElementById('camInput').click()">📷 Camera</button>
+      <button type="button" class="btn gal" onclick="document.getElementById('galInput').click()">🖼 Gallery</button>
     </div>
-    <!-- capture=environment → opens rear camera directly on mobile -->
-    <input type="file" id="photo_camera"  accept="image/*" capture="environment" style="display:none" onchange="onPhotoSelected(this)">
-    <!-- no capture → opens gallery / file picker -->
-    <input type="file" id="photo_gallery" accept="image/*"                        style="display:none" onchange="onPhotoSelected(this)">
-    <div id="compressStatus"></div>
+    <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none" onchange="onPhoto(this)">
+    <input type="file" id="galInput" accept="image/*"                        style="display:none" onchange="onPhoto(this)">
+    <div id="compStat"></div>
 
-    <input type="date" id="date">
-
-    <!-- CHANGE: Head dropdown with 19 options + Other -->
-    <select class="inp" id="head" onchange="onHeadChange()">
+    <input type="date"   id="uDate">
+    <select class="inp"  id="uHead" onchange="headChange()">
       <option value="">-- Select Expense Head --</option>
       <option>Electricity</option>
       <option>Water Charges</option>
@@ -343,109 +212,285 @@
       <option>Telephone / Internet</option>
       <option>Conveyance</option>
       <option>Miscellaneous</option>
-      <option value="__other__">Other (type below)</option>
+      <option value="__other">Other (type below)</option>
     </select>
-    <!-- shown only when Other is picked -->
-    <input type="text" id="head_other" placeholder="Type expense head name" style="display:none;">
+    <input type="text" id="uHeadOther" placeholder="Type expense head" style="display:none">
 
-    <input type="number" id="amount"    placeholder="Amount (₹)">
-    <input type="text"   id="narration" placeholder="Short Narration (optional)">
+    <input type="number" id="uAmt"  placeholder="Amount (₹)">
+    <input type="text"   id="uNarr" placeholder="Narration (optional)">
 
-    <button class="btn btn-primary" id="uploadSubmitBtn" onclick="saveUpload()" style="margin-top:14px;">
-      Upload
-    </button>
+    <button class="btn btn-primary" id="saveBtn" onclick="saveUpload()">Upload</button>
   </div>
 </div>
 
-<!-- ════════ IMAGE LIGHTBOX ════════ -->
+<!-- ══ LIGHTBOX ══ -->
 <div id="lightbox" onclick="this.classList.remove('open')">
-  <img id="lightbox-img" src="" alt="Bill">
+  <img id="lbImg" src="" alt="Bill">
 </div>
 
-<!-- ════════ SCRIPTS ════════ -->
+<!-- ══ SCRIPTS ══ -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-// ════════════════════════════════════════════
-//  FIREBASE CONFIG — DO NOT CHANGE
-// ════════════════════════════════════════════
-const firebaseConfig = {
+// ══════════════════════════════════════════
+//  FIREBASE — DO NOT CHANGE
+// ══════════════════════════════════════════
+firebase.initializeApp({
   apiKey:            "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
   authDomain:        "society-management-d19f9.firebaseapp.com",
   projectId:         "society-management-d19f9",
   storageBucket:     "society-management-d19f9.firebasestorage.app",
   messagingSenderId: "145344389199",
   appId:             "1:145344389199:web:a32affa5732fc825460a3a"
-};
-firebase.initializeApp(firebaseConfig);
+});
 const db = firebase.firestore();
 
-let currentSociety = null;
-let isSuperAdmin   = false;
-let _compressedImg = '';   // compressed image ready to save
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let curSociety  = null;
+let isAdmin     = false;
+let _img        = '';     // compressed image ready to save
 
-// ════════════════════════════════════════════
-//  PASSWORD AUTO-GENERATOR
-//  Takes the email entered by admin, makes a
-//  simple memorable password from it
-//  e.g. sunrise@gmail.com → Sunrise@2025
-// ════════════════════════════════════════════
-function generatePassword(socName) {
-  if (!socName) return '';
-  // Take first 4 letters of society name, lowercase, + @123
-  // e.g. "Sunrise Apartments" → "sunr@123"
-  const clean = socName.trim().toLowerCase().replace(/[^a-z]/g, ''); // letters only
-  const part  = clean.substring(0, 4);                               // first 4 letters
-  return part + '@123';
+// ══════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════
+function showPage(id) {
+  ['pgLogin','pgAdmin','pgSociety'].forEach(p =>
+    document.getElementById(p).style.display = 'none'
+  );
+  document.getElementById(id).style.display = 'block';
 }
 
-// Show preview under the email field as admin types
-function previewPassword() {
-  const name = document.getElementById('socName').value.trim();
-  const hint = document.getElementById('pwdPreview');
-  if (name.length >= 1) {
-    hint.textContent = '🔑 Auto password will be: ' + generatePassword(name);
-  } else {
-    hint.textContent = '';
+// Password = first 4 letters of society name (lowercase) + @123
+// e.g. "Sunrise Apartments" → "sunr@123"
+function makePwd(name) {
+  const clean = name.trim().toLowerCase().replace(/[^a-z]/g, '');
+  return clean.substring(0, 4) + '@123';
+}
+
+function showPwdHint() {
+  const name = document.getElementById('cName').value.trim();
+  const hint = document.getElementById('pwdHint');
+  hint.textContent = name.length > 0
+    ? '🔑 Password will be: ' + makePwd(name)
+    : '';
+}
+
+// ══════════════════════════════════════════
+//  LOGIN
+//  Superadmin: hardcoded check (no Firestore)
+//  Society:    check Firestore societies collection
+// ══════════════════════════════════════════
+function login() {
+  const email = document.getElementById('inEmail').value.trim().toLowerCase();
+  const pwd   = document.getElementById('inPass').value.trim();
+  const err   = document.getElementById('loginErr');
+  const btn   = document.getElementById('loginBtn');
+  err.textContent = '';
+
+  if (!email || !pwd) {
+    err.textContent = 'Please enter email and password.';
+    return;
   }
+
+  // ── Superadmin — no Firestore needed ──
+  if (email === 'companyadmin@gmail.com' && pwd === 'admin@123') {
+    isAdmin = true;
+    showPage('pgAdmin');
+    loadSocieties();
+    return;
+  }
+
+  // ── Society login ──
+  btn.textContent = 'Logging in…';
+  btn.disabled    = true;
+
+  db.collection('societies')
+    .where('email', '==', email)
+    .where('password', '==', pwd)
+    .get()
+    .then(snap => {
+      btn.textContent = 'Login';
+      btn.disabled    = false;
+
+      if (snap.empty) {
+        err.textContent = 'Wrong email or password. Check with your admin.';
+        return;
+      }
+
+      snap.forEach(doc => { curSociety = doc.data().name; });
+      isAdmin = false;
+      showPage('pgSociety');
+      document.getElementById('uploadBtn').style.display   = 'block';
+      document.getElementById('socTitle').textContent      = curSociety.toUpperCase();
+      document.getElementById('backBtn').style.display     = 'none';
+      loadUploads();
+    })
+    .catch(err2 => {
+      btn.textContent = 'Login';
+      btn.disabled    = false;
+      err.textContent = 'Error: ' + err2.message;
+    });
 }
 
-// ════════════════════════════════════════════
+// ══════════════════════════════════════════
+//  CREATE SOCIETY
+// ══════════════════════════════════════════
+function createSociety() {
+  const name  = document.getElementById('cName').value.trim();
+  const email = document.getElementById('cEmail').value.trim().toLowerCase();
+  const date  = document.getElementById('cDate').value;
+  const btn   = document.getElementById('createBtn');
+
+  if (!name || !email || !date) {
+    alert('Please fill:\n• Society Name\n• Society Email\n• Start Date');
+    return;
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  const password = makePwd(name);
+
+  btn.textContent = 'Creating…';
+  btn.disabled    = true;
+
+  // Check if email already exists
+  db.collection('societies').where('email', '==', email).get()
+    .then(existing => {
+      if (!existing.empty) {
+        alert('This email is already used for another society!');
+        btn.textContent = 'Create Society';
+        btn.disabled    = false;
+        return;
+      }
+
+      return db.collection('societies').add({ name: name.toLowerCase(), email, password, date });
+    })
+    .then(ref => {
+      if (!ref) return;
+      btn.textContent = 'Create Society';
+      btn.disabled    = false;
+      alert(
+        '✔ Society Created!\n\n' +
+        'Name    : ' + name + '\n' +
+        'Email   : ' + email + '\n' +
+        'Password: ' + password + '\n\n' +
+        'Share these details with the society.'
+      );
+      document.getElementById('cName').value  = '';
+      document.getElementById('cEmail').value = '';
+      document.getElementById('cDate').value  = '';
+      document.getElementById('pwdHint').textContent = '';
+      loadSocieties();
+    })
+    .catch(e => {
+      alert('Error: ' + e.message);
+      btn.textContent = 'Create Society';
+      btn.disabled    = false;
+    });
+}
+
+// ══════════════════════════════════════════
+//  LOAD SOCIETIES LIST
+// ══════════════════════════════════════════
+function loadSocieties() {
+  const list = document.getElementById('socList');
+  list.innerHTML = "<div class='empty'>Loading…</div>";
+
+  db.collection('societies').get()
+    .then(snap => {
+      if (snap.empty) {
+        list.innerHTML = "<div class='empty'>No societies yet. Create one above!</div>";
+        return;
+      }
+      let html = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        html += `
+          <div class="card soc-card">
+            <div>
+              <div class="sname">${d.name.toUpperCase()}</div>
+              <div class="semail">${d.email}</div>
+              <div class="spass">Password: ${d.password}</div>
+            </div>
+            <div class="acts">
+              <button class="btn btn-sm btn-export" onclick="exportData('${d.name}')">⬇ Excel</button>
+              <button class="btn btn-sm btn-open"   onclick="openSociety('${d.name}')">Open</button>
+              <button class="btn btn-sm btn-delete" onclick="delSociety('${doc.id}')">Delete</button>
+            </div>
+          </div>`;
+      });
+      list.innerHTML = html;
+    })
+    .catch(e => {
+      list.innerHTML = "<div class='empty'>Error loading. Refresh page.</div>";
+    });
+}
+
+// ══════════════════════════════════════════
+//  OPEN SOCIETY (admin view)
+// ══════════════════════════════════════════
+function openSociety(name) {
+  curSociety = name;
+  showPage('pgSociety');
+  document.getElementById('backBtn').style.display    = 'block';
+  document.getElementById('uploadBtn').style.display  = 'none';
+  document.getElementById('socTitle').textContent     = name.toUpperCase();
+  loadUploads();
+}
+
+function goBack() {
+  curSociety = null;
+  document.getElementById('uploads').innerHTML = '';
+  showPage('pgAdmin');
+  document.getElementById('uploadBtn').style.display = 'none';
+  loadSocieties();
+}
+
+// ══════════════════════════════════════════
+//  DELETE SOCIETY
+// ══════════════════════════════════════════
+function delSociety(id) {
+  if (!confirm('Delete this society?\nUploaded bills will stay in database.')) return;
+  db.collection('societies').doc(id).delete()
+    .then(() => { alert('Society deleted.'); loadSocieties(); })
+    .catch(e => alert('Error: ' + e.message));
+}
+
+// ══════════════════════════════════════════
 //  IMAGE COMPRESSION
-//  Resizes to max 900px, JPEG quality stepped
-//  down until safely under 700KB
-// ════════════════════════════════════════════
+//  Max 900px wide, JPEG quality stepped down
+//  until safely under 700KB
+// ══════════════════════════════════════════
 function compressImage(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.onerror = () => reject(new Error('Cannot read file'));
     reader.onload  = e => {
       const img = new Image();
-      img.onerror = () => reject(new Error('Could not load image'));
+      img.onerror = () => reject(new Error('Cannot load image'));
       img.onload  = () => {
-        const MAX_W = 900;
+        const MAX = 900;
         let w = img.width, h = img.height;
-        if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
 
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
 
-        const SAFE = 700 * 1024;   // 700 KB in base64 chars
-        let data = canvas.toDataURL('image/jpeg', 0.60);
-        if (data.length > SAFE) data = canvas.toDataURL('image/jpeg', 0.40);
-        if (data.length > SAFE) data = canvas.toDataURL('image/jpeg', 0.25);
+        const SAFE = 700 * 1024;
+        let data = cv.toDataURL('image/jpeg', 0.60);
+        if (data.length > SAFE) data = cv.toDataURL('image/jpeg', 0.40);
+        if (data.length > SAFE) data = cv.toDataURL('image/jpeg', 0.25);
         if (data.length > SAFE) {
-          // Last resort — shrink to 600px
-          const c2 = document.createElement('canvas');
-          const r  = 600 / w;
-          c2.width  = 600;
-          c2.height = Math.round(h * r);
-          c2.getContext('2d').drawImage(canvas, 0, 0, c2.width, c2.height);
-          data = c2.toDataURL('image/jpeg', 0.30);
+          const cv2 = document.createElement('canvas');
+          cv2.width = 600; cv2.height = Math.round(h * 600 / w);
+          cv2.getContext('2d').drawImage(cv, 0, 0, cv2.width, cv2.height);
+          data = cv2.toDataURL('image/jpeg', 0.30);
         }
         resolve(data);
       };
@@ -455,37 +500,32 @@ function compressImage(file) {
   });
 }
 
-// Called when user picks a photo — compress immediately
-function onPhotoSelected(input) {
+function onPhoto(input) {
   const file = input.files[0];
   if (!file) return;
-  const status = document.getElementById('compressStatus');
-  const btn    = document.getElementById('uploadSubmitBtn');
-  const origKB = (file.size / 1024).toFixed(0);
-  status.textContent = `⏳ Compressing photo (${origKB} KB)…`;
+  const stat = document.getElementById('compStat');
+  const btn  = document.getElementById('saveBtn');
+  stat.textContent = '⏳ Compressing (' + (file.size/1024).toFixed(0) + ' KB)…';
   btn.disabled = true;
-  _compressedImg = '';
-
+  _img = '';
   compressImage(file)
     .then(data => {
-      _compressedImg = data;
-      const newKB = Math.round(data.length * 0.75 / 1024);
-      status.textContent = `✔ Photo ready — ~${newKB} KB`;
+      _img = data;
+      stat.textContent = '✔ Photo ready — ~' + Math.round(data.length * 0.75 / 1024) + ' KB';
       btn.disabled = false;
     })
-    .catch(err => {
-      status.textContent = '⚠ Could not process image. Try another.';
+    .catch(() => {
+      stat.textContent = '⚠ Could not process image. Try another.';
       btn.disabled = false;
-      console.error(err);
     });
 }
 
-// ════════════════════════════════════════════
-//  HEAD DROPDOWN — show/hide "Other" box
-// ════════════════════════════════════════════
-function onHeadChange() {
-  const other = document.getElementById('head_other');
-  if (document.getElementById('head').value === '__other__') {
+// ══════════════════════════════════════════
+//  HEAD DROPDOWN
+// ══════════════════════════════════════════
+function headChange() {
+  const other = document.getElementById('uHeadOther');
+  if (document.getElementById('uHead').value === '__other') {
     other.style.display = 'block';
     other.focus();
   } else {
@@ -494,298 +534,81 @@ function onHeadChange() {
   }
 }
 
-// ════════════════════════════════════════════
-//  LOGIN
-// ════════════════════════════════════════════
-function login() {
-  const email = document.getElementById('userid').value.trim().toLowerCase();
-  const pwd   = document.getElementById('password').value.trim();
-
-  if (!email || !pwd) { alert('Please enter email and password.'); return; }
-
-  // Super admin check
-  if (email === 'companyadmin@gmail.com' && pwd === 'admin@123') {
-    isSuperAdmin = true;
-    showPage('superadminPage');
-    loadSocieties();
-    return;
-  }
-
-  const btn = document.getElementById('loginBtn');
-  btn.textContent = 'Logging in…';
-  btn.disabled = true;
-
-  // Step 1: check by email + password (new societies created with real email)
-  db.collection('societies')
-    .where('email', '==', email)
-    .where('password', '==', pwd)
-    .get()
-    .then(snap => {
-      if (!snap.empty) {
-        // Found by email — login success
-        snap.forEach(doc => { currentSociety = doc.data().name; });
-        doSocietyLogin();
-        return;
-      }
-
-      // Step 2: NOT found by email — check old-style fake email
-      // (for societies created before the email update)
-      // Old email format was: xxx####@society.com
-      // Try matching by old email field too
-      return db.collection('societies')
-        .where('password', '==', pwd)
-        .get()
-        .then(snap2 => {
-          let found = false;
-          snap2.forEach(doc => {
-            const d = doc.data();
-            // match if typed email equals stored email (case-insensitive)
-            if (d.email && d.email.toLowerCase() === email) {
-              currentSociety = d.name;
-              found = true;
-            }
-          });
-          if (found) {
-            doSocietyLogin();
-          } else {
-            alert(
-              'Login failed!
-
-' +
-              'Possible reasons:
-' +
-              '• Wrong email or password
-' +
-              '• Society was created with old system
-
-' +
-              'Ask admin to check your login details.'
-            );
-            btn.textContent = 'Login';
-            btn.disabled = false;
-          }
-        });
-    })
-    .catch(err => {
-      alert('Error: ' + err.message);
-      btn.textContent = 'Login';
-      btn.disabled = false;
-    });
-}
-
-function doSocietyLogin() {
-  isSuperAdmin = false;
-  showPage('memberPage');
-  document.getElementById('uploadBtn').style.display = 'block';
-  document.getElementById('memberSocName').innerText = currentSociety.toUpperCase();
-  document.getElementById('backBtn').style.display   = 'none';
-  document.getElementById('loginBtn').textContent    = 'Login';
-  document.getElementById('loginBtn').disabled       = false;
-  loadUploads();
-}
-
-// ════════════════════════════════════════════
-//  PAGE HELPER
-// ════════════════════════════════════════════
-function showPage(id) {
-  ['loginPage', 'superadminPage', 'memberPage'].forEach(p => {
-    document.getElementById(p).style.display = 'none';
-  });
-  document.getElementById(id).style.display = 'block';
-}
-
-// ════════════════════════════════════════════
-//  CREATE SOCIETY
-//  Admin enters: name + date + society's real email
-//  Password is auto-generated from the email
-// ════════════════════════════════════════════
-function createSociety() {
-  const name  = document.getElementById('socName').value.trim();
-  const date  = document.getElementById('socDate').value;
-  const email = document.getElementById('socEmail').value.trim().toLowerCase();
-
-  if (!name || !date || !email) {
-    alert('Please fill:\n• Society Name\n• Start Date\n• Society Email');
-    return;
-  }
-  if (!email.includes('@') || !email.includes('.')) {
-    alert('Please enter a valid email address.');
-    return;
-  }
-
-  // Auto-generate password from email
-  const password = generatePassword(name);
-
-  // Check if email already used
-  db.collection('societies').where('email', '==', email).get()
-    .then(existing => {
-      if (!existing.empty) {
-        alert('This email is already registered for another society!');
-        return;
-      }
-      return db.collection('societies').add({
-        name: name.toLowerCase(),
-        date,
-        email,
-        password
-      });
-    })
-    .then(ref => {
-      if (!ref) return; // was blocked above
-      alert(
-        '✔ Society Created!\n\n' +
-        'Society : ' + name + '\n' +
-        'Email   : ' + email + '\n' +
-        'Password: ' + password + '\n\n' +
-        'Share these login details with the society.'
-      );
-      document.getElementById('socName').value  = '';
-      document.getElementById('socDate').value  = '';
-      document.getElementById('socEmail').value = '';
-      document.getElementById('pwdPreview').textContent = '';
-      loadSocieties();
-    })
-    .catch(err => alert('Error: ' + err.message));
-}
-
-// ════════════════════════════════════════════
-//  LOAD SOCIETIES
-// ════════════════════════════════════════════
-function loadSocieties() {
-  db.collection('societies').get().then(snap => {
-    if (snap.empty) {
-      document.getElementById('societyList').innerHTML =
-        "<div class='empty-state'>No societies yet. Create one above!</div>";
-      return;
-    }
-    let html = '';
-    snap.forEach(doc => {
-      const d = doc.data();
-      // CHANGE 4: society name in ALL CAPS
-      html += `
-        <div class="card society-card">
-          <div>
-            <div class="name">${d.name.toUpperCase()}</div>
-            <div class="uid">${d.email}</div>
-          </div>
-          <div class="actions">
-            <button class="btn btn-sm btn-export" onclick="exportSocietyData('${d.name}','${doc.id}')">⬇ Excel</button>
-            <button class="btn btn-sm btn-open"   onclick="openSociety('${d.name}')">Open</button>
-            <button class="btn btn-sm btn-delete" onclick="deleteSociety('${doc.id}')">Delete</button>
-          </div>
-        </div>`;
-    });
-    document.getElementById('societyList').innerHTML = html;
-  });
-}
-
-// ════════════════════════════════════════════
-//  OPEN SOCIETY / BACK
-// ════════════════════════════════════════════
-function openSociety(name) {
-  currentSociety = name;
-  showPage('memberPage');
-  document.getElementById('backBtn').style.display    = 'block';
-  document.getElementById('uploadBtn').style.display  = 'none';   // admin = view only
-  document.getElementById('memberSocName').innerText  = name.toUpperCase();
-  loadUploads();
-}
-
-function goBack() {
-  currentSociety = null;
-  document.getElementById('uploads').innerHTML = '';
-  showPage('superadminPage');
-  document.getElementById('uploadBtn').style.display = 'none';
-  loadSocieties();
-}
-
-// ════════════════════════════════════════════
-//  UPLOAD MODAL OPEN / CLOSE
-// ════════════════════════════════════════════
-function openUpload() {
-  _compressedImg = '';
-  document.getElementById('compressStatus').textContent = '';
-  document.getElementById('uploadSubmitBtn').disabled   = false;
+// ══════════════════════════════════════════
+//  UPLOAD MODAL
+// ══════════════════════════════════════════
+function openModal() {
+  _img = '';
+  document.getElementById('compStat').textContent = '';
+  document.getElementById('saveBtn').disabled     = false;
   document.getElementById('uploadModal').classList.add('open');
 }
 
-function closeUpload() {
+function closeModal() {
   document.getElementById('uploadModal').classList.remove('open');
-  // Reset all fields
-  ['date', 'amount', 'narration'].forEach(id =>
+  ['uDate','uAmt','uNarr','uHeadOther'].forEach(id =>
     document.getElementById(id).value = '');
-  document.getElementById('head').value           = '';
-  document.getElementById('head_other').value     = '';
-  document.getElementById('head_other').style.display = 'none';
-  document.getElementById('photo_camera').value   = '';
-  document.getElementById('photo_gallery').value  = '';
-  document.getElementById('compressStatus').textContent = '';
-  _compressedImg = '';
+  document.getElementById('uHead').value          = '';
+  document.getElementById('uHeadOther').style.display = 'none';
+  document.getElementById('camInput').value       = '';
+  document.getElementById('galInput').value       = '';
+  document.getElementById('compStat').textContent = '';
+  document.getElementById('saveBtn').textContent  = 'Upload';
+  _img = '';
 }
 
-// Close modal when tapping outside the box
 document.getElementById('uploadModal').addEventListener('click', function(e) {
-  if (e.target === this) closeUpload();
+  if (e.target === this) closeModal();
 });
 
-// ════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  SAVE UPLOAD
-// ════════════════════════════════════════════
+// ══════════════════════════════════════════
 function saveUpload() {
-  const date = document.getElementById('date').value;
+  const date  = document.getElementById('uDate').value;
+  const hSel  = document.getElementById('uHead').value;
+  const head  = hSel === '__other'
+                ? document.getElementById('uHeadOther').value.trim()
+                : hSel;
+  const amt   = document.getElementById('uAmt').value.trim();
+  const narr  = document.getElementById('uNarr').value.trim();
+  const btn   = document.getElementById('saveBtn');
 
-  // Head — use typed value if "Other" selected
-  const headSel = document.getElementById('head').value;
-  const head    = headSel === '__other__'
-                  ? document.getElementById('head_other').value.trim()
-                  : headSel;
+  if (!_img)       { alert('Please select a photo first.\nTap 📷 Camera or 🖼 Gallery.'); return; }
+  if (!date)       { alert('Please select a date.'); return; }
+  if (!head)       { alert('Please select an expense head.'); return; }
+  if (!amt)        { alert('Please enter the amount.'); return; }
 
-  const amount    = document.getElementById('amount').value.trim();
-  const narration = document.getElementById('narration').value.trim();
-
-  if (!_compressedImg) {
-    alert('Please select a photo first.\nTap 📷 Camera or 🖼 Gallery.');
-    return;
-  }
-  if (!date || !head || !amount) {
-    alert('Please fill:\n• Date\n• Expense Head\n• Amount');
-    return;
-  }
-
-  const btn = document.getElementById('uploadSubmitBtn');
   btn.textContent = 'Uploading…';
   btn.disabled    = true;
 
   db.collection('uploads').add({
-    society: currentSociety,
-    image:   _compressedImg,
-    date, head, amount, narration,
+    society: curSociety, image: _img,
+    date, head, amount: amt, narration: narr,
     timestamp: Date.now()
   })
   .then(() => {
-    alert('✔ Bill uploaded successfully!');
-    closeUpload();
-    btn.textContent = 'Upload';
-    btn.disabled    = false;
+    alert('✔ Bill uploaded!');
+    closeModal();
     loadUploads();
   })
-  .catch(err => {
-    alert('Upload failed: ' + err.message);
+  .catch(e => {
+    alert('Upload failed: ' + e.message);
     btn.textContent = 'Upload';
     btn.disabled    = false;
   });
 }
 
-// ════════════════════════════════════════════
+// ══════════════════════════════════════════
 //  LOAD UPLOADS
-// ════════════════════════════════════════════
+// ══════════════════════════════════════════
 function loadUploads() {
   const area  = document.getElementById('uploads');
-  const empty = document.getElementById('uploadsEmpty');
-  area.innerHTML = "<div class='empty-state'>Loading…</div>";
+  const empty = document.getElementById('emptyMsg');
+  area.innerHTML = "<div class='empty'>Loading…</div>";
 
   db.collection('uploads')
-    .where('society', '==', currentSociety)
+    .where('society', '==', curSociety)
     .get()
     .then(snap => {
       area.innerHTML = '';
@@ -794,307 +617,212 @@ function loadUploads() {
 
       const docs = [];
       snap.forEach(doc => docs.push(doc.data()));
-      docs.sort((a, b) => b.timestamp - a.timestamp);   // newest first
+      docs.sort((a, b) => b.timestamp - a.timestamp);
 
       docs.forEach(u => {
-        const div = document.createElement('div');
-        div.className = 'card upload-card';
-        div.innerHTML = `
-          <img src="${u.image}" alt="Bill"
-               onclick="openLightbox('${u.image}')"
-               title="Click to enlarge">
-          <div class="detail-row"><span class="label">📅 Date</span><span>${u.date}</span></div>
-          <div class="detail-row"><span class="label">🗂 Head</span><span>${u.head}</span></div>
-          <div class="detail-row"><span class="label">💰 Amount</span><span>₹${u.amount}</span></div>
-          <div class="detail-row"><span class="label">📝 Note</span><span>${u.narration || '—'}</span></div>`;
-        area.appendChild(div);
+        const d = document.createElement('div');
+        d.className = 'card upload-card';
+        d.innerHTML =
+          '<img src="' + u.image + '" alt="Bill" onclick="openLB(this.src)" title="Click to enlarge">' +
+          '<div class="drow"><span class="dlbl">📅 Date</span><span>'   + u.date          + '</span></div>' +
+          '<div class="drow"><span class="dlbl">🗂 Head</span><span>'   + u.head          + '</span></div>' +
+          '<div class="drow"><span class="dlbl">💰 Amount</span><span>₹' + u.amount      + '</span></div>' +
+          '<div class="drow"><span class="dlbl">📝 Note</span><span>'   + (u.narration||'—') + '</span></div>';
+        area.appendChild(d);
       });
     })
-    .catch(err => {
-      area.innerHTML = "<div class='empty-state'>Error loading. Please refresh.</div>";
-      console.error(err);
+    .catch(() => {
+      area.innerHTML = "<div class='empty'>Error loading. Please refresh.</div>";
     });
 }
 
-// ════════════════════════════════════════════
-//  LIGHTBOX
-// ════════════════════════════════════════════
-function openLightbox(src) {
-  document.getElementById('lightbox-img').src = src;
+function openLB(src) {
+  document.getElementById('lbImg').src = src;
   document.getElementById('lightbox').classList.add('open');
 }
 
-// ════════════════════════════════════════════
-//  DELETE SOCIETY
-// ════════════════════════════════════════════
-function deleteSociety(docId) {
-  if (!confirm('Delete this society?\n\nUploaded bills remain in database.')) return;
-  db.collection('societies').doc(docId).delete()
-    .then(() => { alert('Society deleted.'); loadSocieties(); })
-    .catch(err => alert(err.message));
-}
-
-// ════════════════════════════════════════════
-//  EXPORT TO EXCEL + HTML VIEWER
-//
-//  Excel has NO way to show images or open links
-//  without security warnings. So the approach is:
-//
-//  Excel column "View Photo" = plain text "Click Me"
-//  + a separate HTML file is downloaded that has
-//  ALL photos in a clean table — each row matches
-//  the Excel row exactly (same Sr No, Date, Head etc.)
-//  Each photo row has a "Back to List" button.
-//
-//  The HTML file IS the photo viewer. No warnings,
-//  no security prompts, no extra steps. Just open
-//  the HTML file alongside Excel and click away.
-// ════════════════════════════════════════════
-function exportSocietyData(societyName) {
+// ══════════════════════════════════════════
+//  EXPORT — Excel + HTML photo viewer
+// ══════════════════════════════════════════
+function exportData(societyName) {
   db.collection('uploads')
     .where('society', '==', societyName)
     .get()
     .then(snap => {
-      if (snap.empty) { alert('No uploads found for: ' + societyName); return; }
+      if (snap.empty) { alert('No uploads for: ' + societyName); return; }
 
       const docs = [];
       snap.forEach(doc => docs.push(doc.data()));
       docs.sort((a, b) => a.date > b.date ? 1 : -1);
 
-      // ── EXCEL: plain text "Click Me" — no formula, no warning ──
-      const rows = [
-        ['Sr No', 'Date', 'Expense Head', 'Amount (₹)', 'Narration', 'Society', 'View Photo']
-      ];
-      docs.forEach((u, i) => {
-        rows.push([
-          i + 1,
-          u.date,
-          u.head,
-          u.amount,
-          u.narration || '',
-          u.society,
-          u.image ? 'Click Me' : 'No photo'   // plain text, zero warnings
-        ]);
-      });
-
+      // ── Excel: "Click Me" plain text (no formula = no warning) ──
+      const rows = [['Sr','Date','Expense Head','Amount (₹)','Narration','Society','View Photo']];
+      docs.forEach((u, i) =>
+        rows.push([i+1, u.date, u.head, u.amount, u.narration||'', u.society,
+                   u.image ? 'Click Me' : 'No photo'])
+      );
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols'] = [{wch:7},{wch:13},{wch:22},{wch:13},{wch:28},{wch:20},{wch:12}];
-      XLSX.utils.book_append_sheet(wb, ws, societyName.substring(0, 31));
+      ws['!cols'] = [{wch:5},{wch:13},{wch:22},{wch:12},{wch:26},{wch:18},{wch:11}];
+      XLSX.utils.book_append_sheet(wb, ws, societyName.substring(0,31));
 
-      // ── HTML VIEWER ────────────────────────────────────────────
-      // Layout: left side = scrollable list of all entries as rows
-      //         right side (or overlay) = photo of selected entry
-      //
-      // Actually simpler and more useful:
-      // A clean TABLE matching Excel exactly.
-      // Last column = "Click Me" button for each row.
-      // Clicking opens that photo in an overlay with Back button.
-      // ─────────────────────────────────────────────────────────
-      const htmlFileName = societyName + '_photos.html';
+      // ── HTML photo viewer ──
+      // Same table as Excel. Each row has "Click Me" button.
+      // Clicking opens that photo in an overlay on the same page.
+      // Overlay has: Back to List + Prev / Next buttons.
+      const htmlFile = societyName + '_photos.html';
 
-      // Embed all images as JS array so no external files needed
-      let imgArray = 'const IMGS = [
-';
-      docs.forEach(u => {
-        imgArray += '  ' + JSON.stringify(u.image || '') + ',
-';
-      });
-      imgArray += '];';
+      // All images embedded as JS array — self-contained, no extra files
+      const imgsJson = JSON.stringify(docs.map(u => u.image || ''));
+      const dataJson = JSON.stringify(docs.map(u => ({
+        date: u.date, head: u.head, amount: u.amount, narration: u.narration || ''
+      })));
 
-      let tableRows = '';
+      let tRows = '';
       docs.forEach((u, i) => {
-        tableRows += `
-          <tr id="row${i+1}">
-            <td>${i+1}</td>
-            <td>${u.date}</td>
-            <td>${u.head}</td>
-            <td>₹${u.amount}</td>
-            <td>${u.narration || '—'}</td>
-            <td>${u.society}</td>
-            <td>${u.image
-              ? `<button class="view-btn" onclick="openPhoto(${i})">Click Me</button>`
-              : '<span style="color:#aaa">No photo</span>'}
-            </td>
-          </tr>`;
+        tRows += '<tr id="r' + (i+1) + '">' +
+          '<td>' + (i+1) + '</td>' +
+          '<td>' + u.date + '</td>' +
+          '<td>' + u.head + '</td>' +
+          '<td>₹' + u.amount + '</td>' +
+          '<td>' + (u.narration||'—') + '</td>' +
+          '<td>' + u.society + '</td>' +
+          '<td>' + (u.image
+            ? '<button class="vbtn" onclick="openPh(' + i + ')">Click Me</button>'
+            : '<span style="color:#aaa">No photo</span>') +
+          '</td></tr>';
       });
 
       const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${societyName.toUpperCase()} — Bill Photos</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${societyName.toUpperCase()} — Photos</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:sans-serif;background:#f0ece4;padding:20px;min-height:100vh}
-  h1{color:#5a3825;text-align:center;margin-bottom:6px;font-size:1.4rem}
-  .subtitle{text-align:center;color:#888;font-size:.82rem;margin-bottom:20px}
-
-  /* TABLE */
-  .tbl-wrap{overflow-x:auto;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
-  table{width:100%;border-collapse:collapse;background:white;font-size:.88rem}
-  thead th{background:#5a3825;color:white;padding:10px 12px;text-align:left;white-space:nowrap}
-  tbody td{padding:9px 12px;border-bottom:1px solid #e6c9a8;vertical-align:middle}
-  tbody tr:last-child td{border-bottom:none}
-  tbody tr:hover td{background:#fdf8f3}
-  .view-btn{
-    background:#8b5e3c;color:white;border:none;
-    padding:6px 14px;border-radius:8px;cursor:pointer;
-    font-size:.82rem;font-weight:700;white-space:nowrap;
-  }
-  .view-btn:hover{background:#5a3825}
-
-  /* OVERLAY */
-  #overlay{
-    display:none;position:fixed;inset:0;
-    background:rgba(0,0,0,0.82);z-index:100;
-    align-items:center;justify-content:center;
-    flex-direction:column;padding:20px;
-  }
-  #overlay.open{display:flex}
-  #overlay-box{
-    background:white;border-radius:16px;
-    width:100%;max-width:520px;max-height:90vh;
-    overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4);
-  }
-  #overlay-head{
-    background:#5a3825;color:white;
-    padding:14px 18px;border-radius:16px 16px 0 0;
-    display:flex;align-items:center;justify-content:space-between;
-  }
-  #overlay-head h3{font-size:1rem;margin:0}
-  #back-btn{
-    background:rgba(255,255,255,0.2);color:white;border:none;
-    padding:6px 14px;border-radius:8px;cursor:pointer;
-    font-size:.85rem;font-weight:700;
-  }
-  #back-btn:hover{background:rgba(255,255,255,0.35)}
-  #overlay-body{padding:16px 18px}
-  #overlay-body img{width:100%;border-radius:10px;margin-top:12px;display:block}
-  .o-row{display:flex;gap:8px;padding:5px 0;font-size:.9rem;border-bottom:1px solid #f0ece4}
-  .o-row:last-of-type{border-bottom:none}
-  .o-lbl{font-weight:700;color:#5a3825;min-width:70px}
-  .nav-row{display:flex;gap:8px;padding:14px 18px;border-top:1px solid #f0ece4;justify-content:center}
-  .nav-btn{background:#e6c9a8;color:#5a3825;border:none;padding:7px 16px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.85rem}
-  .nav-btn:hover{background:#c49a6c;color:white}
-  .nav-btn:disabled{opacity:.4;cursor:not-allowed}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:sans-serif;background:#f0ece4;padding:16px}
+h1{color:#5a3825;text-align:center;margin-bottom:4px;font-size:1.3rem}
+.sub{text-align:center;color:#888;font-size:.78rem;margin-bottom:18px}
+.wrap{overflow-x:auto;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+table{width:100%;border-collapse:collapse;background:white;font-size:.84rem;min-width:560px}
+thead th{background:#5a3825;color:white;padding:9px 11px;text-align:left;white-space:nowrap}
+tbody td{padding:8px 11px;border-bottom:1px solid #e6c9a8;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#fdf8f3}
+.vbtn{background:#8b5e3c;color:white;border:none;padding:5px 13px;border-radius:7px;cursor:pointer;font-size:.8rem;font-weight:700}
+.vbtn:hover{background:#5a3825}
+/* overlay */
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:99;align-items:center;justify-content:center;padding:16px}
+#ov.show{display:flex}
+#ovBox{background:white;border-radius:16px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+#ovHead{background:#5a3825;color:white;padding:13px 16px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between}
+#ovHead h3{font-size:.95rem;margin:0}
+#backBtn{background:rgba(255,255,255,.2);color:white;border:none;padding:5px 13px;border-radius:7px;cursor:pointer;font-size:.82rem;font-weight:700}
+#backBtn:hover{background:rgba(255,255,255,.35)}
+#ovBody{padding:14px 16px}
+#ovBody img{width:100%;border-radius:9px;margin-top:11px;display:block}
+.orow{display:flex;gap:8px;padding:4px 0;font-size:.87rem;border-bottom:1px solid #f0ece4}
+.orow:last-of-type{border-bottom:none}
+.olbl{font-weight:700;color:#5a3825;min-width:68px}
+#navRow{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #f0ece4;justify-content:center;align-items:center}
+.nbtn{background:#e6c9a8;color:#5a3825;border:none;padding:6px 15px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem}
+.nbtn:hover{background:#c49a6c;color:white}
+.nbtn:disabled{opacity:.35;cursor:not-allowed}
+#navLbl{font-size:.82rem;color:#888;min-width:60px;text-align:center}
 </style>
 </head>
 <body>
 <h1>📋 ${societyName.toUpperCase()} — Bill Photos</h1>
-<p class="subtitle">This file matches your Excel exactly. Click "Click Me" on any row to view that bill photo.</p>
-
-<div class="tbl-wrap">
-  <table>
-    <thead>
-      <tr>
-        <th>Sr</th><th>Date</th><th>Expense Head</th>
-        <th>Amount</th><th>Narration</th><th>Society</th><th>Photo</th>
-      </tr>
-    </thead>
-    <tbody>${tableRows}</tbody>
-  </table>
+<p class="sub">Same entries as your Excel file. Click "Click Me" on any row to view that photo.</p>
+<div class="wrap">
+<table>
+<thead><tr><th>Sr</th><th>Date</th><th>Expense Head</th><th>Amount</th><th>Narration</th><th>Society</th><th>Photo</th></tr></thead>
+<tbody>${tRows}</tbody>
+</table>
 </div>
 
 <!-- PHOTO OVERLAY -->
-<div id="overlay">
-  <div id="overlay-box">
-    <div id="overlay-head">
-      <h3 id="overlay-title">Bill Photo</h3>
-      <button id="back-btn" onclick="closePhoto()">← Back to List</button>
+<div id="ov">
+  <div id="ovBox">
+    <div id="ovHead">
+      <h3 id="ovTitle">Photo</h3>
+      <button id="backBtn" onclick="closePh()">← Back to List</button>
     </div>
-    <div id="overlay-body">
-      <div id="overlay-details"></div>
-      <img id="overlay-img" src="" alt="Bill Photo">
+    <div id="ovBody">
+      <div id="ovDetails"></div>
+      <img id="ovImg" src="" alt="Bill photo">
     </div>
-    <div class="nav-row">
-      <button class="nav-btn" id="btn-prev" onclick="navPhoto(-1)">◀ Previous</button>
-      <span id="nav-label" style="align-self:center;font-size:.85rem;color:#888"></span>
-      <button class="nav-btn" id="btn-next" onclick="navPhoto(+1)">Next ▶</button>
+    <div id="navRow">
+      <button class="nbtn" id="btnPrev" onclick="nav(-1)">◀ Prev</button>
+      <span id="navLbl"></span>
+      <button class="nbtn" id="btnNext" onclick="nav(+1)">Next ▶</button>
     </div>
   </div>
 </div>
 
 <script>
-${imgArray}
+const IMGS = ${imgsJson};
+const DATA = ${dataJson};
+let cur = 0;
 
-const DATA = ${repr_data};
-
-let _cur = 0;
-
-function openPhoto(idx) {
-  _cur = idx;
-  renderOverlay();
-  document.getElementById('overlay').classList.add('open');
-  document.getElementById('overlay-box').scrollTop = 0;
+function openPh(i) {
+  cur = i;
+  render();
+  document.getElementById('ov').classList.add('show');
+  document.getElementById('ovBox').scrollTop = 0;
 }
-
-function closePhoto() {
-  document.getElementById('overlay').classList.remove('open');
-  // scroll Excel-matching row into view
-  const row = document.getElementById('row' + (_cur + 1));
+function closePh() {
+  document.getElementById('ov').classList.remove('show');
+  const row = document.getElementById('r' + (cur+1));
   if (row) row.scrollIntoView({behavior:'smooth', block:'center'});
 }
-
-function navPhoto(dir) {
-  _cur = Math.max(0, Math.min(DATA.length - 1, _cur + dir));
-  renderOverlay();
-  document.getElementById('overlay-box').scrollTop = 0;
+function nav(d) {
+  cur = Math.max(0, Math.min(DATA.length-1, cur+d));
+  render();
+  document.getElementById('ovBox').scrollTop = 0;
 }
-
-function renderOverlay() {
-  const u = DATA[_cur];
-  const total = DATA.length;
-  document.getElementById('overlay-title').textContent = 'Sr. ' + (_cur+1) + ' of ' + total;
-  document.getElementById('nav-label').textContent = (_cur+1) + ' / ' + total;
-  document.getElementById('btn-prev').disabled = _cur === 0;
-  document.getElementById('btn-next').disabled = _cur === total - 1;
-  document.getElementById('overlay-details').innerHTML =
-    '<div class="o-row"><span class="o-lbl">📅 Date</span><span>' + u.date + '</span></div>' +
-    '<div class="o-row"><span class="o-lbl">🗂 Head</span><span>' + u.head + '</span></div>' +
-    '<div class="o-row"><span class="o-lbl">💰 Amount</span><span>₹' + u.amount + '</span></div>' +
-    '<div class="o-row"><span class="o-lbl">📝 Note</span><span>' + (u.narration||'—') + '</span></div>';
-  document.getElementById('overlay-img').src = IMGS[_cur] || '';
+function render() {
+  const u = DATA[cur], total = DATA.length;
+  document.getElementById('ovTitle').textContent   = 'Photo ' + (cur+1) + ' of ' + total;
+  document.getElementById('navLbl').textContent    = (cur+1) + ' / ' + total;
+  document.getElementById('btnPrev').disabled      = cur === 0;
+  document.getElementById('btnNext').disabled      = cur === total-1;
+  document.getElementById('ovDetails').innerHTML   =
+    '<div class="orow"><span class="olbl">📅 Date</span><span>'    + u.date              + '</span></div>' +
+    '<div class="orow"><span class="olbl">🗂 Head</span><span>'    + u.head              + '</span></div>' +
+    '<div class="orow"><span class="olbl">💰 Amount</span><span>₹' + u.amount            + '</span></div>' +
+    '<div class="orow"><span class="olbl">📝 Note</span><span>'    + (u.narration||'—')  + '</span></div>';
+  document.getElementById('ovImg').src = IMGS[cur] || '';
 }
-
-// Close overlay on background click
-document.getElementById('overlay').addEventListener('click', function(e){
-  if(e.target === this) closePhoto();
+document.getElementById('ov').addEventListener('click', function(e) {
+  if (e.target === this) closePh();
 });
 <\/script>
 </body>
 </html>`;
 
-      // Replace placeholder with real data
-      const dataJson = JSON.stringify(docs.map(u => ({
-        date: u.date, head: u.head,
-        amount: u.amount, narration: u.narration || ''
-      })));
-      const finalHtml = html.replace('${repr_data}', dataJson);
-
-      // ── Download HTML first ───────────────────────────────────
-      const blob = new Blob([finalHtml], { type: 'text/html' });
+      // Download HTML viewer first
+      const blob = new Blob([html], {type:'text/html'});
       const a    = document.createElement('a');
       a.href     = URL.createObjectURL(blob);
-      a.download = htmlFileName;
+      a.download = htmlFile;
       a.click();
 
-      // ── Download Excel after short delay ─────────────────────
+      // Download Excel after short delay
       setTimeout(() => {
         XLSX.writeFile(wb, societyName + '_expenses.xlsx');
         alert(
-          '✔ Two files downloaded!\n\n' +
-          '1. ' + societyName + '_expenses.xlsx\n' +
-          '   → Your main Excel file\n\n' +
-          '2. ' + htmlFileName + '\n' +
-          '   → Open this in browser\n' +
+          '✔ Downloaded 2 files!\n\n' +
+          '1. ' + societyName + '_expenses.xlsx\n   → Open in Excel\n\n' +
+          '2. ' + htmlFile + '\n   → Open in browser\n' +
           '   → Same rows as Excel\n' +
-          '   → Click "Click Me" to view photo\n' +
-          '   → "← Back to List" returns you to the table'
+          '   → Click "Click Me" to see photo\n' +
+          '   → "← Back to List" to return'
         );
       }, 700);
     })
-    .catch(err => alert('Export failed: ' + err.message));
+    .catch(e => alert('Export failed: ' + e.message));
 }
 </script>
 </body>
