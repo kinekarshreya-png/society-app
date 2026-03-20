@@ -232,6 +232,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 // ══════════════════════════════════════════
 //  FIREBASE — DO NOT CHANGE
@@ -244,7 +245,8 @@ firebase.initializeApp({
   messagingSenderId: "145344389199",
   appId:             "1:145344389199:web:a32affa5732fc825460a3a"
 });
-const db = firebase.firestore();
+const db   = firebase.firestore();
+const auth = firebase.auth();
 
 // ══════════════════════════════════════════
 //  STATE
@@ -280,58 +282,74 @@ function showPwdHint() {
 
 // ══════════════════════════════════════════
 //  LOGIN
-//  Superadmin: hardcoded check (no Firestore)
-//  Society:    check Firestore societies collection
+//  Step 1: Firebase Auth sign-in (handles security)
+//  Step 2: After auth, check if superadmin or society
 // ══════════════════════════════════════════
 function login() {
   const email = document.getElementById('inEmail').value.trim().toLowerCase();
   const pwd   = document.getElementById('inPass').value.trim();
-  const err   = document.getElementById('loginErr');
+  const errEl = document.getElementById('loginErr');
   const btn   = document.getElementById('loginBtn');
-  err.textContent = '';
+  errEl.textContent = '';
 
   if (!email || !pwd) {
-    err.textContent = 'Please enter email and password.';
+    errEl.textContent = 'Please enter email and password.';
     return;
   }
 
-  // ── Superadmin — no Firestore needed ──
-  if (email === 'companyadmin@gmail.com' && pwd === 'admin@123') {
-    isAdmin = true;
-    showPage('pgAdmin');
-    loadSocieties();
-    return;
-  }
-
-  // ── Society login ──
   btn.textContent = 'Logging in…';
   btn.disabled    = true;
 
-  db.collection('societies')
-    .where('email', '==', email)
-    .where('password', '==', pwd)
-    .get()
-    .then(snap => {
-      btn.textContent = 'Login';
-      btn.disabled    = false;
+  // Use Firebase Auth to sign in — this is secure
+  auth.signInWithEmailAndPassword(email, pwd)
+    .then(userCred => {
+      const userEmail = userCred.user.email.toLowerCase();
 
-      if (snap.empty) {
-        err.textContent = 'Wrong email or password. Check with your admin.';
+      // ── Superadmin ──
+      if (userEmail === 'companyadmin@gmail.com') {
+        isAdmin = true;
+        btn.textContent = 'Login';
+        btn.disabled    = false;
+        showPage('pgAdmin');
+        loadSocieties();
         return;
       }
 
-      snap.forEach(doc => { curSociety = doc.data().name; });
-      isAdmin = false;
-      showPage('pgSociety');
-      document.getElementById('uploadBtn').style.display   = 'block';
-      document.getElementById('socTitle').textContent      = curSociety.toUpperCase();
-      document.getElementById('backBtn').style.display     = 'none';
-      loadUploads();
+      // ── Society user — find their society in Firestore ──
+      return db.collection('societies')
+        .where('email', '==', userEmail)
+        .get()
+        .then(snap => {
+          btn.textContent = 'Login';
+          btn.disabled    = false;
+          if (snap.empty) {
+            errEl.textContent = 'Account found but no society linked. Contact admin.';
+            auth.signOut();
+            return;
+          }
+          snap.forEach(doc => { curSociety = doc.data().name; });
+          isAdmin = false;
+          showPage('pgSociety');
+          document.getElementById('uploadBtn').style.display = 'block';
+          document.getElementById('socTitle').textContent    = curSociety.toUpperCase();
+          document.getElementById('backBtn').style.display   = 'none';
+          loadUploads();
+        });
     })
-    .catch(err2 => {
+    .catch(e => {
       btn.textContent = 'Login';
       btn.disabled    = false;
-      err.textContent = 'Error: ' + err2.message;
+      // Show friendly error messages
+      if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' ||
+          e.code === 'auth/invalid-credential') {
+        errEl.textContent = 'Wrong email or password.';
+      } else if (e.code === 'auth/invalid-email') {
+        errEl.textContent = 'Please enter a valid email.';
+      } else if (e.code === 'auth/too-many-requests') {
+        errEl.textContent = 'Too many attempts. Try again later.';
+      } else {
+        errEl.textContent = 'Error: ' + e.message;
+      }
     });
 }
 
@@ -358,20 +376,16 @@ function createSociety() {
   btn.textContent = 'Creating…';
   btn.disabled    = true;
 
-  // Check if email already exists
-  db.collection('societies').where('email', '==', email).get()
-    .then(existing => {
-      if (!existing.empty) {
-        alert('This email is already used for another society!');
-        btn.textContent = 'Create Society';
-        btn.disabled    = false;
-        return;
-      }
-
-      return db.collection('societies').add({ name: name.toLowerCase(), email, password, date });
+  // Step 1: Create Firebase Auth account for the society
+  // This means they can securely log in
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      // Step 2: Save society details in Firestore
+      return db.collection('societies').add({
+        name: name.toLowerCase(), email, password, date
+      });
     })
-    .then(ref => {
-      if (!ref) return;
+    .then(() => {
       btn.textContent = 'Create Society';
       btn.disabled    = false;
       alert(
@@ -379,18 +393,22 @@ function createSociety() {
         'Name    : ' + name + '\n' +
         'Email   : ' + email + '\n' +
         'Password: ' + password + '\n\n' +
-        'Share these details with the society.'
+        'Share these login details with the society.'
       );
-      document.getElementById('cName').value  = '';
-      document.getElementById('cEmail').value = '';
-      document.getElementById('cDate').value  = '';
+      document.getElementById('cName').value         = '';
+      document.getElementById('cEmail').value        = '';
+      document.getElementById('cDate').value         = '';
       document.getElementById('pwdHint').textContent = '';
       loadSocieties();
     })
     .catch(e => {
-      alert('Error: ' + e.message);
       btn.textContent = 'Create Society';
       btn.disabled    = false;
+      if (e.code === 'auth/email-already-in-use') {
+        alert('This email already has an account!\nEither the society exists or try a different email.');
+      } else {
+        alert('Error creating society: ' + e.message);
+      }
     });
 }
 
