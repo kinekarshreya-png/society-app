@@ -673,15 +673,14 @@ function exportData(societyName) {
       snap.forEach(doc => docs.push(doc.data()));
       docs.sort((a, b) => a.date > b.date ? 1 : -1);
 
-      // ── Excel: "Click Me" plain text (no formula = no warning) ──
-      const rows = [['Sr','Date','Expense Head','Amount (₹)','Narration','Society','View Photo']];
+      // ── Excel: clean data only, no photo column ──
+      const rows = [['Sr','Date','Expense Head','Amount (₹)','Narration','Society']];
       docs.forEach((u, i) =>
-        rows.push([i+1, u.date, u.head, u.amount, u.narration||'', u.society,
-                   u.image ? 'Click Me' : 'No photo'])
+        rows.push([i+1, u.date, u.head, u.amount, u.narration||'', u.society])
       );
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols'] = [{wch:5},{wch:13},{wch:22},{wch:12},{wch:26},{wch:18},{wch:11}];
+      ws['!cols'] = [{wch:5},{wch:13},{wch:24},{wch:13},{wch:30},{wch:20}];
       XLSX.utils.book_append_sheet(wb, ws, societyName.substring(0,31));
 
       // ── HTML photo viewer ──
@@ -704,9 +703,8 @@ function exportData(societyName) {
           '<td>' + u.head + '</td>' +
           '<td>₹' + u.amount + '</td>' +
           '<td>' + (u.narration||'—') + '</td>' +
-          '<td>' + u.society + '</td>' +
           '<td>' + (u.image
-            ? '<button class="vbtn" onclick="openPh(' + i + ')">Click Me</button>'
+            ? '<button class="vbtn" onclick="openPh(' + i + ')">📷 View Photo</button>'
             : '<span style="color:#aaa">No photo</span>') +
           '</td></tr>';
       });
@@ -748,14 +746,22 @@ tbody tr:hover td{background:#fdf8f3}
 .nbtn:hover{background:#c49a6c;color:white}
 .nbtn:disabled{opacity:.35;cursor:not-allowed}
 #navLbl{font-size:.82rem;color:#888;min-width:60px;text-align:center}
+.topbtn{background:#8b5e3c;color:white;text-decoration:none;padding:8px 16px;border-radius:9px;font-size:.84rem;font-weight:700;white-space:nowrap}
+.topbtn:hover{background:#5a3825}
 </style>
 </head>
 <body>
-<h1>📋 ${societyName.toUpperCase()} — Bill Photos</h1>
-<p class="sub">Same entries as your Excel file. Click "Click Me" on any row to view that photo.</p>
+<div id="top"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+  <div>
+    <h1 style="margin-bottom:2px">📋 ${societyName.toUpperCase()}</h1>
+    <p class="sub" style="margin:0;text-align:left">Bill Photo Viewer &nbsp;·&nbsp; ${docs.length} entries</p>
+  </div>
+  <a href="#top" class="topbtn">↑ Back to Top</a>
+</div>
 <div class="wrap">
 <table>
-<thead><tr><th>Sr</th><th>Date</th><th>Expense Head</th><th>Amount</th><th>Narration</th><th>Society</th><th>Photo</th></tr></thead>
+<thead><tr><th>Sr</th><th>Date</th><th>Expense Head</th><th>Amount</th><th>Narration</th><th>Photo</th></tr></thead>
 <tbody>${tRows}</tbody>
 </table>
 </div>
@@ -832,11 +838,11 @@ document.getElementById('ov').addEventListener('click', function(e) {
         XLSX.writeFile(wb, societyName + '_expenses.xlsx');
         alert(
           '✔ Downloaded 2 files!\n\n' +
-          '1. ' + societyName + '_expenses.xlsx\n   → Open in Excel\n\n' +
+          '1. ' + societyName + '_expenses.xlsx\n   → Your Excel data file\n\n' +
           '2. ' + htmlFile + '\n   → Open in browser\n' +
-          '   → Same rows as Excel\n' +
-          '   → Click "Click Me" to see photo\n' +
-          '   → "← Back to List" to return'
+          '   → Click "📷 View Photo" to see bill image\n' +
+          '   → "← Back to List" returns to the table\n' +
+          '   → "↑ Back to Top" scrolls to top'
         );
       }, 700);
     })
