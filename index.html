@@ -527,23 +527,14 @@ Share this with the society after approving.')){return;}
     });
     // Mark registration as approved
     await db.collection('registrations').doc(id).update({status:'approved',approvedAt:Date.now()});
-    alert('✔ Society approved!
-
-Name    : '+name+'
-Email   : '+email+'
-Password: '+password+'
-
-Share these login details with the society now.');
+    alert('✔ Society approved!\n\nName    : '+name+'\nEmail   : '+email+'\nPassword: '+password+'\n\nShare these login details with the society now.');
     loadPendingRequests();
     loadSocieties();
   }catch(e){
     if(e.code==='auth/email-already-in-use'){
-      // Auth account exists, just save to Firestore
-      await db.collection('societies').add({name:name.toLowerCase(),email,password,phone,address:addr,city,totalFlats:parseInt(flats)||0,date,approvedAt:Date.now()});
+      await db.collection('societies').add({name:name.toLowerCase(),email,password,phone,address:addr,approvedAt:Date.now()});
       await db.collection('registrations').doc(id).update({status:'approved',approvedAt:Date.now()});
-      alert('✔ Society approved!
-
-Password: '+password);
+      alert('✔ Society approved!\n\nEmail: '+email+'\nPassword: '+password);
       loadPendingRequests();loadSocieties();
     } else {
       alert('Error: '+e.message);
@@ -551,12 +542,7 @@ Password: '+password);
   }
 }
 
-async function rejectRequest(id){
-  if(!confirm('Reject this registration request?'))return;
-  await db.collection('registrations').doc(id).update({status:'rejected',rejectedAt:Date.now()});
-  alert('Request rejected.');
-  loadPendingRequests();
-}
+
 
 // ══════════════════════════════════════════
 //  LOGIN
