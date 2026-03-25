@@ -136,6 +136,62 @@
   /* ── Misc ── */
   .empty { text-align:center; color:#aaa; padding:28px 0; font-style:italic; }
   .err   { color:var(--red); font-size:0.82rem; text-align:center; margin-top:6px; min-height:18px; }
+  .succ  { color:#2e7d32; font-size:0.82rem; text-align:center; margin-top:6px; min-height:18px; }
+
+  /* ── Register link on login page ── */
+  .reg-link { text-align:center; margin-top:14px; font-size:0.82rem; color:#888; }
+  .reg-link a { color:var(--brown-mid); font-weight:700; cursor:pointer; text-decoration:none; }
+  .reg-link a:hover { color:var(--brown-dark); text-decoration:underline; }
+
+  /* ── Pending requests card ── */
+  .req-card { background:#fff8ee; border:1.5px solid var(--brown-light); border-radius:13px; padding:13px 15px; margin:8px 0; }
+  .req-card .rname { font-weight:700; color:var(--brown-dark); font-size:0.92rem; }
+  .req-card .rmeta { font-size:0.76rem; color:#888; margin-top:2px; line-height:1.5; }
+  .req-card .racts { display:flex; gap:7px; margin-top:10px; flex-wrap:wrap; }
+  .btn-approve { background:#2e7d32; color:white; }
+  .btn-approve:hover { background:#1b5e20; }
+  .btn-reject  { background:var(--red); color:white; }
+  .btn-reject:hover  { background:#a93226; }
+  .badge-pending { background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:20px; padding:2px 10px; font-size:0.72rem; font-weight:700; }
+  .badge-count { background:var(--red); color:white; border-radius:50%; width:18px; height:18px; font-size:0.7rem; font-weight:700; display:inline-flex; align-items:center; justify-content:center; margin-left:5px; }
+
+  /* ── Gallery Page ── */
+  #pgGallery { display:none; width:96%; max-width:900px; margin:30px auto 80px; background:var(--white); padding:24px 22px; border-radius:20px; box-shadow:var(--shadow); animation:fadeIn .3s ease; }
+  #pgGallery.show { display:block; }
+  .gal-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+  .gal-top h2 { margin:0; text-align:left; font-size:1.4rem; }
+  .gal-filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+  .gal-filters input, .gal-filters select { padding:7px 11px; border-radius:9px; border:1.5px solid #ddd; font-family:inherit; font-size:0.84rem; background:var(--cream); }
+  .gal-filters input:focus, .gal-filters select:focus { outline:none; border-color:var(--brown-light); }
+  .gal-stats { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+  .gal-stat { background:var(--cream); padding:9px 16px; border-radius:10px; font-size:0.82rem; color:var(--brown-dark); }
+  .gal-stat strong { font-size:1.1rem; display:block; color:var(--brown-dark); }
+  /* Grid layout */
+  .gal-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:14px; }
+  .gal-card { background:var(--cream); border-radius:13px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.08); transition:transform .2s, box-shadow .2s; cursor:pointer; }
+  .gal-card:hover { transform:translateY(-3px); box-shadow:0 6px 18px rgba(90,56,37,.18); }
+  .gal-card img { width:100%; height:140px; object-fit:cover; display:block; }
+  .gal-card .gc-info { padding:9px 11px; }
+  .gal-card .gc-head { font-weight:700; color:var(--brown-dark); font-size:0.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gal-card .gc-meta { font-size:0.74rem; color:#888; margin-top:2px; }
+  .gal-card .gc-amt  { font-size:0.84rem; color:#2e7d32; font-weight:700; margin-top:3px; }
+  /* Full screen photo viewer */
+  #galViewer { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:300; flex-direction:column; align-items:center; justify-content:center; }
+  #galViewer.open { display:flex; }
+  #galViewer img { max-width:92vw; max-height:72vh; border-radius:10px; object-fit:contain; }
+  .gv-info { background:rgba(255,255,255,.1); backdrop-filter:blur(8px); border-radius:12px; padding:12px 20px; margin-top:14px; text-align:center; color:white; max-width:500px; width:92vw; }
+  .gv-info .gv-head { font-family:'Playfair Display',serif; font-size:1rem; font-weight:600; }
+  .gv-info .gv-meta { font-size:0.78rem; opacity:.75; margin-top:4px; }
+  .gv-nav { display:flex; gap:12px; margin-top:14px; align-items:center; }
+  .gv-btn { background:rgba(255,255,255,.18); border:none; color:white; padding:8px 18px; border-radius:9px; cursor:pointer; font-size:0.86rem; font-weight:700; transition:background .15s; }
+  .gv-btn:hover { background:rgba(255,255,255,.32); }
+  .gv-btn:disabled { opacity:.3; cursor:not-allowed; }
+  .gv-close { position:absolute; top:18px; right:20px; background:rgba(255,255,255,.15); border:none; color:white; width:36px; height:36px; border-radius:50%; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .gv-close:hover { background:rgba(255,255,255,.3); }
+  .gv-count { font-size:0.8rem; opacity:.6; }
+  /* Loading spinner */
+  .gal-loading { text-align:center; padding:40px; color:var(--brown-mid); font-style:italic; }
+  .no-results { text-align:center; padding:40px; color:#aaa; font-style:italic; }
 </style>
 </head>
 <body>
@@ -148,6 +204,27 @@
          onkeydown="if(event.key==='Enter')login()">
   <div class="err" id="loginErr"></div>
   <button class="btn btn-primary" id="loginBtn" onclick="login()">Login</button>
+  <div class="reg-link">
+    New society? <a onclick="showRegister()">Register Now →</a>
+  </div>
+</div>
+
+<!-- ══ REGISTER PAGE ══ -->
+<div class="page" id="pgRegister">
+  <h2>🏘️ Register Society</h2>
+  <p style="text-align:center;font-size:0.82rem;color:#888;margin-bottom:18px">Fill your society details. Admin will review and approve your request.</p>
+
+  <input type="text"  id="rSocName"  placeholder="Society Name *">
+  <input type="email" id="rSocEmail" placeholder="Society Email * (this will be your login ID)">
+  <input type="text"  id="rSocPhone" placeholder="Contact Phone No. *">
+  <input type="text"  id="rSocAddr"  placeholder="Society Address *">
+
+  <div class="err"  id="regErr"></div>
+  <div class="succ" id="regSucc"></div>
+  <button class="btn btn-primary" id="regBtn" onclick="submitRegister()" style="margin-top:8px">Submit Registration Request</button>
+  <div class="reg-link" style="margin-top:10px">
+    Already registered? <a onclick="showLogin()">Login here →</a>
+  </div>
 </div>
 
 <!-- ══ SUPER ADMIN ══ -->
@@ -160,6 +237,9 @@
   <input type="date"  id="cDate">
   <div class="hint" id="pwdHint"></div>
   <button class="btn btn-primary" id="createBtn" onclick="createSociety()">Create Society</button>
+
+  <h3 id="pendingH3" style="display:none">⏳ Pending Requests <span class="badge-count" id="pendingCount">0</span></h3>
+  <div id="pendingList"></div>
 
   <h3>🏢 All Societies</h3>
   <div id="socList"><div class="empty">Loading…</div></div>
@@ -228,6 +308,57 @@
   <img id="lbImg" src="" alt="Bill">
 </div>
 
+<!-- ══ GALLERY PAGE ══ -->
+<div id="pgGallery">
+  <div class="gal-top">
+    <div>
+      <h2 id="galTitle">📸 Gallery</h2>
+      <div style="font-size:0.78rem;color:#888;margin-top:2px" id="galSubtitle">Live photo gallery — always up to date</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-sm" style="background:#2e7d32;color:white" onclick="downloadGallery()">⬇ Download Backup</button>
+      <button class="btn btn-back" onclick="closeGallery()" style="margin:0">← Back</button>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="gal-stats" id="galStats"></div>
+
+  <!-- Filters -->
+  <div class="gal-filters">
+    <input type="text"   id="galSearch"  placeholder="🔍 Search head or narration…" oninput="filterGallery()">
+    <select id="galHead" onchange="filterGallery()">
+      <option value="">All Heads</option>
+    </select>
+    <select id="galSort" onchange="filterGallery()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="amount">Highest Amount</option>
+    </select>
+    <button class="btn btn-back" style="margin:0;padding:7px 13px;font-size:0.8rem" onclick="refreshGallery()">🔄 Refresh</button>
+  </div>
+
+  <!-- Grid -->
+  <div class="gal-grid" id="galGrid">
+    <div class="gal-loading">Loading photos…</div>
+  </div>
+</div>
+
+<!-- ══ FULL PHOTO VIEWER ══ -->
+<div id="galViewer">
+  <button class="gv-close" onclick="closeViewer()">✕</button>
+  <img id="gvImg" src="" alt="Bill Photo">
+  <div class="gv-info">
+    <div class="gv-head" id="gvHead"></div>
+    <div class="gv-meta" id="gvMeta"></div>
+  </div>
+  <div class="gv-nav">
+    <button class="gv-btn" id="gvPrev" onclick="navViewer(-1)">◀ Prev</button>
+    <span class="gv-count" id="gvCount"></span>
+    <button class="gv-btn" id="gvNext" onclick="navViewer(+1)">Next ▶</button>
+  </div>
+</div>
+
 <!-- ══ SCRIPTS ══ -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -259,10 +390,23 @@ let _img        = '';     // compressed image ready to save
 //  HELPERS
 // ══════════════════════════════════════════
 function showPage(id) {
-  ['pgLogin','pgAdmin','pgSociety'].forEach(p =>
-    document.getElementById(p).style.display = 'none'
-  );
-  document.getElementById(id).style.display = 'block';
+  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(p => {
+    const el=document.getElementById(p);
+    if(el)el.style.display='none';
+  });
+  const target=document.getElementById(id);
+  if(target)target.style.display='block';
+}
+
+function showRegister() {
+  showPage('pgRegister');
+  ['regErr','regSucc'].forEach(id=>document.getElementById(id).textContent='');
+  ['rSocName','rSocEmail','rSocPhone','rSocAddr'].forEach(id=>document.getElementById(id).value='');
+}
+
+function showLogin() {
+  showPage('pgLogin');
+  document.getElementById('loginErr').textContent='';
 }
 
 // Password = first 4 letters of society name (lowercase) + @123
@@ -279,6 +423,126 @@ function showPwdHint() {
     ? '🔑 Password will be: ' + makePwd(name)
     : '';
 }
+
+// ══════════════════════════════════════════
+//  REGISTER — Society self-registration
+// ══════════════════════════════════════════
+async function submitRegister() {
+  const name  = document.getElementById('rSocName').value.trim();
+  const email = document.getElementById('rSocEmail').value.trim().toLowerCase();
+  const phone = document.getElementById('rSocPhone').value.trim();
+  const addr  = document.getElementById('rSocAddr').value.trim();
+  const err   = document.getElementById('regErr');
+  const succ  = document.getElementById('regSucc');
+  const btn   = document.getElementById('regBtn');
+  err.textContent='';succ.textContent='';
+
+  if(!name||!email||!phone||!addr){
+    err.textContent='Please fill Society Name, Email, Phone and Address.';return;
+  }
+  if(!email.includes('@')||!email.includes('.')){
+    err.textContent='Please enter a valid email address.';return;
+  }
+
+  btn.textContent='Submitting…';btn.disabled=true;
+
+  try {
+    // Check if already registered in societies
+    const socSnap=await db.collection('societies').where('email','==',email).get();
+    if(!socSnap.empty){
+      err.textContent='This email is already registered! Contact admin for login details.';
+      btn.textContent='Submit Registration Request';btn.disabled=false;return;
+    }
+    // Check if already has a pending request
+    const pendSnap=await db.collection('registrations').where('email','==',email).get();
+    if(!pendSnap.empty){
+      err.textContent='A registration request for this email already exists! Admin will contact you soon.';
+      btn.textContent='Submit Registration Request';btn.disabled=false;return;
+    }
+    // Save registration request
+    await db.collection('registrations').add({
+      name,email,phone,
+      address:document.getElementById('rSocAddr').value.trim(),
+      status:'pending',
+      submittedAt:Date.now()
+    });
+    succ.textContent='✔ Request submitted! Admin will review and contact you soon.';
+    btn.textContent='Submit Registration Request';btn.disabled=false;
+    // Clear form
+    ['rSocName','rSocEmail','rSocPhone','rSocAddr'].forEach(id=>document.getElementById(id).value='');
+  } catch(e){
+    err.textContent='Error: '+e.message;
+    btn.textContent='Submit Registration Request';btn.disabled=false;
+  }
+}
+
+// ══════════════════════════════════════════
+//  PENDING REQUESTS — Admin view + approve/reject
+// ══════════════════════════════════════════
+async function loadPendingRequests() {
+  const snap=await db.collection('registrations').where('status','==','pending').get();
+  const h3=document.getElementById('pendingH3');
+  const list=document.getElementById('pendingList');
+  const badge=document.getElementById('pendingCount');
+
+  if(snap.empty){h3.style.display='none';list.innerHTML='';return;}
+
+  h3.style.display='block';
+  badge.textContent=snap.size;
+  let html='';
+  snap.forEach(doc=>{
+    const d=doc.data();
+    html+=`<div class="req-card">
+      <div class="rname">${d.name.toUpperCase()}</div>
+      <div class="rmeta">
+        📧 ${d.email}<br>
+        📞 ${d.phone}<br>
+        📍 ${d.address}
+      </div>
+      <div class="racts">
+        <button class="btn btn-sm btn-approve" onclick="approveRequest('${doc.id}','${d.name}','${d.email}','${d.phone}','${d.address}')">✔ Approve</button>
+        <button class="btn btn-sm btn-reject"  onclick="ignoreRequest('${doc.id}')">🗑 Ignore</button>
+        <span class="badge-pending">Pending</span>
+      </div>
+    </div>`;
+  });
+  list.innerHTML=html;
+}
+
+async function approveRequest(id,name,email,phone,addr,city,flats,date){
+  const password=makePwd(name);
+  if(!confirm('Approve "'+name+'"?
+
+Password will be: '+password+'
+
+Share this with the society after approving.')){return;}
+  try{
+    // Create Firebase Auth account
+    await auth.createUserWithEmailAndPassword(email,password);
+    // Save to societies collection
+    await db.collection('societies').add({
+      name:name.toLowerCase(),email,password,phone,
+      address:addr,city,totalFlats:parseInt(flats)||0,date,
+      approvedAt:Date.now()
+    });
+    // Mark registration as approved
+    await db.collection('registrations').doc(id).update({status:'approved',approvedAt:Date.now()});
+    alert('✔ Society approved!\n\nName    : '+name+'\nEmail   : '+email+'\nPassword: '+password+'\n\nShare these login details with the society now.');
+    loadPendingRequests();
+    loadSocieties();
+  }catch(e){
+    if(e.code==='auth/email-already-in-use'){
+      await db.collection('societies').add({name:name.toLowerCase(),email,password,phone,address:addr,approvedAt:Date.now()});
+      await db.collection('registrations').doc(id).update({status:'approved',approvedAt:Date.now()});
+      alert('✔ Society approved!\n\nEmail: '+email+'\nPassword: '+password);
+      loadPendingRequests();loadSocieties();
+    } else {
+      alert('Error: '+e.message);
+    }
+  }
+}
+
+
 
 // ══════════════════════════════════════════
 //  LOGIN
@@ -416,6 +680,7 @@ function createSociety() {
 //  LOAD SOCIETIES LIST
 // ══════════════════════════════════════════
 function loadSocieties() {
+  loadPendingRequests();  // always check pending requests when admin page loads
   const list = document.getElementById('socList');
   list.innerHTML = "<div class='empty'>Loading…</div>";
 
@@ -437,6 +702,7 @@ function loadSocieties() {
             </div>
             <div class="acts">
               <button class="btn btn-sm btn-export" onclick="exportData('${d.name}')">⬇ Excel</button>
+              <button class="btn btn-sm" style="background:#7b4f9e;color:white" onclick="openGallery('${d.name}')">📸 Gallery</button>
               <button class="btn btn-sm btn-open"   onclick="openSociety('${d.name}')">Open</button>
               <button class="btn btn-sm btn-delete" onclick="delSociety('${doc.id}')">Delete</button>
             </div>
@@ -785,7 +1051,7 @@ tbody tr:hover td{background:#fdf8f3}
   </div>
 </div>
 
-<script>
+<scr'+'ipt>
 const IMGS = ${imgsJson};
 const DATA = ${dataJson};
 let cur = 0;
@@ -848,6 +1114,188 @@ document.getElementById('ov').addEventListener('click', function(e) {
     })
     .catch(e => alert('Export failed: ' + e.message));
 }
+
+// ══════════════════════════════════════════
+//  GALLERY — Live photo viewer
+// ══════════════════════════════════════════
+let _galDocs  = [];   // all docs for current society
+let _galFiltered = []; // after filters applied
+let _galSociety = null;
+let _viewerIdx  = 0;
+
+function openGallery(societyName) {
+  _galSociety = societyName;
+  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
+  document.getElementById('pgGallery').classList.add('show');
+  document.getElementById('galTitle').textContent = '📸 ' + societyName.toUpperCase();
+  document.getElementById('galSubtitle').textContent = 'Live gallery · Always up to date · Click any photo to view full size';
+  document.getElementById('galSearch').value = '';
+  document.getElementById('galSort').value   = 'newest';
+  refreshGallery();
+}
+
+function closeGallery() {
+  document.getElementById('pgGallery').classList.remove('show');
+  _galDocs=[];_galFiltered=[];_galSociety=null;
+  document.getElementById('pgAdmin').style.display='block';
+}
+
+async function refreshGallery() {
+  const grid = document.getElementById('galGrid');
+  grid.innerHTML = '<div class="gal-loading">⏳ Loading latest photos…</div>';
+  try {
+    const snap = await db.collection('uploads').where('society','==',_galSociety).get();
+    _galDocs = [];
+    snap.forEach(doc => _galDocs.push({id:doc.id, ...doc.data()}));
+    // Update stats
+    const totalAmt = _galDocs.reduce((s,d) => s + parseFloat(d.amount||0), 0);
+    const heads    = [...new Set(_galDocs.map(d => d.head).filter(Boolean))].sort();
+    document.getElementById('galStats').innerHTML =
+      `<div class="gal-stat"><strong>${_galDocs.length}</strong>Total Photos</div>` +
+      `<div class="gal-stat"><strong>₹${totalAmt.toLocaleString('en-IN')}</strong>Total Amount</div>` +
+      `<div class="gal-stat"><strong>${heads.length}</strong>Expense Heads</div>`;
+    // Populate head filter dropdown
+    const headSel = document.getElementById('galHead');
+    headSel.innerHTML = '<option value="">All Heads</option>' +
+      heads.map(h => `<option value="${h}">${h}</option>`).join('');
+    filterGallery();
+  } catch(e) {
+    grid.innerHTML = '<div class="no-results">Error loading. Check connection.</div>';
+  }
+}
+
+function filterGallery() {
+  const search = document.getElementById('galSearch').value.toLowerCase().trim();
+  const head   = document.getElementById('galHead').value;
+  const sort   = document.getElementById('galSort').value;
+
+  _galFiltered = _galDocs.filter(d => {
+    const matchHead   = !head   || d.head === head;
+    const matchSearch = !search ||
+      (d.head||'').toLowerCase().includes(search) ||
+      (d.narration||'').toLowerCase().includes(search) ||
+      (d.date||'').includes(search);
+    return matchHead && matchSearch;
+  });
+
+  // Sort
+  if(sort === 'newest')  _galFiltered.sort((a,b) => b.timestamp - a.timestamp);
+  if(sort === 'oldest')  _galFiltered.sort((a,b) => a.timestamp - b.timestamp);
+  if(sort === 'amount')  _galFiltered.sort((a,b) => parseFloat(b.amount||0) - parseFloat(a.amount||0));
+
+  renderGallery();
+}
+
+function renderGallery() {
+  const grid = document.getElementById('galGrid');
+  if(!_galFiltered.length) {
+    grid.innerHTML = '<div class="no-results">No photos found for this filter.</div>';
+    return;
+  }
+  grid.innerHTML = _galFiltered.map((d, i) =>
+    `<div class="gal-card" onclick="openViewer(${i})">
+      <img src="${d.image}" alt="${d.head||'Bill'}" loading="lazy">
+      <div class="gc-info">
+        <div class="gc-head">${d.head || 'Expense'}</div>
+        <div class="gc-meta">📅 ${d.date || '—'}</div>
+        ${d.narration ? `<div class="gc-meta">📝 ${d.narration}</div>` : ''}
+        <div class="gc-amt">₹${parseFloat(d.amount||0).toLocaleString('en-IN')}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+// ── FULL VIEWER ──────────────────────────────────────────────────
+function openViewer(idx) {
+  _viewerIdx = idx;
+  renderViewer();
+  document.getElementById('galViewer').classList.add('open');
+}
+
+function closeViewer() {
+  document.getElementById('galViewer').classList.remove('open');
+}
+
+function navViewer(dir) {
+  _viewerIdx = Math.max(0, Math.min(_galFiltered.length - 1, _viewerIdx + dir));
+  renderViewer();
+}
+
+function renderViewer() {
+  const d     = _galFiltered[_viewerIdx];
+  const total = _galFiltered.length;
+  document.getElementById('gvImg').src      = d.image || '';
+  document.getElementById('gvHead').textContent = d.head || 'Expense';
+  document.getElementById('gvMeta').textContent =
+    '📅 ' + (d.date||'—') + '  ·  ₹' + parseFloat(d.amount||0).toLocaleString('en-IN') +
+    (d.narration ? '  ·  📝 ' + d.narration : '');
+  document.getElementById('gvCount').textContent = (_viewerIdx+1) + ' / ' + total;
+  document.getElementById('gvPrev').disabled = _viewerIdx === 0;
+  document.getElementById('gvNext').disabled = _viewerIdx === total - 1;
+}
+
+// Close viewer on background click
+document.getElementById('galViewer').addEventListener('click', function(e) {
+  if(e.target === this) closeViewer();
+});
+
+// ── DOWNLOAD GALLERY — individual JPG files ─────────────────────
+// Downloads each photo as a separate JPG file
+// Named: SocietyName_Sr_Date_Head.jpg
+async function downloadGallery() {
+  if(!_galFiltered.length){
+    if(!_galDocs.length){alert('No photos to download. Open a society gallery first.');return;}
+    alert('No photos match current filter. Clear filters and try again.');return;
+  }
+  const soc = (_galSociety||'Society').replace(/\s+/g,'-');
+  const total = _galFiltered.length;
+
+  if(!confirm('Download '+total+' photo'+(total>1?'s':'')+' as separate JPG files?\n\nThey will download one by one. Please wait till all are done.'))return;
+
+  // Download each photo with a delay so browser doesn't block
+  for(let i=0;i<_galFiltered.length;i++){
+    const d = _galFiltered[i];
+    if(!d.image)continue;
+
+    // Build clean filename: Society_01_2025-04-05_Electricity.jpg
+    const sr    = String(i+1).padStart(2,'0');
+    const date  = (d.date||'nodate').replace(/[^0-9-]/g,'');
+    const head  = (d.head||'photo').replace(/[^a-zA-Z0-9]/g,'-').substring(0,20);
+    const fname = soc+'_'+sr+'_'+date+'_'+head+'.jpg';
+
+    // Convert base64 to blob and trigger download
+    const base64 = d.image.split(',')[1] || d.image;
+    try{
+      const byteChars = atob(base64);
+      const bytes     = new Uint8Array(byteChars.length);
+      for(let j=0;j<byteChars.length;j++) bytes[j]=byteChars.charCodeAt(j);
+      const blob = new Blob([bytes],{type:'image/jpeg'});
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = fname;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url), 10000);
+    }catch(e){
+      console.error('Could not download photo '+sr,e);
+    }
+
+    // Small delay between downloads so browser handles them properly
+    await new Promise(r=>setTimeout(r,600));
+  }
+
+  alert('✔ All '+total+' photos downloaded!\n\nCheck your Downloads folder.\nPhotos are named: '+soc+'_01_date_head.jpg etc.');
+}
+
+// Keyboard navigation in viewer
+document.addEventListener('keydown', e => {
+  if(!document.getElementById('galViewer').classList.contains('open')) return;
+  if(e.key === 'ArrowLeft')  navViewer(-1);
+  if(e.key === 'ArrowRight') navViewer(+1);
+  if(e.key === 'Escape')     closeViewer();
+});
 </script>
 </body>
 </html>
