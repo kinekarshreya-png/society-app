@@ -365,9 +365,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
-// ══════════════════════════════════════════
-//  FIREBASE — DO NOT CHANGE
-// ══════════════════════════════════════════
+// ══════════════════════════════════════
+// FIREBASE — DO NOT CHANGE
+// ══════════════════════════════════════
 firebase.initializeApp({
   apiKey:            "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
   authDomain:        "society-management-d19f9.firebaseapp.com",
@@ -379,233 +379,86 @@ firebase.initializeApp({
 const db   = firebase.firestore();
 const auth = firebase.auth();
 
-// ══════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════
-let curSociety  = null;
-let isAdmin     = false;
-let _img        = '';     // compressed image ready to save
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+var curSociety = null;
+var isAdmin    = false;
+var _img       = '';
+var _galAll    = [];
+var _galShow   = [];
+var _galSoc    = null;
+var _vIdx      = 0;
 
-// ══════════════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════════════
+// ══════════════════════════════════════
+// PAGE HELPERS
+// ══════════════════════════════════════
 function showPage(id) {
-  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(p => {
-    const el=document.getElementById(p);
-    if(el)el.style.display='none';
+  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(function(p) {
+    var el = document.getElementById(p);
+    if (el) el.style.display = 'none';
   });
-  const target=document.getElementById(id);
-  if(target)target.style.display='block';
+  var t = document.getElementById(id);
+  if (t) t.style.display = 'block';
 }
-
-function showRegister() {
+function showReg() {
   showPage('pgRegister');
-  ['regErr','regSucc'].forEach(id=>document.getElementById(id).textContent='');
-  ['rSocName','rSocEmail','rSocPhone','rSocAddr'].forEach(id=>document.getElementById(id).value='');
+  ['rErr','rSucc'].forEach(function(id){ document.getElementById(id).textContent=''; });
+  ['rName','rEmail','rPhone','rAddr'].forEach(function(id){ document.getElementById(id).value=''; });
 }
-
 function showLogin() {
   showPage('pgLogin');
-  document.getElementById('loginErr').textContent='';
+  document.getElementById('loginErr').textContent = '';
 }
-
-// Password = first 4 letters of society name (lowercase) + @123
-// e.g. "Sunrise Apartments" → "sunr@123"
 function makePwd(name) {
-  const clean = name.trim().toLowerCase().replace(/[^a-z]/g, '');
-  return clean.substring(0, 4) + '@123';
+  var clean = name.trim().toLowerCase().replace(/[^a-z]/g,'');
+  return clean.substring(0,4) + '@123';
 }
-
 function showPwdHint() {
-  const name = document.getElementById('cName').value.trim();
-  const hint = document.getElementById('pwdHint');
-  hint.textContent = name.length > 0
-    ? '🔑 Password will be: ' + makePwd(name)
-    : '';
+  var name = document.getElementById('cName').value.trim();
+  document.getElementById('pwdHint').textContent = name.length > 0 ? 'Password will be: ' + makePwd(name) : '';
 }
 
-// ══════════════════════════════════════════
-//  REGISTER — Society self-registration
-// ══════════════════════════════════════════
-async function submitRegister() {
-  const name  = document.getElementById('rSocName').value.trim();
-  const email = document.getElementById('rSocEmail').value.trim().toLowerCase();
-  const phone = document.getElementById('rSocPhone').value.trim();
-  const addr  = document.getElementById('rSocAddr').value.trim();
-  const err   = document.getElementById('regErr');
-  const succ  = document.getElementById('regSucc');
-  const btn   = document.getElementById('regBtn');
-  err.textContent='';succ.textContent='';
-
-  if(!name||!email||!phone||!addr){
-    err.textContent='Please fill Society Name, Email, Phone and Address.';return;
-  }
-  if(!email.includes('@')||!email.includes('.')){
-    err.textContent='Please enter a valid email address.';return;
-  }
-
-  btn.textContent='Submitting…';btn.disabled=true;
-
-  try {
-    // Check if already registered in societies
-    const socSnap=await db.collection('societies').where('email','==',email).get();
-    if(!socSnap.empty){
-      err.textContent='This email is already registered! Contact admin for login details.';
-      btn.textContent='Submit Registration Request';btn.disabled=false;return;
-    }
-    // Check if already has a pending request
-    const pendSnap=await db.collection('registrations').where('email','==',email).get();
-    if(!pendSnap.empty){
-      err.textContent='A registration request for this email already exists! Admin will contact you soon.';
-      btn.textContent='Submit Registration Request';btn.disabled=false;return;
-    }
-    // Save registration request
-    await db.collection('registrations').add({
-      name,email,phone,
-      address:document.getElementById('rSocAddr').value.trim(),
-      status:'pending',
-      submittedAt:Date.now()
-    });
-    succ.textContent='✔ Request submitted! Admin will review and contact you soon.';
-    btn.textContent='Submit Registration Request';btn.disabled=false;
-    // Clear form
-    ['rSocName','rSocEmail','rSocPhone','rSocAddr'].forEach(id=>document.getElementById(id).value='');
-  } catch(e){
-    err.textContent='Error: '+e.message;
-    btn.textContent='Submit Registration Request';btn.disabled=false;
-  }
-}
-
-// ══════════════════════════════════════════
-//  PENDING REQUESTS — Admin view + approve/reject
-// ══════════════════════════════════════════
-async function loadPendingRequests() {
-  const snap=await db.collection('registrations').where('status','==','pending').get();
-  const h3=document.getElementById('pendingH3');
-  const list=document.getElementById('pendingList');
-  const badge=document.getElementById('pendingCount');
-
-  if(snap.empty){h3.style.display='none';list.innerHTML='';return;}
-
-  h3.style.display='block';
-  badge.textContent=snap.size;
-  let html='';
-  snap.forEach(doc=>{
-    const d=doc.data();
-    html+=`<div class="req-card">
-      <div class="rname">${d.name.toUpperCase()}</div>
-      <div class="rmeta">
-        📧 ${d.email}<br>
-        📞 ${d.phone}<br>
-        📍 ${d.address}
-      </div>
-      <div class="racts">
-        <button class="btn btn-sm btn-approve" onclick="approveRequest('${doc.id}','${d.name}','${d.email}','${d.phone}','${d.address}')">✔ Approve</button>
-        <button class="btn btn-sm btn-reject"  onclick="ignoreRequest('${doc.id}')">🗑 Ignore</button>
-        <span class="badge-pending">Pending</span>
-      </div>
-    </div>`;
-  });
-  list.innerHTML=html;
-}
-
-async function approveRequest(id,name,email,phone,addr,city,flats,date){
-  const password=makePwd(name);
-  if(!confirm('Approve "'+name+'"?
-
-Password will be: '+password+'
-
-Share this with the society after approving.')){return;}
-  try{
-    // Create Firebase Auth account
-    await auth.createUserWithEmailAndPassword(email,password);
-    // Save to societies collection
-    await db.collection('societies').add({
-      name:name.toLowerCase(),email,password,phone,
-      address:addr,city,totalFlats:parseInt(flats)||0,date,
-      approvedAt:Date.now()
-    });
-    // Mark registration as approved
-    await db.collection('registrations').doc(id).update({status:'approved',approvedAt:Date.now()});
-    alert('✔ Society approved!\n\nName    : '+name+'\nEmail   : '+email+'\nPassword: '+password+'\n\nShare these login details with the society now.');
-    loadPendingRequests();
-    loadSocieties();
-  }catch(e){
-    if(e.code==='auth/email-already-in-use'){
-      await db.collection('societies').add({name:name.toLowerCase(),email,password,phone,address:addr,approvedAt:Date.now()});
-      await db.collection('registrations').doc(id).update({status:'approved',approvedAt:Date.now()});
-      alert('✔ Society approved!\n\nEmail: '+email+'\nPassword: '+password);
-      loadPendingRequests();loadSocieties();
-    } else {
-      alert('Error: '+e.message);
-    }
-  }
-}
-
-
-
-// ══════════════════════════════════════════
-//  LOGIN
-//  Step 1: Firebase Auth sign-in (handles security)
-//  Step 2: After auth, check if superadmin or society
-// ══════════════════════════════════════════
+// ══════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════
 function login() {
-  const email = document.getElementById('inEmail').value.trim().toLowerCase();
-  const pwd   = document.getElementById('inPass').value.trim();
-  const errEl = document.getElementById('loginErr');
-  const btn   = document.getElementById('loginBtn');
+  var email = document.getElementById('inEmail').value.trim().toLowerCase();
+  var pwd   = document.getElementById('inPass').value.trim();
+  var errEl = document.getElementById('loginErr');
+  var btn   = document.getElementById('loginBtn');
   errEl.textContent = '';
-
-  if (!email || !pwd) {
-    errEl.textContent = 'Please enter email and password.';
-    return;
-  }
-
-  btn.textContent = 'Logging in…';
-  btn.disabled    = true;
-
-  // Use Firebase Auth to sign in — this is secure
+  if (!email || !pwd) { errEl.textContent = 'Please enter email and password.'; return; }
+  btn.textContent = 'Logging in...'; btn.disabled = true;
   auth.signInWithEmailAndPassword(email, pwd)
-    .then(userCred => {
-      const userEmail = userCred.user.email.toLowerCase();
-
-      // ── Superadmin ──
-      if (userEmail === 'companyadmin@gmail.com') {
+    .then(function(uc) {
+      var ue = uc.user.email.toLowerCase();
+      btn.textContent = 'Login'; btn.disabled = false;
+      if (ue === 'companyadmin@gmail.com') {
         isAdmin = true;
-        btn.textContent = 'Login';
-        btn.disabled    = false;
         showPage('pgAdmin');
         loadSocieties();
+        loadPending();
         return;
       }
-
-      // ── Society user — find their society in Firestore ──
-      return db.collection('societies')
-        .where('email', '==', userEmail)
-        .get()
-        .then(snap => {
-          btn.textContent = 'Login';
-          btn.disabled    = false;
+      db.collection('societies').where('email','==',ue).get()
+        .then(function(snap) {
           if (snap.empty) {
-            errEl.textContent = 'Account found but no society linked. Contact admin.';
-            auth.signOut();
-            return;
+            errEl.textContent = 'No society found. Contact admin.';
+            auth.signOut(); return;
           }
-          snap.forEach(doc => { curSociety = doc.data().name; });
+          snap.forEach(function(doc) { curSociety = doc.data().name; });
           isAdmin = false;
           showPage('pgSociety');
           document.getElementById('uploadBtn').style.display = 'block';
-          document.getElementById('socTitle').textContent    = curSociety.toUpperCase();
-          document.getElementById('backBtn').style.display   = 'none';
+          document.getElementById('socTitle').textContent = curSociety.toUpperCase();
+          document.getElementById('backBtn').style.display = 'none';
           loadUploads();
         });
     })
-    .catch(e => {
-      btn.textContent = 'Login';
-      btn.disabled    = false;
-      // Show friendly error messages
-      if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' ||
-          e.code === 'auth/invalid-credential') {
+    .catch(function(e) {
+      btn.textContent = 'Login'; btn.disabled = false;
+      if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
         errEl.textContent = 'Wrong email or password.';
       } else if (e.code === 'auth/invalid-email') {
         errEl.textContent = 'Please enter a valid email.';
@@ -617,685 +470,474 @@ function login() {
     });
 }
 
-// ══════════════════════════════════════════
-//  CREATE SOCIETY
-// ══════════════════════════════════════════
-function createSociety() {
-  const name  = document.getElementById('cName').value.trim();
-  const email = document.getElementById('cEmail').value.trim().toLowerCase();
-  const date  = document.getElementById('cDate').value;
-  const btn   = document.getElementById('createBtn');
+// ══════════════════════════════════════
+// REGISTER
+// ══════════════════════════════════════
+function submitReg() {
+  var name  = document.getElementById('rName').value.trim();
+  var email = document.getElementById('rEmail').value.trim().toLowerCase();
+  var phone = document.getElementById('rPhone').value.trim();
+  var addr  = document.getElementById('rAddr').value.trim();
+  var err   = document.getElementById('rErr');
+  var succ  = document.getElementById('rSucc');
+  var btn   = document.getElementById('rBtn');
+  err.textContent = ''; succ.textContent = '';
+  if (!name||!email||!phone||!addr) { err.textContent = 'Please fill all 4 fields.'; return; }
+  if (!email.includes('@')||!email.includes('.')) { err.textContent = 'Enter a valid email.'; return; }
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+  db.collection('societies').where('email','==',email).get()
+    .then(function(s1) {
+      if (!s1.empty) {
+        err.textContent = 'This email is already registered! Contact admin for login.';
+        btn.textContent = 'Submit Registration Request'; btn.disabled = false; return;
+      }
+      return db.collection('registrations').where('email','==',email).get()
+        .then(function(s2) {
+          if (!s2.empty) {
+            err.textContent = 'Request already submitted. Admin will contact you soon.';
+            btn.textContent = 'Submit Registration Request'; btn.disabled = false; return;
+          }
+          return db.collection('registrations').add({
+            name:name, email:email, phone:phone, address:addr,
+            status:'pending', submittedAt:Date.now()
+          }).then(function() {
+            succ.textContent = 'Request submitted! Admin will review and contact you.';
+            btn.textContent = 'Submit Registration Request'; btn.disabled = false;
+            ['rName','rEmail','rPhone','rAddr'].forEach(function(id){ document.getElementById(id).value=''; });
+          });
+        });
+    })
+    .catch(function(e) {
+      err.textContent = 'Error: ' + e.message;
+      btn.textContent = 'Submit Registration Request'; btn.disabled = false;
+    });
+}
 
-  if (!name || !email || !date) {
-    alert('Please fill:\n• Society Name\n• Society Email\n• Start Date');
-    return;
-  }
-  if (!email.includes('@') || !email.includes('.')) {
-    alert('Please enter a valid email address.');
-    return;
-  }
+// ══════════════════════════════════════
+// PENDING REQUESTS
+// ══════════════════════════════════════
+function loadPending() {
+  db.collection('registrations').where('status','==','pending').get()
+    .then(function(snap) {
+      var h3=document.getElementById('pendH3');
+      var list=document.getElementById('pendList');
+      var badge=document.getElementById('pendCount');
+      if (snap.empty) { h3.style.display='none'; list.innerHTML=''; return; }
+      h3.style.display='block'; badge.textContent=snap.size;
+      var html='';
+      snap.forEach(function(doc) {
+        var d=doc.data();
+        var sid=doc.id;
+        var sname=d.name.replace(/'/g,' ');
+        var saddr=(d.address||'').replace(/'/g,' ');
+        html+='<div class="req-card">'+
+          '<div class="rname">'+d.name.toUpperCase()+'</div>'+
+          '<div class="rmeta">Email: '+d.email+'<br>Phone: '+d.phone+'<br>Address: '+d.address+'</div>'+
+          '<div class="racts">'+
+          '<button class="btn btn-sm btn-approve" onclick="approveReq(\''+sid+'\',\''+sname+'\',\''+d.email+'\',\''+d.phone+'\',\''+saddr+'\')">Approve</button>'+
+          '<button class="btn btn-sm btn-delete" onclick="ignoreReq(\''+sid+'\')">Ignore</button>'+
+          '<span class="badge-pending">Pending</span>'+
+          '</div></div>';
+      });
+      list.innerHTML=html;
+    });
+}
 
-  const password = makePwd(name);
-
-  btn.textContent = 'Creating…';
-  btn.disabled    = true;
-
-  // Step 1: Create Firebase Auth account for the society
-  // This means they can securely log in
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(() => {
-      // Step 2: Save society details in Firestore
+function approveReq(id, name, email, phone, addr) {
+  var pwd = makePwd(name);
+  if (!confirm('Approve "'+name+'"?\n\nLogin details:\nEmail: '+email+'\nPassword: '+pwd+'\n\nClick OK then share these details.')) return;
+  auth.createUserWithEmailAndPassword(email, pwd)
+    .then(function() {
       return db.collection('societies').add({
-        name: name.toLowerCase(), email, password, date
+        name:name.toLowerCase(), email:email, password:pwd,
+        phone:phone, address:addr, approvedAt:Date.now()
       });
     })
-    .then(() => {
-      btn.textContent = 'Create Society';
-      btn.disabled    = false;
-      alert(
-        '✔ Society Created!\n\n' +
-        'Name    : ' + name + '\n' +
-        'Email   : ' + email + '\n' +
-        'Password: ' + password + '\n\n' +
-        'Share these login details with the society.'
-      );
-      document.getElementById('cName').value         = '';
-      document.getElementById('cEmail').value        = '';
-      document.getElementById('cDate').value         = '';
-      document.getElementById('pwdHint').textContent = '';
-      loadSocieties();
+    .then(function() {
+      return db.collection('registrations').doc(id).update({status:'approved', approvedAt:Date.now()});
     })
-    .catch(e => {
-      btn.textContent = 'Create Society';
-      btn.disabled    = false;
-      if (e.code === 'auth/email-already-in-use') {
-        alert('This email already has an account!\nEither the society exists or try a different email.');
-      } else {
-        alert('Error creating society: ' + e.message);
-      }
+    .then(function() {
+      alert('Approved!\n\nEmail: '+email+'\nPassword: '+pwd+'\n\nShare with the society now.');
+      loadPending(); loadSocieties();
+    })
+    .catch(function(e) {
+      if (e.code==='auth/email-already-in-use') {
+        db.collection('societies').add({
+          name:name.toLowerCase(), email:email, password:pwd,
+          phone:phone, address:addr, approvedAt:Date.now()
+        }).then(function() {
+          return db.collection('registrations').doc(id).update({status:'approved', approvedAt:Date.now()});
+        }).then(function() {
+          alert('Approved!\nEmail: '+email+'\nPassword: '+pwd);
+          loadPending(); loadSocieties();
+        });
+      } else { alert('Error: '+e.message); }
     });
 }
 
-// ══════════════════════════════════════════
-//  LOAD SOCIETIES LIST
-// ══════════════════════════════════════════
+function ignoreReq(id) {
+  if (!confirm('Remove this request?')) return;
+  db.collection('registrations').doc(id).delete().then(function() { loadPending(); });
+}
+
+// ══════════════════════════════════════
+// CREATE SOCIETY
+// ══════════════════════════════════════
+function createSociety() {
+  var name=document.getElementById('cName').value.trim();
+  var email=document.getElementById('cEmail').value.trim().toLowerCase();
+  var date=document.getElementById('cDate').value;
+  var btn=document.getElementById('createBtn');
+  if (!name||!email||!date) { alert('Fill Society Name, Email and Date.'); return; }
+  if (!email.includes('@')) { alert('Enter a valid email.'); return; }
+  var pwd=makePwd(name);
+  btn.textContent='Creating...'; btn.disabled=true;
+  db.collection('societies').where('email','==',email).get()
+    .then(function(ex) {
+      if (!ex.empty) {
+        alert('This email is already used!');
+        btn.textContent='Create Society'; btn.disabled=false; return;
+      }
+      return auth.createUserWithEmailAndPassword(email, pwd)
+        .then(function() {
+          return db.collection('societies').add({
+            name:name.toLowerCase(), email:email, password:pwd, date:date, createdAt:Date.now()
+          });
+        })
+        .then(function() {
+          btn.textContent='Create Society'; btn.disabled=false;
+          alert('Society Created!\n\nName: '+name+'\nEmail: '+email+'\nPassword: '+pwd+'\n\nShare with the society.');
+          document.getElementById('cName').value='';
+          document.getElementById('cEmail').value='';
+          document.getElementById('cDate').value='';
+          document.getElementById('pwdHint').textContent='';
+          loadSocieties();
+        });
+    })
+    .catch(function(e) {
+      btn.textContent='Create Society'; btn.disabled=false;
+      if (e.code==='auth/email-already-in-use') {
+        db.collection('societies').add({
+          name:name.toLowerCase(), email:email, password:pwd, date:date, createdAt:Date.now()
+        }).then(function() {
+          alert('Created!\nEmail: '+email+'\nPassword: '+pwd);
+          loadSocieties();
+        });
+      } else { alert('Error: '+e.message); }
+    });
+}
+
+// ══════════════════════════════════════
+// LOAD SOCIETIES
+// ══════════════════════════════════════
 function loadSocieties() {
-  loadPendingRequests();  // always check pending requests when admin page loads
-  const list = document.getElementById('socList');
-  list.innerHTML = "<div class='empty'>Loading…</div>";
-
+  loadPending();
+  var list=document.getElementById('socList');
+  list.innerHTML="<div class='empty'>Loading...</div>";
   db.collection('societies').get()
-    .then(snap => {
-      if (snap.empty) {
-        list.innerHTML = "<div class='empty'>No societies yet. Create one above!</div>";
-        return;
-      }
-      let html = '';
-      snap.forEach(doc => {
-        const d = doc.data();
-        html += `
-          <div class="card soc-card">
-            <div>
-              <div class="sname">${d.name.toUpperCase()}</div>
-              <div class="semail">${d.email}</div>
-              <div class="spass">Password: ${d.password}</div>
-            </div>
-            <div class="acts">
-              <button class="btn btn-sm btn-export" onclick="exportData('${d.name}')">⬇ Excel</button>
-              <button class="btn btn-sm" style="background:#7b4f9e;color:white" onclick="openGallery('${d.name}')">📸 Gallery</button>
-              <button class="btn btn-sm btn-open"   onclick="openSociety('${d.name}')">Open</button>
-              <button class="btn btn-sm btn-delete" onclick="delSociety('${doc.id}')">Delete</button>
-            </div>
-          </div>`;
+    .then(function(snap) {
+      if (snap.empty) { list.innerHTML="<div class='empty'>No societies yet.</div>"; return; }
+      var html='';
+      snap.forEach(function(doc) {
+        var d=doc.data();
+        html+='<div class="card soc-card">'+
+          '<div>'+
+          '<div class="sname">'+d.name.toUpperCase()+'</div>'+
+          '<div class="semail">'+d.email+'</div>'+
+          '<div class="spass">Password: '+(d.password||'—')+'</div>'+
+          '</div>'+
+          '<div class="acts">'+
+          '<button class="btn btn-sm btn-export" onclick="exportData(\"'+d.name+'\")">Excel</button>'+
+          '<button class="btn btn-sm btn-purple" onclick="openGallery(\"'+d.name+'\")">Gallery</button>'+
+          '<button class="btn btn-sm btn-open" onclick="openSociety(\"'+d.name+'\")">Open</button>'+
+          '<button class="btn btn-sm btn-delete" onclick="delSociety(\"'+doc.id+'\")">Delete</button>'+
+          '</div></div>';
       });
-      list.innerHTML = html;
+      list.innerHTML=html;
     })
-    .catch(e => {
-      list.innerHTML = "<div class='empty'>Error loading. Refresh page.</div>";
-    });
+    .catch(function() { list.innerHTML="<div class='empty'>Error. Refresh page.</div>"; });
 }
 
-// ══════════════════════════════════════════
-//  OPEN SOCIETY (admin view)
-// ══════════════════════════════════════════
 function openSociety(name) {
-  curSociety = name;
+  curSociety=name;
   showPage('pgSociety');
-  document.getElementById('backBtn').style.display    = 'block';
-  document.getElementById('uploadBtn').style.display  = 'none';
-  document.getElementById('socTitle').textContent     = name.toUpperCase();
+  document.getElementById('backBtn').style.display='block';
+  document.getElementById('uploadBtn').style.display='none';
+  document.getElementById('socTitle').textContent=name.toUpperCase();
   loadUploads();
 }
-
 function goBack() {
-  curSociety = null;
-  document.getElementById('uploads').innerHTML = '';
+  curSociety=null;
+  document.getElementById('uploads').innerHTML='';
+  document.getElementById('uploadBtn').style.display='none';
   showPage('pgAdmin');
-  document.getElementById('uploadBtn').style.display = 'none';
   loadSocieties();
 }
-
-// ══════════════════════════════════════════
-//  DELETE SOCIETY
-// ══════════════════════════════════════════
 function delSociety(id) {
-  if (!confirm('Delete this society?\nUploaded bills will stay in database.')) return;
+  if (!confirm('Delete this society?')) return;
   db.collection('societies').doc(id).delete()
-    .then(() => { alert('Society deleted.'); loadSocieties(); })
-    .catch(e => alert('Error: ' + e.message));
+    .then(function() { loadSocieties(); })
+    .catch(function(e) { alert('Error: '+e.message); });
 }
 
-// ══════════════════════════════════════════
-//  IMAGE COMPRESSION
-//  Max 900px wide, JPEG quality stepped down
-//  until safely under 700KB
-// ══════════════════════════════════════════
+// ══════════════════════════════════════
+// IMAGE COMPRESSION
+// ══════════════════════════════════════
 function compressImage(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Cannot read file'));
-    reader.onload  = e => {
-      const img = new Image();
-      img.onerror = () => reject(new Error('Cannot load image'));
-      img.onload  = () => {
-        const MAX = 900;
-        let w = img.width, h = img.height;
-        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-
-        const cv = document.createElement('canvas');
-        cv.width = w; cv.height = h;
-        cv.getContext('2d').drawImage(img, 0, 0, w, h);
-
-        const SAFE = 700 * 1024;
-        let data = cv.toDataURL('image/jpeg', 0.60);
-        if (data.length > SAFE) data = cv.toDataURL('image/jpeg', 0.40);
-        if (data.length > SAFE) data = cv.toDataURL('image/jpeg', 0.25);
-        if (data.length > SAFE) {
-          const cv2 = document.createElement('canvas');
-          cv2.width = 600; cv2.height = Math.round(h * 600 / w);
-          cv2.getContext('2d').drawImage(cv, 0, 0, cv2.width, cv2.height);
-          data = cv2.toDataURL('image/jpeg', 0.30);
+  return new Promise(function(resolve,reject) {
+    var reader=new FileReader();
+    reader.onerror=function(){ reject(new Error('Cannot read')); };
+    reader.onload=function(e) {
+      var img=new Image();
+      img.onerror=function(){ reject(new Error('Cannot load')); };
+      img.onload=function() {
+        var MAX=900,w=img.width,h=img.height;
+        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+        var cv=document.createElement('canvas');
+        cv.width=w;cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        var SAFE=700*1024;
+        var data=cv.toDataURL('image/jpeg',0.60);
+        if(data.length>SAFE) data=cv.toDataURL('image/jpeg',0.40);
+        if(data.length>SAFE) data=cv.toDataURL('image/jpeg',0.25);
+        if(data.length>SAFE){
+          var cv2=document.createElement('canvas');
+          cv2.width=600;cv2.height=Math.round(h*600/w);
+          cv2.getContext('2d').drawImage(cv,0,0,cv2.width,cv2.height);
+          data=cv2.toDataURL('image/jpeg',0.30);
         }
         resolve(data);
       };
-      img.src = e.target.result;
+      img.src=e.target.result;
     };
     reader.readAsDataURL(file);
   });
 }
-
 function onPhoto(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const stat = document.getElementById('compStat');
-  const btn  = document.getElementById('saveBtn');
-  stat.textContent = '⏳ Compressing (' + (file.size/1024).toFixed(0) + ' KB)…';
-  btn.disabled = true;
-  _img = '';
+  var file=input.files[0]; if(!file)return;
+  var stat=document.getElementById('compStat');
+  var btn=document.getElementById('saveBtn');
+  stat.textContent='Compressing ('+Math.round(file.size/1024)+' KB)...';
+  btn.disabled=true; _img='';
   compressImage(file)
-    .then(data => {
-      _img = data;
-      stat.textContent = '✔ Photo ready — ~' + Math.round(data.length * 0.75 / 1024) + ' KB';
-      btn.disabled = false;
-    })
-    .catch(() => {
-      stat.textContent = '⚠ Could not process image. Try another.';
-      btn.disabled = false;
-    });
+    .then(function(data){ _img=data; stat.textContent='Photo ready — ~'+Math.round(data.length*0.75/1024)+' KB'; btn.disabled=false; })
+    .catch(function(){ stat.textContent='Could not process image. Try another.'; btn.disabled=false; });
 }
 
-// ══════════════════════════════════════════
-//  HEAD DROPDOWN
-// ══════════════════════════════════════════
+// ══════════════════════════════════════
+// HEAD DROPDOWN
+// ══════════════════════════════════════
 function headChange() {
-  const other = document.getElementById('uHeadOther');
-  if (document.getElementById('uHead').value === '__other') {
-    other.style.display = 'block';
-    other.focus();
-  } else {
-    other.style.display = 'none';
-    other.value = '';
-  }
+  var other=document.getElementById('uHeadOther');
+  if(document.getElementById('uHead').value==='__other'){other.style.display='block';other.focus();}
+  else{other.style.display='none';other.value='';}
 }
 
-// ══════════════════════════════════════════
-//  UPLOAD MODAL
-// ══════════════════════════════════════════
-function openModal() {
-  _img = '';
-  document.getElementById('compStat').textContent = '';
-  document.getElementById('saveBtn').disabled     = false;
+// ══════════════════════════════════════
+// UPLOAD MODAL
+// ══════════════════════════════════════
+function openModal(){
+  _img='';
+  document.getElementById('compStat').textContent='';
+  document.getElementById('saveBtn').disabled=false;
   document.getElementById('uploadModal').classList.add('open');
 }
-
-function closeModal() {
+function closeModal(){
   document.getElementById('uploadModal').classList.remove('open');
-  ['uDate','uAmt','uNarr','uHeadOther'].forEach(id =>
-    document.getElementById(id).value = '');
-  document.getElementById('uHead').value          = '';
-  document.getElementById('uHeadOther').style.display = 'none';
-  document.getElementById('camInput').value       = '';
-  document.getElementById('galInput').value       = '';
-  document.getElementById('compStat').textContent = '';
-  document.getElementById('saveBtn').textContent  = 'Upload';
-  _img = '';
+  ['uDate','uAmt','uNarr','uHeadOther'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('uHead').value='';
+  document.getElementById('uHeadOther').style.display='none';
+  document.getElementById('camInput').value='';
+  document.getElementById('galInput').value='';
+  document.getElementById('compStat').textContent='';
+  document.getElementById('saveBtn').textContent='Upload';
+  _img='';
 }
+document.getElementById('uploadModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-document.getElementById('uploadModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-// ══════════════════════════════════════════
-//  SAVE UPLOAD
-// ══════════════════════════════════════════
-function saveUpload() {
-  const date  = document.getElementById('uDate').value;
-  const hSel  = document.getElementById('uHead').value;
-  const head  = hSel === '__other'
-                ? document.getElementById('uHeadOther').value.trim()
-                : hSel;
-  const amt   = document.getElementById('uAmt').value.trim();
-  const narr  = document.getElementById('uNarr').value.trim();
-  const btn   = document.getElementById('saveBtn');
-
-  if (!_img)       { alert('Please select a photo first.\nTap 📷 Camera or 🖼 Gallery.'); return; }
-  if (!date)       { alert('Please select a date.'); return; }
-  if (!head)       { alert('Please select an expense head.'); return; }
-  if (!amt)        { alert('Please enter the amount.'); return; }
-
-  btn.textContent = 'Uploading…';
-  btn.disabled    = true;
-
+function saveUpload(){
+  var date=document.getElementById('uDate').value;
+  var hSel=document.getElementById('uHead').value;
+  var head=hSel==='__other'?document.getElementById('uHeadOther').value.trim():hSel;
+  var amt=document.getElementById('uAmt').value.trim();
+  var narr=document.getElementById('uNarr').value.trim();
+  var btn=document.getElementById('saveBtn');
+  if(!_img){alert('Please select a photo first.');return;}
+  if(!date){alert('Please select a date.');return;}
+  if(!head){alert('Please select an expense head.');return;}
+  if(!amt){alert('Please enter the amount.');return;}
+  btn.textContent='Uploading...';btn.disabled=true;
   db.collection('uploads').add({
-    society: curSociety, image: _img,
-    date, head, amount: amt, narration: narr,
-    timestamp: Date.now()
-  })
-  .then(() => {
-    alert('✔ Bill uploaded!');
-    closeModal();
-    loadUploads();
-  })
-  .catch(e => {
-    alert('Upload failed: ' + e.message);
-    btn.textContent = 'Upload';
-    btn.disabled    = false;
+    society:curSociety,image:_img,date:date,head:head,amount:amt,narration:narr,timestamp:Date.now()
+  }).then(function(){
+    alert('Bill uploaded!');closeModal();loadUploads();
+  }).catch(function(e){
+    alert('Upload failed: '+e.message);btn.textContent='Upload';btn.disabled=false;
   });
 }
 
-// ══════════════════════════════════════════
-//  LOAD UPLOADS
-// ══════════════════════════════════════════
-function loadUploads() {
-  const area  = document.getElementById('uploads');
-  const empty = document.getElementById('emptyMsg');
-  area.innerHTML = "<div class='empty'>Loading…</div>";
-
-  db.collection('uploads')
-    .where('society', '==', curSociety)
-    .get()
-    .then(snap => {
-      area.innerHTML = '';
-      if (snap.empty) { empty.style.display = 'block'; return; }
-      empty.style.display = 'none';
-
-      const docs = [];
-      snap.forEach(doc => docs.push(doc.data()));
-      docs.sort((a, b) => b.timestamp - a.timestamp);
-
-      docs.forEach(u => {
-        const d = document.createElement('div');
-        d.className = 'card upload-card';
-        d.innerHTML =
-          '<img src="' + u.image + '" alt="Bill" onclick="openLB(this.src)" title="Click to enlarge">' +
-          '<div class="drow"><span class="dlbl">📅 Date</span><span>'   + u.date          + '</span></div>' +
-          '<div class="drow"><span class="dlbl">🗂 Head</span><span>'   + u.head          + '</span></div>' +
-          '<div class="drow"><span class="dlbl">💰 Amount</span><span>₹' + u.amount      + '</span></div>' +
-          '<div class="drow"><span class="dlbl">📝 Note</span><span>'   + (u.narration||'—') + '</span></div>';
+// ══════════════════════════════════════
+// LOAD UPLOADS
+// ══════════════════════════════════════
+function loadUploads(){
+  var area=document.getElementById('uploads');
+  var empty=document.getElementById('emptyMsg');
+  area.innerHTML="<div class='empty'>Loading...</div>";
+  db.collection('uploads').where('society','==',curSociety).get()
+    .then(function(snap){
+      area.innerHTML='';
+      if(snap.empty){empty.style.display='block';return;}
+      empty.style.display='none';
+      var docs=[];snap.forEach(function(doc){docs.push(doc.data());});
+      docs.sort(function(a,b){return b.timestamp-a.timestamp;});
+      docs.forEach(function(u){
+        var d=document.createElement('div');
+        d.className='card upload-card';
+        d.innerHTML='<img src="'+u.image+'" alt="Bill" onclick="openLB(this.src)" title="Click to enlarge">'+
+          '<div class="drow"><span class="dlbl">Date</span><span>'+u.date+'</span></div>'+
+          '<div class="drow"><span class="dlbl">Head</span><span>'+u.head+'</span></div>'+
+          '<div class="drow"><span class="dlbl">Amount</span><span>Rs.'+u.amount+'</span></div>'+
+          '<div class="drow"><span class="dlbl">Note</span><span>'+(u.narration||'—')+'</span></div>';
         area.appendChild(d);
       });
     })
-    .catch(() => {
-      area.innerHTML = "<div class='empty'>Error loading. Please refresh.</div>";
-    });
+    .catch(function(){area.innerHTML="<div class='empty'>Error loading. Refresh.</div>";});
 }
+function openLB(src){document.getElementById('lbImg').src=src;document.getElementById('lightbox').classList.add('open');}
 
-function openLB(src) {
-  document.getElementById('lbImg').src = src;
-  document.getElementById('lightbox').classList.add('open');
-}
-
-// ══════════════════════════════════════════
-//  EXPORT — Excel + HTML photo viewer
-// ══════════════════════════════════════════
-function exportData(societyName) {
-  db.collection('uploads')
-    .where('society', '==', societyName)
-    .get()
-    .then(snap => {
-      if (snap.empty) { alert('No uploads for: ' + societyName); return; }
-
-      const docs = [];
-      snap.forEach(doc => docs.push(doc.data()));
-      docs.sort((a, b) => a.date > b.date ? 1 : -1);
-
-      // ── Excel: clean data only, no photo column ──
-      const rows = [['Sr','Date','Expense Head','Amount (₹)','Narration','Society']];
-      docs.forEach((u, i) =>
-        rows.push([i+1, u.date, u.head, u.amount, u.narration||'', u.society])
-      );
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols'] = [{wch:5},{wch:13},{wch:24},{wch:13},{wch:30},{wch:20}];
-      XLSX.utils.book_append_sheet(wb, ws, societyName.substring(0,31));
-
-      // ── HTML photo viewer ──
-      // Same table as Excel. Each row has "Click Me" button.
-      // Clicking opens that photo in an overlay on the same page.
-      // Overlay has: Back to List + Prev / Next buttons.
-      const htmlFile = societyName + '_photos.html';
-
-      // All images embedded as JS array — self-contained, no extra files
-      const imgsJson = JSON.stringify(docs.map(u => u.image || ''));
-      const dataJson = JSON.stringify(docs.map(u => ({
-        date: u.date, head: u.head, amount: u.amount, narration: u.narration || ''
-      })));
-
-      let tRows = '';
-      docs.forEach((u, i) => {
-        tRows += '<tr id="r' + (i+1) + '">' +
-          '<td>' + (i+1) + '</td>' +
-          '<td>' + u.date + '</td>' +
-          '<td>' + u.head + '</td>' +
-          '<td>₹' + u.amount + '</td>' +
-          '<td>' + (u.narration||'—') + '</td>' +
-          '<td>' + (u.image
-            ? '<button class="vbtn" onclick="openPh(' + i + ')">📷 View Photo</button>'
-            : '<span style="color:#aaa">No photo</span>') +
-          '</td></tr>';
-      });
-
-      const html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${societyName.toUpperCase()} — Photos</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:sans-serif;background:#f0ece4;padding:16px}
-h1{color:#5a3825;text-align:center;margin-bottom:4px;font-size:1.3rem}
-.sub{text-align:center;color:#888;font-size:.78rem;margin-bottom:18px}
-.wrap{overflow-x:auto;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
-table{width:100%;border-collapse:collapse;background:white;font-size:.84rem;min-width:560px}
-thead th{background:#5a3825;color:white;padding:9px 11px;text-align:left;white-space:nowrap}
-tbody td{padding:8px 11px;border-bottom:1px solid #e6c9a8;vertical-align:middle}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:#fdf8f3}
-.vbtn{background:#8b5e3c;color:white;border:none;padding:5px 13px;border-radius:7px;cursor:pointer;font-size:.8rem;font-weight:700}
-.vbtn:hover{background:#5a3825}
-/* overlay */
-#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:99;align-items:center;justify-content:center;padding:16px}
-#ov.show{display:flex}
-#ovBox{background:white;border-radius:16px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-#ovHead{background:#5a3825;color:white;padding:13px 16px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between}
-#ovHead h3{font-size:.95rem;margin:0}
-#backBtn{background:rgba(255,255,255,.2);color:white;border:none;padding:5px 13px;border-radius:7px;cursor:pointer;font-size:.82rem;font-weight:700}
-#backBtn:hover{background:rgba(255,255,255,.35)}
-#ovBody{padding:14px 16px}
-#ovBody img{width:100%;border-radius:9px;margin-top:11px;display:block}
-.orow{display:flex;gap:8px;padding:4px 0;font-size:.87rem;border-bottom:1px solid #f0ece4}
-.orow:last-of-type{border-bottom:none}
-.olbl{font-weight:700;color:#5a3825;min-width:68px}
-#navRow{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #f0ece4;justify-content:center;align-items:center}
-.nbtn{background:#e6c9a8;color:#5a3825;border:none;padding:6px 15px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem}
-.nbtn:hover{background:#c49a6c;color:white}
-.nbtn:disabled{opacity:.35;cursor:not-allowed}
-#navLbl{font-size:.82rem;color:#888;min-width:60px;text-align:center}
-.topbtn{background:#8b5e3c;color:white;text-decoration:none;padding:8px 16px;border-radius:9px;font-size:.84rem;font-weight:700;white-space:nowrap}
-.topbtn:hover{background:#5a3825}
-</style>
-</head>
-<body>
-<div id="top"></div>
-<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-  <div>
-    <h1 style="margin-bottom:2px">📋 ${societyName.toUpperCase()}</h1>
-    <p class="sub" style="margin:0;text-align:left">Bill Photo Viewer &nbsp;·&nbsp; ${docs.length} entries</p>
-  </div>
-  <a href="#top" class="topbtn">↑ Back to Top</a>
-</div>
-<div class="wrap">
-<table>
-<thead><tr><th>Sr</th><th>Date</th><th>Expense Head</th><th>Amount</th><th>Narration</th><th>Photo</th></tr></thead>
-<tbody>${tRows}</tbody>
-</table>
-</div>
-
-<!-- PHOTO OVERLAY -->
-<div id="ov">
-  <div id="ovBox">
-    <div id="ovHead">
-      <h3 id="ovTitle">Photo</h3>
-      <button id="backBtn" onclick="closePh()">← Back to List</button>
-    </div>
-    <div id="ovBody">
-      <div id="ovDetails"></div>
-      <img id="ovImg" src="" alt="Bill photo">
-    </div>
-    <div id="navRow">
-      <button class="nbtn" id="btnPrev" onclick="nav(-1)">◀ Prev</button>
-      <span id="navLbl"></span>
-      <button class="nbtn" id="btnNext" onclick="nav(+1)">Next ▶</button>
-    </div>
-  </div>
-</div>
-
-<scr'+'ipt>
-const IMGS = ${imgsJson};
-const DATA = ${dataJson};
-let cur = 0;
-
-function openPh(i) {
-  cur = i;
-  render();
-  document.getElementById('ov').classList.add('show');
-  document.getElementById('ovBox').scrollTop = 0;
-}
-function closePh() {
-  document.getElementById('ov').classList.remove('show');
-  const row = document.getElementById('r' + (cur+1));
-  if (row) row.scrollIntoView({behavior:'smooth', block:'center'});
-}
-function nav(d) {
-  cur = Math.max(0, Math.min(DATA.length-1, cur+d));
-  render();
-  document.getElementById('ovBox').scrollTop = 0;
-}
-function render() {
-  const u = DATA[cur], total = DATA.length;
-  document.getElementById('ovTitle').textContent   = 'Photo ' + (cur+1) + ' of ' + total;
-  document.getElementById('navLbl').textContent    = (cur+1) + ' / ' + total;
-  document.getElementById('btnPrev').disabled      = cur === 0;
-  document.getElementById('btnNext').disabled      = cur === total-1;
-  document.getElementById('ovDetails').innerHTML   =
-    '<div class="orow"><span class="olbl">📅 Date</span><span>'    + u.date              + '</span></div>' +
-    '<div class="orow"><span class="olbl">🗂 Head</span><span>'    + u.head              + '</span></div>' +
-    '<div class="orow"><span class="olbl">💰 Amount</span><span>₹' + u.amount            + '</span></div>' +
-    '<div class="orow"><span class="olbl">📝 Note</span><span>'    + (u.narration||'—')  + '</span></div>';
-  document.getElementById('ovImg').src = IMGS[cur] || '';
-}
-document.getElementById('ov').addEventListener('click', function(e) {
-  if (e.target === this) closePh();
-});
-<\/script>
-</body>
-</html>`;
-
-      // Download HTML viewer first
-      const blob = new Blob([html], {type:'text/html'});
-      const a    = document.createElement('a');
-      a.href     = URL.createObjectURL(blob);
-      a.download = htmlFile;
-      a.click();
-
-      // Download Excel after short delay
-      setTimeout(() => {
-        XLSX.writeFile(wb, societyName + '_expenses.xlsx');
-        alert(
-          '✔ Downloaded 2 files!\n\n' +
-          '1. ' + societyName + '_expenses.xlsx\n   → Your Excel data file\n\n' +
-          '2. ' + htmlFile + '\n   → Open in browser\n' +
-          '   → Click "📷 View Photo" to see bill image\n' +
-          '   → "← Back to List" returns to the table\n' +
-          '   → "↑ Back to Top" scrolls to top'
-        );
-      }, 700);
+// ══════════════════════════════════════
+// EXPORT EXCEL
+// ══════════════════════════════════════
+function exportData(socName){
+  db.collection('uploads').where('society','==',socName).get()
+    .then(function(snap){
+      if(snap.empty){alert('No uploads for: '+socName);return;}
+      var docs=[];snap.forEach(function(doc){docs.push(doc.data());});
+      docs.sort(function(a,b){return a.date>b.date?1:-1;});
+      var rows=[['Sr','Date','Expense Head','Amount (Rs.)','Narration','Society']];
+      docs.forEach(function(u,i){rows.push([i+1,u.date,u.head,u.amount,u.narration||'',u.society]);});
+      var wb=XLSX.utils.book_new();
+      var ws=XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols']=[{wch:5},{wch:13},{wch:24},{wch:13},{wch:30},{wch:20}];
+      XLSX.utils.book_append_sheet(wb,ws,socName.substring(0,31));
+      XLSX.writeFile(wb,socName+'_expenses.xlsx');
     })
-    .catch(e => alert('Export failed: ' + e.message));
+    .catch(function(e){alert('Export failed: '+e.message);});
 }
 
-// ══════════════════════════════════════════
-//  GALLERY — Live photo viewer
-// ══════════════════════════════════════════
-let _galDocs  = [];   // all docs for current society
-let _galFiltered = []; // after filters applied
-let _galSociety = null;
-let _viewerIdx  = 0;
-
-function openGallery(societyName) {
-  _galSociety = societyName;
-  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(p=>{const el=document.getElementById(p);if(el)el.style.display='none';});
+// ══════════════════════════════════════
+// GALLERY
+// ══════════════════════════════════════
+function openGallery(socName){
+  _galSoc=socName;
+  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(function(p){var el=document.getElementById(p);if(el)el.style.display='none';});
   document.getElementById('pgGallery').classList.add('show');
-  document.getElementById('galTitle').textContent = '📸 ' + societyName.toUpperCase();
-  document.getElementById('galSubtitle').textContent = 'Live gallery · Always up to date · Click any photo to view full size';
-  document.getElementById('galSearch').value = '';
-  document.getElementById('galSort').value   = 'newest';
-  refreshGallery();
+  document.getElementById('galTitle').textContent='Gallery — '+socName.toUpperCase();
+  document.getElementById('galSub').textContent='Live gallery — always latest';
+  document.getElementById('galSearch').value='';
+  document.getElementById('galSort').value='newest';
+  refreshGal();
 }
-
-function closeGallery() {
+function closeGallery(){
   document.getElementById('pgGallery').classList.remove('show');
-  _galDocs=[];_galFiltered=[];_galSociety=null;
+  _galAll=[];_galShow=[];_galSoc=null;
   document.getElementById('pgAdmin').style.display='block';
 }
-
-async function refreshGallery() {
-  const grid = document.getElementById('galGrid');
-  grid.innerHTML = '<div class="gal-loading">⏳ Loading latest photos…</div>';
-  try {
-    const snap = await db.collection('uploads').where('society','==',_galSociety).get();
-    _galDocs = [];
-    snap.forEach(doc => _galDocs.push({id:doc.id, ...doc.data()}));
-    // Update stats
-    const totalAmt = _galDocs.reduce((s,d) => s + parseFloat(d.amount||0), 0);
-    const heads    = [...new Set(_galDocs.map(d => d.head).filter(Boolean))].sort();
-    document.getElementById('galStats').innerHTML =
-      `<div class="gal-stat"><strong>${_galDocs.length}</strong>Total Photos</div>` +
-      `<div class="gal-stat"><strong>₹${totalAmt.toLocaleString('en-IN')}</strong>Total Amount</div>` +
-      `<div class="gal-stat"><strong>${heads.length}</strong>Expense Heads</div>`;
-    // Populate head filter dropdown
-    const headSel = document.getElementById('galHead');
-    headSel.innerHTML = '<option value="">All Heads</option>' +
-      heads.map(h => `<option value="${h}">${h}</option>`).join('');
-    filterGallery();
-  } catch(e) {
-    grid.innerHTML = '<div class="no-results">Error loading. Check connection.</div>';
-  }
+function refreshGal(){
+  var grid=document.getElementById('galGrid');
+  grid.innerHTML='<div class="gal-loading">Loading photos...</div>';
+  db.collection('uploads').where('society','==',_galSoc).get()
+    .then(function(snap){
+      _galAll=[];snap.forEach(function(doc){_galAll.push(doc.data());});
+      var total=_galAll.length;
+      var amt=_galAll.reduce(function(s,d){return s+parseFloat(d.amount||0);},0);
+      var heads=[];
+      _galAll.forEach(function(d){if(d.head&&heads.indexOf(d.head)===-1)heads.push(d.head);});
+      heads.sort();
+      document.getElementById('galStats').innerHTML=
+        '<div class="gal-stat"><strong>'+total+'</strong>Photos</div>'+
+        '<div class="gal-stat"><strong>Rs.'+Math.round(amt).toLocaleString('en-IN')+'</strong>Total</div>'+
+        '<div class="gal-stat"><strong>'+heads.length+'</strong>Heads</div>';
+      var sel=document.getElementById('galHead');
+      sel.innerHTML='<option value="">All Heads</option>';
+      heads.forEach(function(h){var o=document.createElement('option');o.value=h;o.textContent=h;sel.appendChild(o);});
+      filterGal();
+    })
+    .catch(function(){grid.innerHTML='<div class="no-results">Error loading.</div>';});
 }
-
-function filterGallery() {
-  const search = document.getElementById('galSearch').value.toLowerCase().trim();
-  const head   = document.getElementById('galHead').value;
-  const sort   = document.getElementById('galSort').value;
-
-  _galFiltered = _galDocs.filter(d => {
-    const matchHead   = !head   || d.head === head;
-    const matchSearch = !search ||
-      (d.head||'').toLowerCase().includes(search) ||
-      (d.narration||'').toLowerCase().includes(search) ||
-      (d.date||'').includes(search);
-    return matchHead && matchSearch;
+function filterGal(){
+  var search=document.getElementById('galSearch').value.toLowerCase().trim();
+  var head=document.getElementById('galHead').value;
+  var sort=document.getElementById('galSort').value;
+  _galShow=_galAll.filter(function(d){
+    var mH=!head||d.head===head;
+    var mS=!search||(d.head||'').toLowerCase().indexOf(search)!==-1||(d.narration||'').toLowerCase().indexOf(search)!==-1||(d.date||'').indexOf(search)!==-1;
+    return mH&&mS;
   });
-
-  // Sort
-  if(sort === 'newest')  _galFiltered.sort((a,b) => b.timestamp - a.timestamp);
-  if(sort === 'oldest')  _galFiltered.sort((a,b) => a.timestamp - b.timestamp);
-  if(sort === 'amount')  _galFiltered.sort((a,b) => parseFloat(b.amount||0) - parseFloat(a.amount||0));
-
-  renderGallery();
+  if(sort==='newest') _galShow.sort(function(a,b){return b.timestamp-a.timestamp;});
+  if(sort==='oldest') _galShow.sort(function(a,b){return a.timestamp-b.timestamp;});
+  if(sort==='amount') _galShow.sort(function(a,b){return parseFloat(b.amount||0)-parseFloat(a.amount||0);});
+  renderGal();
 }
-
-function renderGallery() {
-  const grid = document.getElementById('galGrid');
-  if(!_galFiltered.length) {
-    grid.innerHTML = '<div class="no-results">No photos found for this filter.</div>';
-    return;
-  }
-  grid.innerHTML = _galFiltered.map((d, i) =>
-    `<div class="gal-card" onclick="openViewer(${i})">
-      <img src="${d.image}" alt="${d.head||'Bill'}" loading="lazy">
-      <div class="gc-info">
-        <div class="gc-head">${d.head || 'Expense'}</div>
-        <div class="gc-meta">📅 ${d.date || '—'}</div>
-        ${d.narration ? `<div class="gc-meta">📝 ${d.narration}</div>` : ''}
-        <div class="gc-amt">₹${parseFloat(d.amount||0).toLocaleString('en-IN')}</div>
-      </div>
-    </div>`
-  ).join('');
+function renderGal(){
+  var grid=document.getElementById('galGrid');
+  if(!_galShow.length){grid.innerHTML='<div class="no-results">No photos found.</div>';return;}
+  var html='';
+  _galShow.forEach(function(d,i){
+    html+='<div class="gal-card" onclick="openViewer('+i+')">'+'<img src="'+d.image+'" alt="'+(d.head||'Bill')+'" loading="lazy">'+'<div class="gc-info"><div class="gc-head">'+(d.head||'Expense')+'</div><div class="gc-meta">'+( d.date||'—')+'</div><div class="gc-amt">Rs.'+parseFloat(d.amount||0).toLocaleString('en-IN')+'</div></div></div>';
+  });
+  grid.innerHTML=html;
 }
-
-// ── FULL VIEWER ──────────────────────────────────────────────────
-function openViewer(idx) {
-  _viewerIdx = idx;
-  renderViewer();
-  document.getElementById('galViewer').classList.add('open');
+function openViewer(idx){_vIdx=idx;renderViewer();document.getElementById('galViewer').classList.add('open');}
+function closeViewer(){document.getElementById('galViewer').classList.remove('open');}
+function navV(dir){_vIdx=Math.max(0,Math.min(_galShow.length-1,_vIdx+dir));renderViewer();}
+function renderViewer(){
+  var d=_galShow[_vIdx];var total=_galShow.length;
+  document.getElementById('gvImg').src=d.image||'';
+  document.getElementById('gvHead').textContent=d.head||'Expense';
+  document.getElementById('gvMeta').textContent=(d.date||'—')+' - Rs.'+parseFloat(d.amount||0).toLocaleString('en-IN')+(d.narration?' - '+d.narration:'');
+  document.getElementById('gvCount').textContent=(_vIdx+1)+' / '+total;
+  document.getElementById('gvPrev').disabled=_vIdx===0;
+  document.getElementById('gvNext').disabled=_vIdx===total-1;
 }
-
-function closeViewer() {
-  document.getElementById('galViewer').classList.remove('open');
-}
-
-function navViewer(dir) {
-  _viewerIdx = Math.max(0, Math.min(_galFiltered.length - 1, _viewerIdx + dir));
-  renderViewer();
-}
-
-function renderViewer() {
-  const d     = _galFiltered[_viewerIdx];
-  const total = _galFiltered.length;
-  document.getElementById('gvImg').src      = d.image || '';
-  document.getElementById('gvHead').textContent = d.head || 'Expense';
-  document.getElementById('gvMeta').textContent =
-    '📅 ' + (d.date||'—') + '  ·  ₹' + parseFloat(d.amount||0).toLocaleString('en-IN') +
-    (d.narration ? '  ·  📝 ' + d.narration : '');
-  document.getElementById('gvCount').textContent = (_viewerIdx+1) + ' / ' + total;
-  document.getElementById('gvPrev').disabled = _viewerIdx === 0;
-  document.getElementById('gvNext').disabled = _viewerIdx === total - 1;
-}
-
-// Close viewer on background click
-document.getElementById('galViewer').addEventListener('click', function(e) {
-  if(e.target === this) closeViewer();
+document.getElementById('galViewer').addEventListener('click',function(e){if(e.target===this)closeViewer();});
+document.addEventListener('keydown',function(e){
+  if(!document.getElementById('galViewer').classList.contains('open'))return;
+  if(e.key==='ArrowLeft')navV(-1);
+  if(e.key==='ArrowRight')navV(+1);
+  if(e.key==='Escape')closeViewer();
 });
 
-// ── DOWNLOAD GALLERY — individual JPG files ─────────────────────
-// Downloads each photo as a separate JPG file
-// Named: SocietyName_Sr_Date_Head.jpg
-async function downloadGallery() {
-  if(!_galFiltered.length){
-    if(!_galDocs.length){alert('No photos to download. Open a society gallery first.');return;}
-    alert('No photos match current filter. Clear filters and try again.');return;
-  }
-  const soc = (_galSociety||'Society').replace(/\s+/g,'-');
-  const total = _galFiltered.length;
-
-  if(!confirm('Download '+total+' photo'+(total>1?'s':'')+' as separate JPG files?\n\nThey will download one by one. Please wait till all are done.'))return;
-
-  // Download each photo with a delay so browser doesn't block
-  for(let i=0;i<_galFiltered.length;i++){
-    const d = _galFiltered[i];
-    if(!d.image)continue;
-
-    // Build clean filename: Society_01_2025-04-05_Electricity.jpg
-    const sr    = String(i+1).padStart(2,'0');
-    const date  = (d.date||'nodate').replace(/[^0-9-]/g,'');
-    const head  = (d.head||'photo').replace(/[^a-zA-Z0-9]/g,'-').substring(0,20);
-    const fname = soc+'_'+sr+'_'+date+'_'+head+'.jpg';
-
-    // Convert base64 to blob and trigger download
-    const base64 = d.image.split(',')[1] || d.image;
+// ══════════════════════════════════════
+// DOWNLOAD GALLERY — separate JPG files
+// ══════════════════════════════════════
+async function downloadGallery(){
+  if(!_galShow.length){alert('No photos to download.');return;}
+  var soc=(_galSoc||'Society').replace(/\s+/g,'-');
+  var total=_galShow.length;
+  if(!confirm('Download '+total+' photo'+(total>1?'s':'')+' as separate JPG files?'))return;
+  for(var i=0;i<_galShow.length;i++){
+    var d=_galShow[i];if(!d.image)continue;
+    var sr=String(i+1).padStart(2,'0');
+    var dt=(d.date||'nodate').replace(/[^0-9\-]/g,'');
+    var hd=(d.head||'photo').replace(/[^a-zA-Z0-9]/g,'-').substring(0,20);
+    var fname=soc+'_'+sr+'_'+dt+'_'+hd+'.jpg';
     try{
-      const byteChars = atob(base64);
-      const bytes     = new Uint8Array(byteChars.length);
-      for(let j=0;j<byteChars.length;j++) bytes[j]=byteChars.charCodeAt(j);
-      const blob = new Blob([bytes],{type:'image/jpeg'});
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
-      a.download = fname;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(()=>URL.revokeObjectURL(url), 10000);
-    }catch(e){
-      console.error('Could not download photo '+sr,e);
-    }
-
-    // Small delay between downloads so browser handles them properly
-    await new Promise(r=>setTimeout(r,600));
+      var b64=d.image.indexOf(',')!==-1?d.image.split(',')[1]:d.image;
+      var chars=atob(b64);
+      var bytes=new Uint8Array(chars.length);
+      for(var j=0;j<chars.length;j++)bytes[j]=chars.charCodeAt(j);
+      var blob=new Blob([bytes],{type:'image/jpeg'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url;a.download=fname;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout((function(u){return function(){URL.revokeObjectURL(u);};})(url),10000);
+    }catch(ex){console.error('Photo '+sr+' failed',ex);}
+    await new Promise(function(r){setTimeout(r,700);});
   }
-
-  alert('✔ All '+total+' photos downloaded!\n\nCheck your Downloads folder.\nPhotos are named: '+soc+'_01_date_head.jpg etc.');
+  alert('All '+total+' photos downloaded! Check your Downloads folder.');
 }
-
-// Keyboard navigation in viewer
-document.addEventListener('keydown', e => {
-  if(!document.getElementById('galViewer').classList.contains('open')) return;
-  if(e.key === 'ArrowLeft')  navViewer(-1);
-  if(e.key === 'ArrowRight') navViewer(+1);
-  if(e.key === 'Escape')     closeViewer();
-});
 </script>
 </body>
 </html>
