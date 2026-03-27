@@ -6,272 +6,173 @@
 <title>Society Expense Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --brown-dark: #5a3825;
-    --brown-mid:  #8b5e3c;
-    --brown-light:#c49a6c;
-    --cream:      #f9f4ef;
-    --bg:         #e6c9a8;
-    --white:      #ffffff;
-    --red:        #c0392b;
-    --shadow:     0 10px 30px rgba(90,56,37,0.15);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Lato', sans-serif;
-    min-height: 100vh;
-    background: var(--bg);
-    background-image: radial-gradient(ellipse at top left, #d4a96a 0%, #e6c9a8 50%, #c9a882 100%);
-  }
-  /* ── Pages ── */
-  .page {
-    display: none;
-    width: 92%;
-    max-width: 560px;
-    margin: 44px auto 80px;
-    background: var(--white);
-    padding: 30px 26px;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
-  /* ── Typography ── */
-  h2 { font-family:'Playfair Display',serif; text-align:center; color:var(--brown-dark); margin-bottom:22px; font-size:1.65rem; }
-  h3 { font-family:'Playfair Display',serif; color:var(--brown-dark); margin:20px 0 10px; font-size:1.1rem; border-bottom:2px solid var(--bg); padding-bottom:5px; }
-
-  /* ── Inputs ── */
-  input[type=text], input[type=email], input[type=password], input[type=number], input[type=date] {
-    width:100%; padding:11px 14px; margin:5px 0; border-radius:10px;
-    border:1.5px solid #ddd; font-family:inherit; font-size:0.94rem;
-    background:var(--cream); display:block; transition:border .2s;
-  }
-  input:focus { outline:none; border-color:var(--brown-light); }
-  select.inp {
-    width:100%; padding:11px 14px; margin:5px 0; border-radius:10px;
-    border:1.5px solid #ddd; font-family:inherit; font-size:0.94rem;
-    background:var(--cream); display:block; color:#333;
-  }
-  select.inp:focus { outline:none; border-color:var(--brown-light); }
-  .hint { font-size:0.78rem; color:var(--brown-mid); margin:2px 0 5px 2px; min-height:16px; font-style:italic; }
-
-  /* ── Buttons ── */
-  .btn {
-    display:inline-block; padding:10px 18px; border-radius:10px;
-    border:none; cursor:pointer; font-family:inherit;
-    font-size:0.9rem; font-weight:700; transition:background .2s, transform .1s;
-  }
-  .btn:active { transform:scale(0.97); }
-  .btn-primary { background:var(--brown-mid); color:white; width:100%; padding:12px; margin-top:8px; font-size:1rem; }
-  .btn-primary:hover { background:var(--brown-dark); }
-  .btn-primary:disabled { background:#bbb; cursor:not-allowed; }
-  .btn-sm { padding:6px 13px; font-size:0.81rem; border-radius:8px; }
-  .btn-open   { background:var(--brown-mid); color:white; }
-  .btn-open:hover   { background:var(--brown-dark); }
-  .btn-delete { background:var(--red); color:white; }
-  .btn-delete:hover { background:#a93226; }
-  .btn-export { background:#2e7d32; color:white; }
-  .btn-export:hover { background:#1b5e20; }
-  .btn-back   { background:transparent; color:var(--brown-mid); border:1.5px solid var(--brown-mid); margin-bottom:14px; padding:7px 15px; }
-  .btn-back:hover { background:var(--brown-mid); color:white; }
-
-  /* photo buttons */
-  .photo-btns { display:flex; gap:10px; margin:5px 0; }
-  .photo-btns .btn { flex:1; margin-top:0; background:var(--brown-mid); color:white; padding:11px 8px; font-size:0.87rem; }
-  .photo-btns .btn.gal { background:#6d4c41; }
-  .photo-btns .btn:hover { background:var(--brown-dark); }
-
-  /* ── Cards ── */
-  .card { background:var(--cream); padding:13px 15px; margin:9px 0; border-radius:13px; box-shadow:0 2px 8px rgba(0,0,0,.07); }
-  .soc-card { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
-  .soc-card .sname { font-weight:700; color:var(--brown-dark); font-size:0.94rem; flex:1; }
-  .soc-card .semail { color:#888; font-size:0.78rem; }
-  .soc-card .spass  { color:var(--brown-mid); font-size:0.78rem; font-style:italic; }
-  .soc-card .acts   { display:flex; gap:6px; flex-wrap:wrap; }
-
-  .upload-card img { width:100%; border-radius:11px; margin-bottom:9px; max-height:250px; object-fit:cover; cursor:zoom-in; }
-  .drow { display:flex; gap:6px; margin:3px 0; font-size:0.88rem; }
-  .dlbl { font-weight:700; color:var(--brown-dark); min-width:78px; }
-
-  /* ── Society list ── */
-  #socList { max-height:340px; overflow-y:auto; padding-right:3px; }
-  #socList::-webkit-scrollbar { width:4px; }
-  #socList::-webkit-scrollbar-thumb { background:var(--brown-light); border-radius:4px; }
-
-  /* ── FAB ── */
-  #uploadBtn {
-    position:fixed; bottom:26px; right:26px;
-    background:var(--brown-mid); width:56px; height:56px;
-    border-radius:50%; font-size:28px; color:white; border:none;
-    box-shadow:0 5px 16px rgba(0,0,0,.28); cursor:pointer; display:none;
-    transition:background .2s, transform .2s; line-height:1;
-  }
-  #uploadBtn:hover { background:var(--brown-dark); transform:scale(1.08) rotate(45deg); }
-
-  /* ── Modal ── */
-  #uploadModal {
-    display:none; position:fixed; inset:0;
-    background:rgba(0,0,0,0.46); z-index:100;
-    align-items:center; justify-content:center;
-  }
-  #uploadModal.open { display:flex; }
-  .modal-box {
-    background:white; border-radius:18px; padding:26px 24px;
-    width:92%; max-width:430px; max-height:92vh; overflow-y:auto;
-    box-shadow:0 18px 50px rgba(0,0,0,.25); animation:fadeIn .22s ease;
-  }
-  .modal-box h3 { margin-top:0; border:none; }
-  .mclose { float:right; background:none; border:none; font-size:1.35rem; cursor:pointer; color:#888; }
-  .mclose:hover { color:var(--brown-dark); }
-
-  /* ── Status ── */
-  #compStat { font-size:0.78rem; color:var(--brown-mid); margin-top:3px; min-height:16px; }
-
-  /* ── Lightbox ── */
-  #lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:200; align-items:center; justify-content:center; cursor:zoom-out; }
-  #lightbox.open { display:flex; }
-  #lightbox img { max-width:94vw; max-height:90vh; border-radius:10px; }
-
-  /* ── Misc ── */
-  .empty { text-align:center; color:#aaa; padding:28px 0; font-style:italic; }
-  .err   { color:var(--red); font-size:0.82rem; text-align:center; margin-top:6px; min-height:18px; }
-  .succ  { color:#2e7d32; font-size:0.82rem; text-align:center; margin-top:6px; min-height:18px; }
-
-  /* ── Register link on login page ── */
-  .reg-link { text-align:center; margin-top:14px; font-size:0.82rem; color:#888; }
-  .reg-link a { color:var(--brown-mid); font-weight:700; cursor:pointer; text-decoration:none; }
-  .reg-link a:hover { color:var(--brown-dark); text-decoration:underline; }
-
-  /* ── Pending requests card ── */
-  .req-card { background:#fff8ee; border:1.5px solid var(--brown-light); border-radius:13px; padding:13px 15px; margin:8px 0; }
-  .req-card .rname { font-weight:700; color:var(--brown-dark); font-size:0.92rem; }
-  .req-card .rmeta { font-size:0.76rem; color:#888; margin-top:2px; line-height:1.5; }
-  .req-card .racts { display:flex; gap:7px; margin-top:10px; flex-wrap:wrap; }
-  .btn-approve { background:#2e7d32; color:white; }
-  .btn-approve:hover { background:#1b5e20; }
-  .btn-reject  { background:var(--red); color:white; }
-  .btn-reject:hover  { background:#a93226; }
-  .badge-pending { background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:20px; padding:2px 10px; font-size:0.72rem; font-weight:700; }
-  .badge-count { background:var(--red); color:white; border-radius:50%; width:18px; height:18px; font-size:0.7rem; font-weight:700; display:inline-flex; align-items:center; justify-content:center; margin-left:5px; }
-
-  /* ── Gallery Page ── */
-  #pgGallery { display:none; width:96%; max-width:900px; margin:30px auto 80px; background:var(--white); padding:24px 22px; border-radius:20px; box-shadow:var(--shadow); animation:fadeIn .3s ease; }
-  #pgGallery.show { display:block; }
-  .gal-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
-  .gal-top h2 { margin:0; text-align:left; font-size:1.4rem; }
-  .gal-filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
-  .gal-filters input, .gal-filters select { padding:7px 11px; border-radius:9px; border:1.5px solid #ddd; font-family:inherit; font-size:0.84rem; background:var(--cream); }
-  .gal-filters input:focus, .gal-filters select:focus { outline:none; border-color:var(--brown-light); }
-  .gal-stats { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
-  .gal-stat { background:var(--cream); padding:9px 16px; border-radius:10px; font-size:0.82rem; color:var(--brown-dark); }
-  .gal-stat strong { font-size:1.1rem; display:block; color:var(--brown-dark); }
-  /* Grid layout */
-  .gal-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:14px; }
-  .gal-card { background:var(--cream); border-radius:13px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.08); transition:transform .2s, box-shadow .2s; cursor:pointer; }
-  .gal-card:hover { transform:translateY(-3px); box-shadow:0 6px 18px rgba(90,56,37,.18); }
-  .gal-card img { width:100%; height:140px; object-fit:cover; display:block; }
-  .gal-card .gc-info { padding:9px 11px; }
-  .gal-card .gc-head { font-weight:700; color:var(--brown-dark); font-size:0.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .gal-card .gc-meta { font-size:0.74rem; color:#888; margin-top:2px; }
-  .gal-card .gc-amt  { font-size:0.84rem; color:#2e7d32; font-weight:700; margin-top:3px; }
-  /* Full screen photo viewer */
-  #galViewer { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:300; flex-direction:column; align-items:center; justify-content:center; }
-  #galViewer.open { display:flex; }
-  #galViewer img { max-width:92vw; max-height:72vh; border-radius:10px; object-fit:contain; }
-  .gv-info { background:rgba(255,255,255,.1); backdrop-filter:blur(8px); border-radius:12px; padding:12px 20px; margin-top:14px; text-align:center; color:white; max-width:500px; width:92vw; }
-  .gv-info .gv-head { font-family:'Playfair Display',serif; font-size:1rem; font-weight:600; }
-  .gv-info .gv-meta { font-size:0.78rem; opacity:.75; margin-top:4px; }
-  .gv-nav { display:flex; gap:12px; margin-top:14px; align-items:center; }
-  .gv-btn { background:rgba(255,255,255,.18); border:none; color:white; padding:8px 18px; border-radius:9px; cursor:pointer; font-size:0.86rem; font-weight:700; transition:background .15s; }
-  .gv-btn:hover { background:rgba(255,255,255,.32); }
-  .gv-btn:disabled { opacity:.3; cursor:not-allowed; }
-  .gv-close { position:absolute; top:18px; right:20px; background:rgba(255,255,255,.15); border:none; color:white; width:36px; height:36px; border-radius:50%; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-  .gv-close:hover { background:rgba(255,255,255,.3); }
-  .gv-count { font-size:0.8rem; opacity:.6; }
-  /* Loading spinner */
-  .gal-loading { text-align:center; padding:40px; color:var(--brown-mid); font-style:italic; }
-  .no-results { text-align:center; padding:40px; color:#aaa; font-style:italic; }
+:root{--bd:#5a3825;--bm:#8b5e3c;--bl:#c49a6c;--cream:#f9f4ef;--bg:#e6c9a8;--wh:#fff;--red:#c0392b;--sh:0 10px 30px rgba(90,56,37,.15)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Lato',sans-serif;min-height:100vh;background:var(--bg);background-image:radial-gradient(ellipse at top left,#d4a96a 0%,#e6c9a8 50%,#c9a882 100%)}
+.page{display:none;width:92%;max-width:560px;margin:44px auto 80px;background:var(--wh);padding:30px 26px;border-radius:20px;box-shadow:var(--sh);animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+h2{font-family:'Playfair Display',serif;text-align:center;color:var(--bd);margin-bottom:22px;font-size:1.65rem}
+h3{font-family:'Playfair Display',serif;color:var(--bd);margin:20px 0 10px;font-size:1.1rem;border-bottom:2px solid var(--bg);padding-bottom:5px}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=date]{width:100%;padding:11px 14px;margin:5px 0;border-radius:10px;border:1.5px solid #ddd;font-family:inherit;font-size:.94rem;background:var(--cream);display:block;transition:border .2s}
+input:focus{outline:none;border-color:var(--bl)}
+select.inp{width:100%;padding:11px 14px;margin:5px 0;border-radius:10px;border:1.5px solid #ddd;font-family:inherit;font-size:.94rem;background:var(--cream);display:block;color:#333}
+.hint{font-size:.78rem;color:var(--bm);margin:2px 0 5px 2px;min-height:16px;font-style:italic}
+.btn{display:inline-block;padding:10px 18px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.9rem;font-weight:700;transition:background .2s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{background:#bbb!important;cursor:not-allowed}
+.btn-primary{background:var(--bm);color:white;width:100%;padding:12px;margin-top:8px;font-size:1rem}
+.btn-primary:hover{background:var(--bd)}
+.btn-sm{padding:6px 13px;font-size:.81rem;border-radius:8px}
+.btn-open{background:var(--bm);color:white}.btn-open:hover{background:var(--bd)}
+.btn-delete{background:var(--red);color:white}.btn-delete:hover{background:#a93226}
+.btn-export{background:#2e7d32;color:white}.btn-export:hover{background:#1b5e20}
+.btn-purple{background:#7b4f9e;color:white}.btn-purple:hover{background:#5e3a7a}
+.btn-approve{background:#2e7d32;color:white}.btn-approve:hover{background:#1b5e20}
+.btn-back{background:transparent;color:var(--bm);border:1.5px solid var(--bm);margin-bottom:14px;padding:7px 15px}
+.btn-back:hover{background:var(--bm);color:white}
+.photo-btns{display:flex;gap:10px;margin:5px 0}
+.photo-btns .btn{flex:1;margin-top:0;background:var(--bm);color:white;padding:11px 8px;font-size:.87rem}
+.photo-btns .btn.gal{background:#6d4c41}
+.photo-btns .btn:hover{background:var(--bd)}
+.card{background:var(--cream);padding:13px 15px;margin:9px 0;border-radius:13px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.soc-card{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.soc-card .sname{font-weight:700;color:var(--bd);font-size:.94rem;flex:1}
+.soc-card .semail{color:#888;font-size:.78rem}
+.soc-card .spass{color:var(--bm);font-size:.78rem;font-style:italic}
+.soc-card .acts{display:flex;gap:6px;flex-wrap:wrap}
+.upload-card img{width:100%;border-radius:11px;margin-bottom:9px;max-height:250px;object-fit:cover;cursor:zoom-in}
+.drow{display:flex;gap:6px;margin:3px 0;font-size:.88rem}
+.dlbl{font-weight:700;color:var(--bd);min-width:78px}
+#socList{max-height:340px;overflow-y:auto;padding-right:3px}
+#socList::-webkit-scrollbar{width:4px}
+#socList::-webkit-scrollbar-thumb{background:var(--bl);border-radius:4px}
+#uploadBtn{position:fixed;bottom:26px;right:26px;background:var(--bm);width:56px;height:56px;border-radius:50%;font-size:28px;color:white;border:none;box-shadow:0 5px 16px rgba(0,0,0,.28);cursor:pointer;display:none;transition:background .2s,transform .2s;line-height:1}
+#uploadBtn:hover{background:var(--bd);transform:scale(1.08) rotate(45deg)}
+#uploadModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.46);z-index:100;align-items:center;justify-content:center}
+#uploadModal.open{display:flex}
+.modal-box{background:white;border-radius:18px;padding:26px 24px;width:92%;max-width:430px;max-height:92vh;overflow-y:auto;box-shadow:0 18px 50px rgba(0,0,0,.25);animation:fi .22s ease}
+.modal-box h3{margin-top:0;border:none}
+.mclose{float:right;background:none;border:none;font-size:1.35rem;cursor:pointer;color:#888}
+.mclose:hover{color:var(--bd)}
+#compStat{font-size:.78rem;color:var(--bm);margin-top:3px;min-height:16px}
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;cursor:zoom-out}
+#lightbox.open{display:flex}
+#lightbox img{max-width:94vw;max-height:90vh;border-radius:10px}
+.empty{text-align:center;color:#aaa;padding:28px 0;font-style:italic}
+.err{color:var(--red);font-size:.82rem;text-align:center;margin-top:6px;min-height:18px}
+.succ{color:#2e7d32;font-size:.82rem;text-align:center;margin-top:6px;min-height:18px}
+.reg-link{text-align:center;margin-top:14px;font-size:.82rem;color:#888}
+.reg-link a{color:var(--bm);font-weight:700;cursor:pointer;text-decoration:none}
+.reg-link a:hover{color:var(--bd);text-decoration:underline}
+.req-card{background:#fff8ee;border:1.5px solid var(--bl);border-radius:13px;padding:13px 15px;margin:8px 0}
+.req-card .rname{font-weight:700;color:var(--bd);font-size:.92rem}
+.req-card .rmeta{font-size:.76rem;color:#888;margin-top:2px;line-height:1.6}
+.req-card .racts{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.badge-pending{background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:20px;padding:2px 10px;font-size:.72rem;font-weight:700}
+.badge-count{background:var(--red);color:white;border-radius:50%;width:18px;height:18px;font-size:.7rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:5px}
+#pgGallery{display:none;width:96%;max-width:900px;margin:30px auto 80px;background:var(--wh);padding:24px 22px;border-radius:20px;box-shadow:var(--sh);animation:fi .3s ease}
+#pgGallery.show{display:block}
+.gal-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.gal-top h2{margin:0;text-align:left;font-size:1.4rem}
+.gal-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.gal-filters input,.gal-filters select{padding:7px 11px;border-radius:9px;border:1.5px solid #ddd;font-family:inherit;font-size:.84rem;background:var(--cream)}
+.gal-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.gal-stat{background:var(--cream);padding:8px 14px;border-radius:10px;font-size:.82rem;color:var(--bd)}
+.gal-stat strong{font-size:1.05rem;display:block}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:13px}
+.gal-card{background:var(--cream);border-radius:13px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .2s,box-shadow .2s;cursor:pointer}
+.gal-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(90,56,37,.18)}
+.gal-card img{width:100%;height:138px;object-fit:cover;display:block}
+.gal-card .gc-info{padding:8px 10px}
+.gal-card .gc-head{font-weight:700;color:var(--bd);font-size:.83rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gal-card .gc-meta{font-size:.73rem;color:#888;margin-top:1px}
+.gal-card .gc-amt{font-size:.83rem;color:#2e7d32;font-weight:700;margin-top:2px}
+#galViewer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+#galViewer.open{display:flex}
+#galViewer img{max-width:92vw;max-height:72vh;border-radius:10px;object-fit:contain}
+.gv-info{background:rgba(255,255,255,.1);border-radius:12px;padding:11px 18px;margin-top:12px;text-align:center;color:white;max-width:500px;width:92vw}
+.gv-head{font-family:'Playfair Display',serif;font-size:.98rem;font-weight:600}
+.gv-meta{font-size:.76rem;opacity:.75;margin-top:3px}
+.gv-nav{display:flex;gap:12px;margin-top:12px;align-items:center}
+.gv-btn{background:rgba(255,255,255,.18);border:none;color:white;padding:7px 17px;border-radius:9px;cursor:pointer;font-size:.85rem;font-weight:700}
+.gv-btn:hover{background:rgba(255,255,255,.32)}
+.gv-btn:disabled{opacity:.3;cursor:not-allowed}
+.gv-close{position:absolute;top:16px;right:18px;background:rgba(255,255,255,.15);border:none;color:white;width:34px;height:34px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.gv-close:hover{background:rgba(255,255,255,.3)}
+.gv-count{font-size:.8rem;opacity:.6}
+.gal-loading{text-align:center;padding:36px;color:var(--bm);font-style:italic}
+.no-results{text-align:center;padding:36px;color:#aaa;font-style:italic}
 </style>
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
+<!-- LOGIN -->
 <div class="page" id="pgLogin" style="display:block">
   <h2>🏘️ Society Expense Portal</h2>
-  <input type="email"    id="inEmail" placeholder="Email Address" autocomplete="username">
-  <input type="password" id="inPass"  placeholder="Password" autocomplete="current-password"
-         onkeydown="if(event.key==='Enter')login()">
+  <input type="email" id="loginEmail" placeholder="Email Address" autocomplete="username">
+  <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
   <div class="err" id="loginErr"></div>
-  <button class="btn btn-primary" id="loginBtn" onclick="login()">Login</button>
-  <div class="reg-link">
-    New society? <a onclick="showRegister()">Register Now →</a>
-  </div>
+  <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">Login</button>
+  <div class="reg-link">New society? <a onclick="goToRegister()">Register Now →</a></div>
 </div>
 
-<!-- ══ REGISTER PAGE ══ -->
+<!-- REGISTER -->
 <div class="page" id="pgRegister">
-  <h2>🏘️ Register Society</h2>
-  <p style="text-align:center;font-size:0.82rem;color:#888;margin-bottom:18px">Fill your society details. Admin will review and approve your request.</p>
-
-  <input type="text"  id="rSocName"  placeholder="Society Name *">
-  <input type="email" id="rSocEmail" placeholder="Society Email * (this will be your login ID)">
-  <input type="text"  id="rSocPhone" placeholder="Contact Phone No. *">
-  <input type="text"  id="rSocAddr"  placeholder="Society Address *">
-
+  <h2>🏘️ Register Your Society</h2>
+  <p style="text-align:center;font-size:.82rem;color:#888;margin-bottom:16px">Fill details. Admin will review, create your account and share login password.</p>
+  <input type="text"  id="regName"  placeholder="Society Name *">
+  <input type="email" id="regEmail" placeholder="Society Email * (will be your login ID)">
+  <input type="text"  id="regPhone" placeholder="Contact Phone *">
+  <input type="text"  id="regAddr"  placeholder="Society Address *">
   <div class="err"  id="regErr"></div>
   <div class="succ" id="regSucc"></div>
-  <button class="btn btn-primary" id="regBtn" onclick="submitRegister()" style="margin-top:8px">Submit Registration Request</button>
-  <div class="reg-link" style="margin-top:10px">
-    Already registered? <a onclick="showLogin()">Login here →</a>
-  </div>
+  <button class="btn btn-primary" id="regSubmitBtn" onclick="doRegister()">Submit Registration Request</button>
+  <div class="reg-link" style="margin-top:10px">Already have login? <a onclick="goToLogin()">Login here →</a></div>
 </div>
 
-<!-- ══ SUPER ADMIN ══ -->
+<!-- ADMIN -->
 <div class="page" id="pgAdmin">
   <h2>Super Admin Dashboard</h2>
 
-  <h3>➕ Create New Society</h3>
-  <input type="text"  id="cName"  placeholder="Society Name  (e.g. Sunrise Apartments)" oninput="showPwdHint()">
-  <input type="email" id="cEmail" placeholder="Society Email  (e.g. sunrise@gmail.com)">
-  <input type="date"  id="cDate">
-  <div class="hint" id="pwdHint"></div>
-  <button class="btn btn-primary" id="createBtn" onclick="createSociety()">Create Society</button>
+  <h3>➕ Create Society Directly</h3>
+  <input type="text"  id="createName"  placeholder="Society Name" oninput="updatePwdHint()">
+  <input type="email" id="createEmail" placeholder="Society Email">
+  <input type="date"  id="createDate">
+  <div class="hint" id="createPwdHint"></div>
+  <button class="btn btn-primary" id="createBtn" onclick="doCreateSociety()">Create Society</button>
 
-  <h3 id="pendingH3" style="display:none">⏳ Pending Requests <span class="badge-count" id="pendingCount">0</span></h3>
-  <div id="pendingList"></div>
+  <h3 id="reqH3" style="display:none">⏳ Registration Requests <span class="badge-count" id="reqCount">0</span></h3>
+  <div id="reqList"></div>
 
   <h3>🏢 All Societies</h3>
   <div id="socList"><div class="empty">Loading…</div></div>
 </div>
 
-<!-- ══ SOCIETY VIEW ══ -->
+<!-- SOCIETY VIEW -->
 <div class="page" id="pgSociety">
-  <button class="btn btn-back" id="backBtn" style="display:none" onclick="goBack()">← Back</button>
+  <button class="btn btn-back" id="backBtn" style="display:none" onclick="doGoBack()">← Back</button>
   <h2 id="socTitle"></h2>
   <div id="uploads"></div>
-  <div class="empty" id="emptyMsg" style="display:none">No bills uploaded yet.</div>
+  <div class="empty" id="emptyUploads" style="display:none">No bills uploaded yet.</div>
 </div>
 
-<!-- ══ FAB ══ -->
-<button id="uploadBtn" onclick="openModal()">+</button>
+<!-- FAB -->
+<button id="uploadBtn" onclick="openUploadModal()">+</button>
 
-<!-- ══ UPLOAD MODAL ══ -->
+<!-- UPLOAD MODAL -->
 <div id="uploadModal">
   <div class="modal-box">
-    <button class="mclose" onclick="closeModal()">✕</button>
+    <button class="mclose" onclick="closeUploadModal()">✕</button>
     <h3>📎 Upload Bill / Voucher</h3>
-
     <div class="photo-btns">
-      <button type="button" class="btn" onclick="document.getElementById('camInput').click()">📷 Camera</button>
-      <button type="button" class="btn gal" onclick="document.getElementById('galInput').click()">🖼 Gallery</button>
+      <button type="button" class="btn" onclick="document.getElementById('camFile').click()">📷 Camera</button>
+      <button type="button" class="btn gal" onclick="document.getElementById('galFile').click()">🖼 Gallery</button>
     </div>
-    <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none" onchange="onPhoto(this)">
-    <input type="file" id="galInput" accept="image/*"                        style="display:none" onchange="onPhoto(this)">
+    <input type="file" id="camFile" accept="image/*" capture="environment" style="display:none" onchange="onFileSelected(this)">
+    <input type="file" id="galFile" accept="image/*" style="display:none" onchange="onFileSelected(this)">
     <div id="compStat"></div>
-
-    <input type="date"   id="uDate">
-    <select class="inp"  id="uHead" onchange="headChange()">
+    <input type="date" id="billDate">
+    <select class="inp" id="billHead" onchange="onHeadChange()">
       <option value="">-- Select Expense Head --</option>
       <option>Electricity</option>
       <option>Water Charges</option>
@@ -294,352 +195,345 @@
       <option>Miscellaneous</option>
       <option value="__other">Other (type below)</option>
     </select>
-    <input type="text" id="uHeadOther" placeholder="Type expense head" style="display:none">
-
-    <input type="number" id="uAmt"  placeholder="Amount (₹)">
-    <input type="text"   id="uNarr" placeholder="Narration (optional)">
-
-    <button class="btn btn-primary" id="saveBtn" onclick="saveUpload()">Upload</button>
+    <input type="text" id="billHeadOther" placeholder="Type expense head" style="display:none">
+    <input type="number" id="billAmt" placeholder="Amount (Rs.)">
+    <input type="text" id="billNarr" placeholder="Narration (optional)">
+    <button class="btn btn-primary" id="uploadSubmitBtn" onclick="doUpload()">Upload</button>
   </div>
 </div>
 
-<!-- ══ LIGHTBOX ══ -->
+<!-- LIGHTBOX -->
 <div id="lightbox" onclick="this.classList.remove('open')">
-  <img id="lbImg" src="" alt="Bill">
+  <img id="lightboxImg" src="" alt="Bill">
 </div>
 
-<!-- ══ GALLERY PAGE ══ -->
+<!-- GALLERY PAGE -->
 <div id="pgGallery">
   <div class="gal-top">
     <div>
-      <h2 id="galTitle">📸 Gallery</h2>
-      <div style="font-size:0.78rem;color:#888;margin-top:2px" id="galSubtitle">Live photo gallery — always up to date</div>
+      <h2 id="galTitle">Gallery</h2>
+      <div style="font-size:.78rem;color:#888;margin-top:2px">Live — always latest from Firebase</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-sm" style="background:#2e7d32;color:white" onclick="downloadGallery()">⬇ Download Backup</button>
-      <button class="btn btn-back" onclick="closeGallery()" style="margin:0">← Back</button>
+      <button class="btn btn-sm btn-export" onclick="doDownloadPhotos()">⬇ Download JPGs</button>
+      <button class="btn btn-back" onclick="closeGalleryPage()" style="margin:0">← Back</button>
     </div>
   </div>
-
-  <!-- Stats bar -->
   <div class="gal-stats" id="galStats"></div>
-
-  <!-- Filters -->
   <div class="gal-filters">
-    <input type="text"   id="galSearch"  placeholder="🔍 Search head or narration…" oninput="filterGallery()">
-    <select id="galHead" onchange="filterGallery()">
-      <option value="">All Heads</option>
-    </select>
-    <select id="galSort" onchange="filterGallery()">
+    <input type="text" id="galSearchBox" placeholder="Search…" oninput="applyGalFilter()">
+    <select id="galHeadFilter" onchange="applyGalFilter()"><option value="">All Heads</option></select>
+    <select id="galSortBy" onchange="applyGalFilter()">
       <option value="newest">Newest First</option>
       <option value="oldest">Oldest First</option>
       <option value="amount">Highest Amount</option>
     </select>
-    <button class="btn btn-back" style="margin:0;padding:7px 13px;font-size:0.8rem" onclick="refreshGallery()">🔄 Refresh</button>
+    <button class="btn btn-sm btn-back" style="margin:0;padding:6px 12px" onclick="loadGallery()">🔄 Refresh</button>
   </div>
-
-  <!-- Grid -->
-  <div class="gal-grid" id="galGrid">
-    <div class="gal-loading">Loading photos…</div>
-  </div>
+  <div class="gal-grid" id="galGrid"><div class="gal-loading">Loading photos…</div></div>
 </div>
 
-<!-- ══ FULL PHOTO VIEWER ══ -->
+<!-- FULLSCREEN VIEWER -->
 <div id="galViewer">
-  <button class="gv-close" onclick="closeViewer()">✕</button>
-  <img id="gvImg" src="" alt="Bill Photo">
+  <button class="gv-close" onclick="closePhotoViewer()">✕</button>
+  <img id="viewerImg" src="" alt="Bill Photo">
   <div class="gv-info">
-    <div class="gv-head" id="gvHead"></div>
-    <div class="gv-meta" id="gvMeta"></div>
+    <div class="gv-head" id="viewerHead"></div>
+    <div class="gv-meta" id="viewerMeta"></div>
   </div>
   <div class="gv-nav">
-    <button class="gv-btn" id="gvPrev" onclick="navViewer(-1)">◀ Prev</button>
-    <span class="gv-count" id="gvCount"></span>
-    <button class="gv-btn" id="gvNext" onclick="navViewer(+1)">Next ▶</button>
+    <button class="gv-btn" id="viewerPrev" onclick="moveViewer(-1)">◀ Prev</button>
+    <span class="gv-count" id="viewerCount"></span>
+    <button class="gv-btn" id="viewerNext" onclick="moveViewer(+1)">Next ▶</button>
   </div>
 </div>
 
-<!-- ══ SCRIPTS ══ -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
-// ══════════════════════════════════════
-// FIREBASE — DO NOT CHANGE
-// ══════════════════════════════════════
 firebase.initializeApp({
-  apiKey:            "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
-  authDomain:        "society-management-d19f9.firebaseapp.com",
-  projectId:         "society-management-d19f9",
-  storageBucket:     "society-management-d19f9.firebasestorage.app",
-  messagingSenderId: "145344389199",
-  appId:             "1:145344389199:web:a32affa5732fc825460a3a"
+  apiKey:"AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
+  authDomain:"society-management-d19f9.firebaseapp.com",
+  projectId:"society-management-d19f9",
+  storageBucket:"society-management-d19f9.firebasestorage.app",
+  messagingSenderId:"145344389199",
+  appId:"1:145344389199:web:a32affa5732fc825460a3a"
 });
-const db   = firebase.firestore();
-const auth = firebase.auth();
+var db=firebase.firestore();
+var auth=firebase.auth();
+var curSociety=null;
+var compressedImg='';
+var galAllPhotos=[];
+var galShownPhotos=[];
+var galCurrentSociety=null;
+var viewerIdx=0;
 
-// ══════════════════════════════════════
-// STATE
-// ══════════════════════════════════════
-var curSociety = null;
-var isAdmin    = false;
-var _img       = '';
-var _galAll    = [];
-var _galShow   = [];
-var _galSoc    = null;
-var _vIdx      = 0;
-
-// ══════════════════════════════════════
-// PAGE HELPERS
-// ══════════════════════════════════════
-function showPage(id) {
-  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(function(p) {
-    var el = document.getElementById(p);
-    if (el) el.style.display = 'none';
+// ── PAGE NAVIGATION ──────────────────────────────────────
+function showOnlyPage(id){
+  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(function(p){
+    var el=document.getElementById(p);
+    if(el) el.style.display='none';
   });
-  var t = document.getElementById(id);
-  if (t) t.style.display = 'block';
+  var pg=document.getElementById(id);
+  if(pg) pg.style.display='block';
 }
-function showReg() {
-  showPage('pgRegister');
-  ['rErr','rSucc'].forEach(function(id){ document.getElementById(id).textContent=''; });
-  ['rName','rEmail','rPhone','rAddr'].forEach(function(id){ document.getElementById(id).value=''; });
+function goToRegister(){
+  showOnlyPage('pgRegister');
+  document.getElementById('regErr').textContent='';
+  document.getElementById('regSucc').textContent='';
+  document.getElementById('regName').value='';
+  document.getElementById('regEmail').value='';
+  document.getElementById('regPhone').value='';
+  document.getElementById('regAddr').value='';
 }
-function showLogin() {
-  showPage('pgLogin');
-  document.getElementById('loginErr').textContent = '';
-}
-function makePwd(name) {
-  var clean = name.trim().toLowerCase().replace(/[^a-z]/g,'');
-  return clean.substring(0,4) + '@123';
-}
-function showPwdHint() {
-  var name = document.getElementById('cName').value.trim();
-  document.getElementById('pwdHint').textContent = name.length > 0 ? 'Password will be: ' + makePwd(name) : '';
+function goToLogin(){
+  showOnlyPage('pgLogin');
+  document.getElementById('loginErr').textContent='';
 }
 
-// ══════════════════════════════════════
-// LOGIN
-// ══════════════════════════════════════
-function login() {
-  var email = document.getElementById('inEmail').value.trim().toLowerCase();
-  var pwd   = document.getElementById('inPass').value.trim();
-  var errEl = document.getElementById('loginErr');
-  var btn   = document.getElementById('loginBtn');
-  errEl.textContent = '';
-  if (!email || !pwd) { errEl.textContent = 'Please enter email and password.'; return; }
-  btn.textContent = 'Logging in...'; btn.disabled = true;
-  auth.signInWithEmailAndPassword(email, pwd)
-    .then(function(uc) {
-      var ue = uc.user.email.toLowerCase();
-      btn.textContent = 'Login'; btn.disabled = false;
-      if (ue === 'companyadmin@gmail.com') {
-        isAdmin = true;
-        showPage('pgAdmin');
-        loadSocieties();
-        loadPending();
+// ── HELPER ───────────────────────────────────────────────
+function makePwd(name){
+  var c=name.trim().toLowerCase().replace(/[^a-z]/g,'');
+  return c.substring(0,4)+'@123';
+}
+function updatePwdHint(){
+  var n=document.getElementById('createName').value.trim();
+  document.getElementById('createPwdHint').textContent=n?'Password will be: '+makePwd(n):'';
+}
+
+// ── LOGIN ────────────────────────────────────────────────
+function doLogin(){
+  var email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  var pwd=document.getElementById('loginPass').value.trim();
+  var errEl=document.getElementById('loginErr');
+  var btn=document.getElementById('loginBtn');
+  errEl.textContent='';
+  if(!email||!pwd){errEl.textContent='Enter email and password.';return;}
+  btn.textContent='Logging in...';btn.disabled=true;
+  auth.signInWithEmailAndPassword(email,pwd)
+    .then(function(uc){
+      btn.textContent='Login';btn.disabled=false;
+      var ue=uc.user.email.toLowerCase();
+      if(ue==='companyadmin@gmail.com'){
+        showOnlyPage('pgAdmin');
+        loadAllSocieties();
+        loadRequests();
         return;
       }
       db.collection('societies').where('email','==',ue).get()
-        .then(function(snap) {
-          if (snap.empty) {
-            errEl.textContent = 'No society found. Contact admin.';
-            auth.signOut(); return;
-          }
-          snap.forEach(function(doc) { curSociety = doc.data().name; });
-          isAdmin = false;
-          showPage('pgSociety');
-          document.getElementById('uploadBtn').style.display = 'block';
-          document.getElementById('socTitle').textContent = curSociety.toUpperCase();
-          document.getElementById('backBtn').style.display = 'none';
+        .then(function(snap){
+          if(snap.empty){errEl.textContent='No society found. Contact admin.';auth.signOut();return;}
+          snap.forEach(function(doc){curSociety=doc.data().name;});
+          showOnlyPage('pgSociety');
+          document.getElementById('uploadBtn').style.display='block';
+          document.getElementById('socTitle').textContent=curSociety.toUpperCase();
+          document.getElementById('backBtn').style.display='none';
           loadUploads();
         });
     })
-    .catch(function(e) {
-      btn.textContent = 'Login'; btn.disabled = false;
-      if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
-        errEl.textContent = 'Wrong email or password.';
-      } else if (e.code === 'auth/invalid-email') {
-        errEl.textContent = 'Please enter a valid email.';
-      } else if (e.code === 'auth/too-many-requests') {
-        errEl.textContent = 'Too many attempts. Try again later.';
-      } else {
-        errEl.textContent = 'Error: ' + e.message;
+    .catch(function(e){
+      btn.textContent='Login';btn.disabled=false;
+      if(e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found'){
+        errEl.textContent='Wrong email or password.';
+      }else if(e.code==='auth/invalid-email'){
+        errEl.textContent='Enter a valid email.';
+      }else if(e.code==='auth/too-many-requests'){
+        errEl.textContent='Too many attempts. Try later.';
+      }else{
+        errEl.textContent='Error: '+e.message;
       }
     });
 }
 
-// ══════════════════════════════════════
-// REGISTER
-// ══════════════════════════════════════
-function submitReg() {
-  var name  = document.getElementById('rName').value.trim();
-  var email = document.getElementById('rEmail').value.trim().toLowerCase();
-  var phone = document.getElementById('rPhone').value.trim();
-  var addr  = document.getElementById('rAddr').value.trim();
-  var err   = document.getElementById('rErr');
-  var succ  = document.getElementById('rSucc');
-  var btn   = document.getElementById('rBtn');
-  err.textContent = ''; succ.textContent = '';
-  if (!name||!email||!phone||!addr) { err.textContent = 'Please fill all 4 fields.'; return; }
-  if (!email.includes('@')||!email.includes('.')) { err.textContent = 'Enter a valid email.'; return; }
-  btn.textContent = 'Submitting...'; btn.disabled = true;
+// ── REGISTER ─────────────────────────────────────────────
+function doRegister(){
+  var name=document.getElementById('regName').value.trim();
+  var email=document.getElementById('regEmail').value.trim().toLowerCase();
+  var phone=document.getElementById('regPhone').value.trim();
+  var addr=document.getElementById('regAddr').value.trim();
+  var errEl=document.getElementById('regErr');
+  var succEl=document.getElementById('regSucc');
+  var btn=document.getElementById('regSubmitBtn');
+  errEl.textContent='';succEl.textContent='';
+  if(!name||!email||!phone||!addr){errEl.textContent='Fill all 4 fields.';return;}
+  if(!email.includes('@')||!email.includes('.')){errEl.textContent='Enter a valid email.';return;}
+  btn.textContent='Checking...';btn.disabled=true;
   db.collection('societies').where('email','==',email).get()
-    .then(function(s1) {
-      if (!s1.empty) {
-        err.textContent = 'This email is already registered! Contact admin for login.';
-        btn.textContent = 'Submit Registration Request'; btn.disabled = false; return;
+    .then(function(s1){
+      if(!s1.empty){
+        errEl.textContent='This email is already registered! Contact admin for login.';
+        btn.textContent='Submit Registration Request';btn.disabled=false;return;
       }
       return db.collection('registrations').where('email','==',email).get()
-        .then(function(s2) {
-          if (!s2.empty) {
-            err.textContent = 'Request already submitted. Admin will contact you soon.';
-            btn.textContent = 'Submit Registration Request'; btn.disabled = false; return;
+        .then(function(s2){
+          if(!s2.empty){
+            errEl.textContent='Request already submitted. Admin will contact you soon.';
+            btn.textContent='Submit Registration Request';btn.disabled=false;return;
           }
           return db.collection('registrations').add({
-            name:name, email:email, phone:phone, address:addr,
-            status:'pending', submittedAt:Date.now()
-          }).then(function() {
-            succ.textContent = 'Request submitted! Admin will review and contact you.';
-            btn.textContent = 'Submit Registration Request'; btn.disabled = false;
-            ['rName','rEmail','rPhone','rAddr'].forEach(function(id){ document.getElementById(id).value=''; });
+            name:name,email:email,phone:phone,address:addr,
+            status:'pending',submittedAt:Date.now()
+          }).then(function(){
+            succEl.textContent='Request submitted! Admin will review and share your login details.';
+            btn.textContent='Submit Registration Request';btn.disabled=false;
+            document.getElementById('regName').value='';
+            document.getElementById('regEmail').value='';
+            document.getElementById('regPhone').value='';
+            document.getElementById('regAddr').value='';
           });
         });
     })
-    .catch(function(e) {
-      err.textContent = 'Error: ' + e.message;
-      btn.textContent = 'Submit Registration Request'; btn.disabled = false;
+    .catch(function(e){
+      errEl.textContent='Error: '+e.message;
+      btn.textContent='Submit Registration Request';btn.disabled=false;
     });
 }
 
-// ══════════════════════════════════════
-// PENDING REQUESTS
-// ══════════════════════════════════════
-function loadPending() {
+// ── REQUESTS ─────────────────────────────────────────────
+function loadRequests(){
   db.collection('registrations').where('status','==','pending').get()
-    .then(function(snap) {
-      var h3=document.getElementById('pendH3');
-      var list=document.getElementById('pendList');
-      var badge=document.getElementById('pendCount');
-      if (snap.empty) { h3.style.display='none'; list.innerHTML=''; return; }
-      h3.style.display='block'; badge.textContent=snap.size;
+    .then(function(snap){
+      var h3=document.getElementById('reqH3');
+      var list=document.getElementById('reqList');
+      var badge=document.getElementById('reqCount');
+      if(snap.empty){h3.style.display='none';list.innerHTML='';return;}
+      h3.style.display='block';badge.textContent=snap.size;
       var html='';
-      snap.forEach(function(doc) {
+      snap.forEach(function(doc){
         var d=doc.data();
         var sid=doc.id;
-        var sname=d.name.replace(/'/g,' ');
-        var saddr=(d.address||'').replace(/'/g,' ');
+        var n=d.name.replace(/"/g,'').replace(/'/g,'');
+        var ad=(d.address||'').replace(/"/g,'').replace(/'/g,'');
         html+='<div class="req-card">'+
           '<div class="rname">'+d.name.toUpperCase()+'</div>'+
           '<div class="rmeta">Email: '+d.email+'<br>Phone: '+d.phone+'<br>Address: '+d.address+'</div>'+
           '<div class="racts">'+
-          '<button class="btn btn-sm btn-approve" onclick="approveReq(\''+sid+'\',\''+sname+'\',\''+d.email+'\',\''+d.phone+'\',\''+saddr+'\')">Approve</button>'+
-          '<button class="btn btn-sm btn-delete" onclick="ignoreReq(\''+sid+'\')">Ignore</button>'+
+          '<button class="btn btn-sm btn-approve" onclick="doApprove(this)">Approve</button>'+
+          '<button class="btn btn-sm btn-delete" onclick="doIgnore(this)">Ignore</button>'+
           '<span class="badge-pending">Pending</span>'+
           '</div></div>';
       });
       list.innerHTML=html;
+      // Store data on buttons using dataset
+      var cards=list.querySelectorAll('.req-card');
+      var i=0;
+      snap.forEach(function(doc){
+        var d=doc.data();
+        var approveBtn=cards[i].querySelector('.btn-approve');
+        var ignoreBtn=cards[i].querySelector('.btn-delete');
+        approveBtn.dataset.id=doc.id;
+        approveBtn.dataset.name=d.name;
+        approveBtn.dataset.email=d.email;
+        approveBtn.dataset.phone=d.phone;
+        approveBtn.dataset.addr=d.address||'';
+        ignoreBtn.dataset.id=doc.id;
+        i++;
+      });
     });
 }
 
-function approveReq(id, name, email, phone, addr) {
-  var pwd = makePwd(name);
-  if (!confirm('Approve "'+name+'"?\n\nLogin details:\nEmail: '+email+'\nPassword: '+pwd+'\n\nClick OK then share these details.')) return;
-  auth.createUserWithEmailAndPassword(email, pwd)
-    .then(function() {
+function doApprove(btn){
+  var id=btn.dataset.id;
+  var name=btn.dataset.name;
+  var email=btn.dataset.email;
+  var phone=btn.dataset.phone;
+  var addr=btn.dataset.addr;
+  var pwd=makePwd(name);
+  if(!confirm('Approve "'+name+'"?\n\nNote down these login details to share:\nEmail: '+email+'\nPassword: '+pwd+'\n\nClick OK to approve.')){return;}
+  btn.disabled=true;btn.textContent='Approving...';
+  auth.createUserWithEmailAndPassword(email,pwd)
+    .then(function(){
       return db.collection('societies').add({
-        name:name.toLowerCase(), email:email, password:pwd,
-        phone:phone, address:addr, approvedAt:Date.now()
+        name:name.toLowerCase(),email:email,password:pwd,
+        phone:phone,address:addr,approvedAt:Date.now()
       });
     })
-    .then(function() {
-      return db.collection('registrations').doc(id).update({status:'approved', approvedAt:Date.now()});
+    .then(function(){
+      return db.collection('registrations').doc(id).update({status:'approved',approvedAt:Date.now()});
     })
-    .then(function() {
-      alert('Approved!\n\nEmail: '+email+'\nPassword: '+pwd+'\n\nShare with the society now.');
-      loadPending(); loadSocieties();
+    .then(function(){
+      alert('Society Approved!\n\nShare these details with the society:\nEmail: '+email+'\nPassword: '+pwd);
+      loadRequests();loadAllSocieties();
     })
-    .catch(function(e) {
-      if (e.code==='auth/email-already-in-use') {
+    .catch(function(e){
+      if(e.code==='auth/email-already-in-use'){
         db.collection('societies').add({
-          name:name.toLowerCase(), email:email, password:pwd,
-          phone:phone, address:addr, approvedAt:Date.now()
-        }).then(function() {
-          return db.collection('registrations').doc(id).update({status:'approved', approvedAt:Date.now()});
-        }).then(function() {
+          name:name.toLowerCase(),email:email,password:pwd,
+          phone:phone,address:addr,approvedAt:Date.now()
+        }).then(function(){
+          return db.collection('registrations').doc(id).update({status:'approved',approvedAt:Date.now()});
+        }).then(function(){
           alert('Approved!\nEmail: '+email+'\nPassword: '+pwd);
-          loadPending(); loadSocieties();
+          loadRequests();loadAllSocieties();
         });
-      } else { alert('Error: '+e.message); }
+      }else{alert('Error: '+e.message);btn.disabled=false;btn.textContent='Approve';}
     });
 }
 
-function ignoreReq(id) {
-  if (!confirm('Remove this request?')) return;
-  db.collection('registrations').doc(id).delete().then(function() { loadPending(); });
+function doIgnore(btn){
+  var id=btn.dataset.id;
+  if(!confirm('Remove this request?'))return;
+  db.collection('registrations').doc(id).delete()
+    .then(function(){loadRequests();});
 }
 
-// ══════════════════════════════════════
-// CREATE SOCIETY
-// ══════════════════════════════════════
-function createSociety() {
-  var name=document.getElementById('cName').value.trim();
-  var email=document.getElementById('cEmail').value.trim().toLowerCase();
-  var date=document.getElementById('cDate').value;
+// ── CREATE SOCIETY ────────────────────────────────────────
+function doCreateSociety(){
+  var name=document.getElementById('createName').value.trim();
+  var email=document.getElementById('createEmail').value.trim().toLowerCase();
+  var date=document.getElementById('createDate').value;
   var btn=document.getElementById('createBtn');
-  if (!name||!email||!date) { alert('Fill Society Name, Email and Date.'); return; }
-  if (!email.includes('@')) { alert('Enter a valid email.'); return; }
+  if(!name||!email||!date){alert('Fill Name, Email and Date.');return;}
+  if(!email.includes('@')){alert('Enter a valid email.');return;}
   var pwd=makePwd(name);
-  btn.textContent='Creating...'; btn.disabled=true;
+  btn.textContent='Creating...';btn.disabled=true;
   db.collection('societies').where('email','==',email).get()
-    .then(function(ex) {
-      if (!ex.empty) {
-        alert('This email is already used!');
-        btn.textContent='Create Society'; btn.disabled=false; return;
-      }
-      return auth.createUserWithEmailAndPassword(email, pwd)
-        .then(function() {
+    .then(function(ex){
+      if(!ex.empty){alert('Email already used!');btn.textContent='Create Society';btn.disabled=false;return;}
+      return auth.createUserWithEmailAndPassword(email,pwd)
+        .then(function(){
           return db.collection('societies').add({
-            name:name.toLowerCase(), email:email, password:pwd, date:date, createdAt:Date.now()
+            name:name.toLowerCase(),email:email,password:pwd,date:date,createdAt:Date.now()
           });
         })
-        .then(function() {
-          btn.textContent='Create Society'; btn.disabled=false;
-          alert('Society Created!\n\nName: '+name+'\nEmail: '+email+'\nPassword: '+pwd+'\n\nShare with the society.');
-          document.getElementById('cName').value='';
-          document.getElementById('cEmail').value='';
-          document.getElementById('cDate').value='';
-          document.getElementById('pwdHint').textContent='';
-          loadSocieties();
+        .then(function(){
+          btn.textContent='Create Society';btn.disabled=false;
+          alert('Created!\n\nName: '+name+'\nEmail: '+email+'\nPassword: '+pwd+'\n\nShare these login details with the society.');
+          document.getElementById('createName').value='';
+          document.getElementById('createEmail').value='';
+          document.getElementById('createDate').value='';
+          document.getElementById('createPwdHint').textContent='';
+          loadAllSocieties();
         });
     })
-    .catch(function(e) {
-      btn.textContent='Create Society'; btn.disabled=false;
-      if (e.code==='auth/email-already-in-use') {
+    .catch(function(e){
+      btn.textContent='Create Society';btn.disabled=false;
+      if(e.code==='auth/email-already-in-use'){
         db.collection('societies').add({
-          name:name.toLowerCase(), email:email, password:pwd, date:date, createdAt:Date.now()
-        }).then(function() {
+          name:name.toLowerCase(),email:email,password:pwd,date:date,createdAt:Date.now()
+        }).then(function(){
           alert('Created!\nEmail: '+email+'\nPassword: '+pwd);
-          loadSocieties();
+          loadAllSocieties();
         });
-      } else { alert('Error: '+e.message); }
+      }else{alert('Error: '+e.message);}
     });
 }
 
-// ══════════════════════════════════════
-// LOAD SOCIETIES
-// ══════════════════════════════════════
-function loadSocieties() {
-  loadPending();
+// ── LOAD SOCIETIES ────────────────────────────────────────
+function loadAllSocieties(){
+  loadRequests();
   var list=document.getElementById('socList');
   list.innerHTML="<div class='empty'>Loading...</div>";
   db.collection('societies').get()
-    .then(function(snap) {
-      if (snap.empty) { list.innerHTML="<div class='empty'>No societies yet.</div>"; return; }
+    .then(function(snap){
+      if(snap.empty){list.innerHTML="<div class='empty'>No societies yet.</div>";return;}
       var html='';
-      snap.forEach(function(doc) {
+      snap.forEach(function(doc){
         var d=doc.data();
+        var did=doc.id;
+        var dname=d.name;
         html+='<div class="card soc-card">'+
           '<div>'+
           '<div class="sname">'+d.name.toUpperCase()+'</div>'+
@@ -647,50 +541,48 @@ function loadSocieties() {
           '<div class="spass">Password: '+(d.password||'—')+'</div>'+
           '</div>'+
           '<div class="acts">'+
-          '<button class="btn btn-sm btn-export" onclick="exportData(\"'+d.name+'\")">Excel</button>'+
-          '<button class="btn btn-sm btn-purple" onclick="openGallery(\"'+d.name+'\")">Gallery</button>'+
-          '<button class="btn btn-sm btn-open" onclick="openSociety(\"'+d.name+'\")">Open</button>'+
-          '<button class="btn btn-sm btn-delete" onclick="delSociety(\"'+doc.id+'\")">Delete</button>'+
+          '<button class="btn btn-sm btn-export" data-soc="'+dname+'" onclick="doExcel(this)">Excel</button>'+
+          '<button class="btn btn-sm btn-purple" data-soc="'+dname+'" onclick="openGalleryPage(this)">Gallery</button>'+
+          '<button class="btn btn-sm btn-open" data-soc="'+dname+'" onclick="doOpenSociety(this)">Open</button>'+
+          '<button class="btn btn-sm btn-delete" data-id="'+did+'" onclick="doDeleteSociety(this)">Delete</button>'+
           '</div></div>';
       });
       list.innerHTML=html;
     })
-    .catch(function() { list.innerHTML="<div class='empty'>Error. Refresh page.</div>"; });
+    .catch(function(){list.innerHTML="<div class='empty'>Error. Refresh.</div>";});
 }
 
-function openSociety(name) {
-  curSociety=name;
-  showPage('pgSociety');
+function doOpenSociety(btn){
+  curSociety=btn.dataset.soc;
+  showOnlyPage('pgSociety');
   document.getElementById('backBtn').style.display='block';
   document.getElementById('uploadBtn').style.display='none';
-  document.getElementById('socTitle').textContent=name.toUpperCase();
+  document.getElementById('socTitle').textContent=curSociety.toUpperCase();
   loadUploads();
 }
-function goBack() {
+function doGoBack(){
   curSociety=null;
   document.getElementById('uploads').innerHTML='';
   document.getElementById('uploadBtn').style.display='none';
-  showPage('pgAdmin');
-  loadSocieties();
+  showOnlyPage('pgAdmin');
+  loadAllSocieties();
 }
-function delSociety(id) {
-  if (!confirm('Delete this society?')) return;
-  db.collection('societies').doc(id).delete()
-    .then(function() { loadSocieties(); })
-    .catch(function(e) { alert('Error: '+e.message); });
+function doDeleteSociety(btn){
+  if(!confirm('Delete this society?'))return;
+  db.collection('societies').doc(btn.dataset.id).delete()
+    .then(function(){loadAllSocieties();})
+    .catch(function(e){alert('Error: '+e.message);});
 }
 
-// ══════════════════════════════════════
-// IMAGE COMPRESSION
-// ══════════════════════════════════════
-function compressImage(file) {
-  return new Promise(function(resolve,reject) {
-    var reader=new FileReader();
-    reader.onerror=function(){ reject(new Error('Cannot read')); };
-    reader.onload=function(e) {
+// ── IMAGE COMPRESSION ─────────────────────────────────────
+function compressImage(file){
+  return new Promise(function(resolve,reject){
+    var r=new FileReader();
+    r.onerror=function(){reject(new Error('Cannot read'));};
+    r.onload=function(e){
       var img=new Image();
-      img.onerror=function(){ reject(new Error('Cannot load')); };
-      img.onload=function() {
+      img.onerror=function(){reject(new Error('Cannot load'));};
+      img.onload=function(){
         var MAX=900,w=img.width,h=img.height;
         if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
         var cv=document.createElement('canvas');
@@ -698,8 +590,8 @@ function compressImage(file) {
         cv.getContext('2d').drawImage(img,0,0,w,h);
         var SAFE=700*1024;
         var data=cv.toDataURL('image/jpeg',0.60);
-        if(data.length>SAFE) data=cv.toDataURL('image/jpeg',0.40);
-        if(data.length>SAFE) data=cv.toDataURL('image/jpeg',0.25);
+        if(data.length>SAFE)data=cv.toDataURL('image/jpeg',0.40);
+        if(data.length>SAFE)data=cv.toDataURL('image/jpeg',0.25);
         if(data.length>SAFE){
           var cv2=document.createElement('canvas');
           cv2.width=600;cv2.height=Math.round(h*600/w);
@@ -710,90 +602,96 @@ function compressImage(file) {
       };
       img.src=e.target.result;
     };
-    reader.readAsDataURL(file);
+    r.readAsDataURL(file);
   });
 }
-function onPhoto(input) {
-  var file=input.files[0]; if(!file)return;
+function onFileSelected(input){
+  var file=input.files[0];if(!file)return;
   var stat=document.getElementById('compStat');
-  var btn=document.getElementById('saveBtn');
+  var btn=document.getElementById('uploadSubmitBtn');
   stat.textContent='Compressing ('+Math.round(file.size/1024)+' KB)...';
-  btn.disabled=true; _img='';
+  btn.disabled=true;compressedImg='';
   compressImage(file)
-    .then(function(data){ _img=data; stat.textContent='Photo ready — ~'+Math.round(data.length*0.75/1024)+' KB'; btn.disabled=false; })
-    .catch(function(){ stat.textContent='Could not process image. Try another.'; btn.disabled=false; });
+    .then(function(data){
+      compressedImg=data;
+      stat.textContent='Photo ready — ~'+Math.round(data.length*0.75/1024)+' KB';
+      btn.disabled=false;
+    })
+    .catch(function(){
+      stat.textContent='Could not process. Try another photo.';
+      btn.disabled=false;
+    });
 }
 
-// ══════════════════════════════════════
-// HEAD DROPDOWN
-// ══════════════════════════════════════
-function headChange() {
-  var other=document.getElementById('uHeadOther');
-  if(document.getElementById('uHead').value==='__other'){other.style.display='block';other.focus();}
+// ── HEAD DROPDOWN ─────────────────────────────────────────
+function onHeadChange(){
+  var other=document.getElementById('billHeadOther');
+  if(document.getElementById('billHead').value==='__other'){other.style.display='block';other.focus();}
   else{other.style.display='none';other.value='';}
 }
 
-// ══════════════════════════════════════
-// UPLOAD MODAL
-// ══════════════════════════════════════
-function openModal(){
-  _img='';
+// ── UPLOAD MODAL ──────────────────────────────────────────
+function openUploadModal(){
+  compressedImg='';
   document.getElementById('compStat').textContent='';
-  document.getElementById('saveBtn').disabled=false;
+  document.getElementById('uploadSubmitBtn').disabled=false;
   document.getElementById('uploadModal').classList.add('open');
 }
-function closeModal(){
+function closeUploadModal(){
   document.getElementById('uploadModal').classList.remove('open');
-  ['uDate','uAmt','uNarr','uHeadOther'].forEach(function(id){document.getElementById(id).value='';});
-  document.getElementById('uHead').value='';
-  document.getElementById('uHeadOther').style.display='none';
-  document.getElementById('camInput').value='';
-  document.getElementById('galInput').value='';
+  document.getElementById('billDate').value='';
+  document.getElementById('billHead').value='';
+  document.getElementById('billHeadOther').value='';
+  document.getElementById('billHeadOther').style.display='none';
+  document.getElementById('billAmt').value='';
+  document.getElementById('billNarr').value='';
+  document.getElementById('camFile').value='';
+  document.getElementById('galFile').value='';
   document.getElementById('compStat').textContent='';
-  document.getElementById('saveBtn').textContent='Upload';
-  _img='';
+  document.getElementById('uploadSubmitBtn').textContent='Upload';
+  compressedImg='';
 }
-document.getElementById('uploadModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('uploadModal').addEventListener('click',function(e){if(e.target===this)closeUploadModal();});
 
-function saveUpload(){
-  var date=document.getElementById('uDate').value;
-  var hSel=document.getElementById('uHead').value;
-  var head=hSel==='__other'?document.getElementById('uHeadOther').value.trim():hSel;
-  var amt=document.getElementById('uAmt').value.trim();
-  var narr=document.getElementById('uNarr').value.trim();
-  var btn=document.getElementById('saveBtn');
-  if(!_img){alert('Please select a photo first.');return;}
-  if(!date){alert('Please select a date.');return;}
-  if(!head){alert('Please select an expense head.');return;}
-  if(!amt){alert('Please enter the amount.');return;}
+function doUpload(){
+  var date=document.getElementById('billDate').value;
+  var hSel=document.getElementById('billHead').value;
+  var head=hSel==='__other'?document.getElementById('billHeadOther').value.trim():hSel;
+  var amt=document.getElementById('billAmt').value.trim();
+  var narr=document.getElementById('billNarr').value.trim();
+  var btn=document.getElementById('uploadSubmitBtn');
+  if(!compressedImg){alert('Select a photo first.');return;}
+  if(!date){alert('Select a date.');return;}
+  if(!head){alert('Select an expense head.');return;}
+  if(!amt){alert('Enter the amount.');return;}
   btn.textContent='Uploading...';btn.disabled=true;
   db.collection('uploads').add({
-    society:curSociety,image:_img,date:date,head:head,amount:amt,narration:narr,timestamp:Date.now()
+    society:curSociety,image:compressedImg,
+    date:date,head:head,amount:amt,narration:narr,timestamp:Date.now()
   }).then(function(){
-    alert('Bill uploaded!');closeModal();loadUploads();
+    alert('Bill uploaded!');closeUploadModal();loadUploads();
   }).catch(function(e){
     alert('Upload failed: '+e.message);btn.textContent='Upload';btn.disabled=false;
   });
 }
 
-// ══════════════════════════════════════
-// LOAD UPLOADS
-// ══════════════════════════════════════
+// ── LOAD UPLOADS ──────────────────────────────────────────
 function loadUploads(){
   var area=document.getElementById('uploads');
-  var empty=document.getElementById('emptyMsg');
+  var empty=document.getElementById('emptyUploads');
   area.innerHTML="<div class='empty'>Loading...</div>";
   db.collection('uploads').where('society','==',curSociety).get()
     .then(function(snap){
       area.innerHTML='';
       if(snap.empty){empty.style.display='block';return;}
       empty.style.display='none';
-      var docs=[];snap.forEach(function(doc){docs.push(doc.data());});
+      var docs=[];
+      snap.forEach(function(doc){docs.push(doc.data());});
       docs.sort(function(a,b){return b.timestamp-a.timestamp;});
       docs.forEach(function(u){
         var d=document.createElement('div');
         d.className='card upload-card';
-        d.innerHTML='<img src="'+u.image+'" alt="Bill" onclick="openLB(this.src)" title="Click to enlarge">'+
+        d.innerHTML='<img src="'+u.image+'" alt="Bill" onclick="openLightbox(this.src)" title="Click to enlarge">'+
           '<div class="drow"><span class="dlbl">Date</span><span>'+u.date+'</span></div>'+
           '<div class="drow"><span class="dlbl">Head</span><span>'+u.head+'</span></div>'+
           '<div class="drow"><span class="dlbl">Amount</span><span>Rs.'+u.amount+'</span></div>'+
@@ -801,14 +699,16 @@ function loadUploads(){
         area.appendChild(d);
       });
     })
-    .catch(function(){area.innerHTML="<div class='empty'>Error loading. Refresh.</div>";});
+    .catch(function(){area.innerHTML="<div class='empty'>Error. Refresh.</div>";});
 }
-function openLB(src){document.getElementById('lbImg').src=src;document.getElementById('lightbox').classList.add('open');}
+function openLightbox(src){
+  document.getElementById('lightboxImg').src=src;
+  document.getElementById('lightbox').classList.add('open');
+}
 
-// ══════════════════════════════════════
-// EXPORT EXCEL
-// ══════════════════════════════════════
-function exportData(socName){
+// ── EXPORT EXCEL ──────────────────────────────────────────
+function doExcel(btn){
+  var socName=btn.dataset.soc;
   db.collection('uploads').where('society','==',socName).get()
     .then(function(snap){
       if(snap.empty){alert('No uploads for: '+socName);return;}
@@ -825,99 +725,125 @@ function exportData(socName){
     .catch(function(e){alert('Export failed: '+e.message);});
 }
 
-// ══════════════════════════════════════
-// GALLERY
-// ══════════════════════════════════════
-function openGallery(socName){
-  _galSoc=socName;
-  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(function(p){var el=document.getElementById(p);if(el)el.style.display='none';});
+// ── GALLERY ───────────────────────────────────────────────
+function openGalleryPage(btn){
+  galCurrentSociety=btn.dataset.soc;
+  ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(function(p){
+    var el=document.getElementById(p);if(el)el.style.display='none';
+  });
   document.getElementById('pgGallery').classList.add('show');
-  document.getElementById('galTitle').textContent='Gallery — '+socName.toUpperCase();
-  document.getElementById('galSub').textContent='Live gallery — always latest';
-  document.getElementById('galSearch').value='';
-  document.getElementById('galSort').value='newest';
-  refreshGal();
+  document.getElementById('galTitle').textContent='Gallery — '+galCurrentSociety.toUpperCase();
+  document.getElementById('galSearchBox').value='';
+  document.getElementById('galSortBy').value='newest';
+  loadGallery();
 }
-function closeGallery(){
+function closeGalleryPage(){
   document.getElementById('pgGallery').classList.remove('show');
-  _galAll=[];_galShow=[];_galSoc=null;
+  galAllPhotos=[];galShownPhotos=[];galCurrentSociety=null;
   document.getElementById('pgAdmin').style.display='block';
 }
-function refreshGal(){
+function loadGallery(){
   var grid=document.getElementById('galGrid');
   grid.innerHTML='<div class="gal-loading">Loading photos...</div>';
-  db.collection('uploads').where('society','==',_galSoc).get()
+  db.collection('uploads').where('society','==',galCurrentSociety).get()
     .then(function(snap){
-      _galAll=[];snap.forEach(function(doc){_galAll.push(doc.data());});
-      var total=_galAll.length;
-      var amt=_galAll.reduce(function(s,d){return s+parseFloat(d.amount||0);},0);
+      galAllPhotos=[];
+      snap.forEach(function(doc){galAllPhotos.push(doc.data());});
+      var total=galAllPhotos.length;
+      var amt=galAllPhotos.reduce(function(s,d){return s+parseFloat(d.amount||0);},0);
       var heads=[];
-      _galAll.forEach(function(d){if(d.head&&heads.indexOf(d.head)===-1)heads.push(d.head);});
+      galAllPhotos.forEach(function(d){if(d.head&&heads.indexOf(d.head)===-1)heads.push(d.head);});
       heads.sort();
       document.getElementById('galStats').innerHTML=
-        '<div class="gal-stat"><strong>'+total+'</strong>Photos</div>'+
-        '<div class="gal-stat"><strong>Rs.'+Math.round(amt).toLocaleString('en-IN')+'</strong>Total</div>'+
-        '<div class="gal-stat"><strong>'+heads.length+'</strong>Heads</div>';
-      var sel=document.getElementById('galHead');
+        '<div class="gal-stat"><strong>'+total+'</strong>Total Photos</div>'+
+        '<div class="gal-stat"><strong>Rs.'+Math.round(amt).toLocaleString('en-IN')+'</strong>Total Amount</div>'+
+        '<div class="gal-stat"><strong>'+heads.length+'</strong>Expense Heads</div>';
+      var sel=document.getElementById('galHeadFilter');
       sel.innerHTML='<option value="">All Heads</option>';
-      heads.forEach(function(h){var o=document.createElement('option');o.value=h;o.textContent=h;sel.appendChild(o);});
-      filterGal();
+      heads.forEach(function(h){
+        var o=document.createElement('option');o.value=h;o.textContent=h;sel.appendChild(o);
+      });
+      applyGalFilter();
     })
-    .catch(function(){grid.innerHTML='<div class="no-results">Error loading.</div>';});
+    .catch(function(){grid.innerHTML='<div class="no-results">Error loading. Check connection.</div>';});
 }
-function filterGal(){
-  var search=document.getElementById('galSearch').value.toLowerCase().trim();
-  var head=document.getElementById('galHead').value;
-  var sort=document.getElementById('galSort').value;
-  _galShow=_galAll.filter(function(d){
+function applyGalFilter(){
+  var search=document.getElementById('galSearchBox').value.toLowerCase().trim();
+  var head=document.getElementById('galHeadFilter').value;
+  var sort=document.getElementById('galSortBy').value;
+  galShownPhotos=galAllPhotos.filter(function(d){
     var mH=!head||d.head===head;
-    var mS=!search||(d.head||'').toLowerCase().indexOf(search)!==-1||(d.narration||'').toLowerCase().indexOf(search)!==-1||(d.date||'').indexOf(search)!==-1;
+    var mS=!search||
+      (d.head||'').toLowerCase().indexOf(search)!==-1||
+      (d.narration||'').toLowerCase().indexOf(search)!==-1||
+      (d.date||'').indexOf(search)!==-1;
     return mH&&mS;
   });
-  if(sort==='newest') _galShow.sort(function(a,b){return b.timestamp-a.timestamp;});
-  if(sort==='oldest') _galShow.sort(function(a,b){return a.timestamp-b.timestamp;});
-  if(sort==='amount') _galShow.sort(function(a,b){return parseFloat(b.amount||0)-parseFloat(a.amount||0);});
-  renderGal();
+  if(sort==='newest')galShownPhotos.sort(function(a,b){return b.timestamp-a.timestamp;});
+  if(sort==='oldest')galShownPhotos.sort(function(a,b){return a.timestamp-b.timestamp;});
+  if(sort==='amount')galShownPhotos.sort(function(a,b){return parseFloat(b.amount||0)-parseFloat(a.amount||0);});
+  renderGallery();
 }
-function renderGal(){
+function renderGallery(){
   var grid=document.getElementById('galGrid');
-  if(!_galShow.length){grid.innerHTML='<div class="no-results">No photos found.</div>';return;}
+  if(!galShownPhotos.length){grid.innerHTML='<div class="no-results">No photos found.</div>';return;}
   var html='';
-  _galShow.forEach(function(d,i){
-    html+='<div class="gal-card" onclick="openViewer('+i+')">'+'<img src="'+d.image+'" alt="'+(d.head||'Bill')+'" loading="lazy">'+'<div class="gc-info"><div class="gc-head">'+(d.head||'Expense')+'</div><div class="gc-meta">'+( d.date||'—')+'</div><div class="gc-amt">Rs.'+parseFloat(d.amount||0).toLocaleString('en-IN')+'</div></div></div>';
+  galShownPhotos.forEach(function(d,i){
+    html+='<div class="gal-card" onclick="openPhotoViewer('+i+')">'+
+      '<img src="'+d.image+'" alt="'+(d.head||'Bill')+'" loading="lazy">'+
+      '<div class="gc-info">'+
+      '<div class="gc-head">'+(d.head||'Expense')+'</div>'+
+      '<div class="gc-meta">'+(d.date||'—')+'</div>'+
+      '<div class="gc-amt">Rs.'+parseFloat(d.amount||0).toLocaleString('en-IN')+'</div>'+
+      '</div></div>';
   });
   grid.innerHTML=html;
 }
-function openViewer(idx){_vIdx=idx;renderViewer();document.getElementById('galViewer').classList.add('open');}
-function closeViewer(){document.getElementById('galViewer').classList.remove('open');}
-function navV(dir){_vIdx=Math.max(0,Math.min(_galShow.length-1,_vIdx+dir));renderViewer();}
-function renderViewer(){
-  var d=_galShow[_vIdx];var total=_galShow.length;
-  document.getElementById('gvImg').src=d.image||'';
-  document.getElementById('gvHead').textContent=d.head||'Expense';
-  document.getElementById('gvMeta').textContent=(d.date||'—')+' - Rs.'+parseFloat(d.amount||0).toLocaleString('en-IN')+(d.narration?' - '+d.narration:'');
-  document.getElementById('gvCount').textContent=(_vIdx+1)+' / '+total;
-  document.getElementById('gvPrev').disabled=_vIdx===0;
-  document.getElementById('gvNext').disabled=_vIdx===total-1;
+
+// ── PHOTO VIEWER ──────────────────────────────────────────
+function openPhotoViewer(idx){
+  viewerIdx=idx;
+  renderPhotoViewer();
+  document.getElementById('galViewer').classList.add('open');
 }
-document.getElementById('galViewer').addEventListener('click',function(e){if(e.target===this)closeViewer();});
+function closePhotoViewer(){
+  document.getElementById('galViewer').classList.remove('open');
+}
+function moveViewer(dir){
+  viewerIdx=Math.max(0,Math.min(galShownPhotos.length-1,viewerIdx+dir));
+  renderPhotoViewer();
+}
+function renderPhotoViewer(){
+  var d=galShownPhotos[viewerIdx];
+  var total=galShownPhotos.length;
+  document.getElementById('viewerImg').src=d.image||'';
+  document.getElementById('viewerHead').textContent=d.head||'Expense';
+  document.getElementById('viewerMeta').textContent=
+    (d.date||'—')+' — Rs.'+parseFloat(d.amount||0).toLocaleString('en-IN')+
+    (d.narration?' — '+d.narration:'');
+  document.getElementById('viewerCount').textContent=(viewerIdx+1)+' / '+total;
+  document.getElementById('viewerPrev').disabled=viewerIdx===0;
+  document.getElementById('viewerNext').disabled=viewerIdx===total-1;
+}
+document.getElementById('galViewer').addEventListener('click',function(e){
+  if(e.target===this)closePhotoViewer();
+});
 document.addEventListener('keydown',function(e){
   if(!document.getElementById('galViewer').classList.contains('open'))return;
-  if(e.key==='ArrowLeft')navV(-1);
-  if(e.key==='ArrowRight')navV(+1);
-  if(e.key==='Escape')closeViewer();
+  if(e.key==='ArrowLeft')moveViewer(-1);
+  if(e.key==='ArrowRight')moveViewer(+1);
+  if(e.key==='Escape')closePhotoViewer();
 });
 
-// ══════════════════════════════════════
-// DOWNLOAD GALLERY — separate JPG files
-// ══════════════════════════════════════
-async function downloadGallery(){
-  if(!_galShow.length){alert('No photos to download.');return;}
-  var soc=(_galSoc||'Society').replace(/\s+/g,'-');
-  var total=_galShow.length;
-  if(!confirm('Download '+total+' photo'+(total>1?'s':'')+' as separate JPG files?'))return;
-  for(var i=0;i<_galShow.length;i++){
-    var d=_galShow[i];if(!d.image)continue;
+// ── DOWNLOAD PHOTOS as JPG files ─────────────────────────
+async function doDownloadPhotos(){
+  if(!galShownPhotos.length){alert('No photos to download. Open gallery first.');return;}
+  var soc=(galCurrentSociety||'Society').replace(/\s+/g,'-');
+  var total=galShownPhotos.length;
+  if(!confirm('Download '+total+' photo'+(total>1?'s':'')+' as JPG files?\n\nThey will download one by one to your Downloads folder.'))return;
+  for(var i=0;i<galShownPhotos.length;i++){
+    var d=galShownPhotos[i];
+    if(!d.image)continue;
     var sr=String(i+1).padStart(2,'0');
     var dt=(d.date||'nodate').replace(/[^0-9\-]/g,'');
     var hd=(d.head||'photo').replace(/[^a-zA-Z0-9]/g,'-').substring(0,20);
@@ -932,11 +858,11 @@ async function downloadGallery(){
       var a=document.createElement('a');
       a.href=url;a.download=fname;
       document.body.appendChild(a);a.click();document.body.removeChild(a);
-      setTimeout((function(u){return function(){URL.revokeObjectURL(u);};})(url),10000);
+      setTimeout((function(u){return function(){URL.revokeObjectURL(u);};})(url),15000);
     }catch(ex){console.error('Photo '+sr+' failed',ex);}
     await new Promise(function(r){setTimeout(r,700);});
   }
-  alert('All '+total+' photos downloaded! Check your Downloads folder.');
+  alert('All '+total+' photos downloaded!\n\nCheck your Downloads folder.\nFiles named: '+soc+'_01_date_head.jpg etc.');
 }
 </script>
 </body>
