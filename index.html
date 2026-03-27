@@ -261,6 +261,13 @@ firebase.initializeApp({
   messagingSenderId:"145344389199",
   appId:"1:145344389199:web:a32affa5732fc825460a3a"
 });
+var secondaryApp = firebase.initializeApp({
+  apiKey:"AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
+  authDomain:"society-management-d19f9.firebaseapp.com",
+  projectId:"society-management-d19f9"
+}, "Secondary");
+
+var secondaryAuth = secondaryApp.auth();
 var db=firebase.firestore();
 var auth=firebase.auth();
 var curSociety=null;
@@ -443,7 +450,7 @@ function doApprove(btn){
   var pwd=makePwd(name);
   if(!confirm('Approve "'+name+'"?\n\nNote down these login details to share:\nEmail: '+email+'\nPassword: '+pwd+'\n\nClick OK to approve.')){return;}
   btn.disabled=true;btn.textContent='Approving...';
-  auth.createUserWithEmailAndPassword(email,pwd)
+  secondaryAuth.createUserWithEmailAndPassword(email,pwd)
     .then(function(){
       return db.collection('societies').add({
         name:name.toLowerCase(),email:email,password:pwd,
