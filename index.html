@@ -384,7 +384,7 @@ function doRegister(){
 
     })
     .then(function(){
-
+      sendEmailToUser(email, pwd);
       alert(
         "Account Created!\n\n" +
         "Email: " + email + "\n" +
@@ -844,7 +844,18 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight')moveViewer(+1);
   if(e.key==='Escape')closePhotoViewer();
 });
-
+function sendEmailToUser(email, pwd){
+  emailjs.send("service_3g7iwo8", "template_wv6d3rz", {
+    to_email: email,
+    password: pwd
+  })
+  .then(function(){
+    console.log("Email sent");
+  })
+  .catch(function(error){
+    console.log("Email error:", error);
+  });
+}
 // ── DOWNLOAD PHOTOS as JPG files ─────────────────────────
 async function doDownloadPhotos(){
   if(!galShownPhotos.length){alert('No photos to download. Open gallery first.');return;}
