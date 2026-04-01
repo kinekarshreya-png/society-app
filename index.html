@@ -254,6 +254,7 @@ select.inp{width:100%;padding:11px 14px;margin:5px 0;border-radius:10px;border:1
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script>
   emailjs.init("AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI");
 </script>
@@ -275,6 +276,7 @@ var secondaryApp = firebase.initializeApp({
 var secondaryAuth = secondaryApp.auth();
 var db=firebase.firestore();
 var auth=firebase.auth();
+  var storage = firebase.storage();
 var curSociety=null;
 var compressedImg='';
 var galAllPhotos=[];
@@ -696,18 +698,26 @@ function doUpload(){
   var file = document.getElementById('galFile').files[0];
 
   if(!file){
-    alert("Select file");
+    alert("Select photo first");
     return;
   }
 
-  var ref = storage.ref("uploads/" + curSociety + "/" + Date.now() + ".jpg");
+  var btn = document.getElementById('uploadSubmitBtn');
+  btn.textContent = "Uploading...";
+  btn.disabled = true;
 
+  // 📁 Create folder path
+  var fileName = Date.now() + ".jpg";
+  var ref = storage.ref("uploads/" + curSociety + "/" + fileName);
+
+  // 📤 Upload file
   ref.put(file)
     .then(function(snapshot){
       return snapshot.ref.getDownloadURL();
     })
     .then(function(url){
 
+      // 📦 Save URL in Firestore
       return db.collection('uploads').add({
         society: curSociety,
         image: url,
@@ -716,10 +726,14 @@ function doUpload(){
 
     })
     .then(function(){
-      alert("Uploaded!");
+      alert("Uploaded successfully!");
+      btn.textContent = "Upload";
+      btn.disabled = false;
     })
     .catch(function(e){
-      alert(e.message);
+      alert("Error: " + e.message);
+      btn.textContent = "Upload";
+      btn.disabled = false;
     });
 }
 
