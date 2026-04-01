@@ -114,6 +114,7 @@ select.inp{width:100%;padding:11px 14px;margin:5px 0;border-radius:10px;border:1
   <div class="err" id="loginErr"></div>
   <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">Login</button>
   <div class="reg-link">New society? <a onclick="goToRegister()">Register Now →</a></div>
+  <a onclick="forgotPassword()">Forgot Password?</a>
 </div>
 
 <!-- REGISTER -->
@@ -530,7 +531,35 @@ function doCreateSociety(){
       }else{alert('Error: '+e.message);}
     });
 }
+function forgotPassword(){
+  var email = document.getElementById('loginEmail').value.trim();
 
+  if(!email){
+    alert("Enter your email first");
+    return;
+  }
+
+  auth.sendPasswordResetEmail(email)
+    .then(function(){
+      alert("Password reset email sent!");
+    })
+    .catch(function(e){
+      alert(e.message);
+    });
+}
+  function changePassword(){
+  var newPass = prompt("Enter new password");
+
+  if(!newPass) return;
+
+  auth.currentUser.updatePassword(newPass)
+    .then(function(){
+      alert("Password updated!");
+    })
+    .catch(function(e){
+      alert(e.message);
+    });
+}
 // ── LOAD SOCIETIES ────────────────────────────────────────
 function loadAllSocieties(){
   loadRequests();
@@ -664,25 +693,34 @@ function closeUploadModal(){
 document.getElementById('uploadModal').addEventListener('click',function(e){if(e.target===this)closeUploadModal();});
 
 function doUpload(){
-  var date=document.getElementById('billDate').value;
-  var hSel=document.getElementById('billHead').value;
-  var head=hSel==='__other'?document.getElementById('billHeadOther').value.trim():hSel;
-  var amt=document.getElementById('billAmt').value.trim();
-  var narr=document.getElementById('billNarr').value.trim();
-  var btn=document.getElementById('uploadSubmitBtn');
-  if(!compressedImg){alert('Select a photo first.');return;}
-  if(!date){alert('Select a date.');return;}
-  if(!head){alert('Select an expense head.');return;}
-  if(!amt){alert('Enter the amount.');return;}
-  btn.textContent='Uploading...';btn.disabled=true;
-  db.collection('uploads').add({
-    society:curSociety,image:compressedImg,
-    date:date,head:head,amount:amt,narration:narr,timestamp:Date.now()
-  }).then(function(){
-    alert('Bill uploaded!');closeUploadModal();loadUploads();
-  }).catch(function(e){
-    alert('Upload failed: '+e.message);btn.textContent='Upload';btn.disabled=false;
-  });
+  var file = document.getElementById('galFile').files[0];
+
+  if(!file){
+    alert("Select file");
+    return;
+  }
+
+  var ref = storage.ref("uploads/" + curSociety + "/" + Date.now() + ".jpg");
+
+  ref.put(file)
+    .then(function(snapshot){
+      return snapshot.ref.getDownloadURL();
+    })
+    .then(function(url){
+
+      return db.collection('uploads').add({
+        society: curSociety,
+        image: url,
+        timestamp: Date.now()
+      });
+
+    })
+    .then(function(){
+      alert("Uploaded!");
+    })
+    .catch(function(e){
+      alert(e.message);
+    });
 }
 
 // ── LOAD UPLOADS ──────────────────────────────────────────
