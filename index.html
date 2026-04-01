@@ -356,45 +356,44 @@ function doLogin(){
 
 // ── REGISTER ─────────────────────────────────────────────
 function doRegister(){
-  var name=document.getElementById('regName').value.trim();
-  var email=document.getElementById('regEmail').value.trim().toLowerCase();
-  var phone=document.getElementById('regPhone').value.trim();
-  var addr=document.getElementById('regAddr').value.trim();
-  var errEl=document.getElementById('regErr');
-  var succEl=document.getElementById('regSucc');
-  var btn=document.getElementById('regSubmitBtn');
-  errEl.textContent='';succEl.textContent='';
-  if(!name||!email||!phone||!addr){errEl.textContent='Fill all 4 fields.';return;}
-  if(!email.includes('@')||!email.includes('.')){errEl.textContent='Enter a valid email.';return;}
-  btn.textContent='Checking...';btn.disabled=true;
-  db.collection('societies').where('email','==',email).get()
-    .then(function(s1){
-      if(!s1.empty){
-        errEl.textContent='This email is already registered! Contact admin for login.';
-        btn.textContent='Submit Registration Request';btn.disabled=false;return;
-      }
-      return db.collection('registrations').where('email','==',email).get()
-        .then(function(s2){
-          if(!s2.empty){
-            errEl.textContent='Request already submitted. Admin will contact you soon.';
-            btn.textContent='Submit Registration Request';btn.disabled=false;return;
-          }
-          return db.collection('registrations').add({
-            name:name,email:email,phone:phone,address:addr,
-            status:'pending',submittedAt:Date.now()
-          }).then(function(){
-            succEl.textContent='Request submitted! Admin will review and share your login details.';
-            btn.textContent='Submit Registration Request';btn.disabled=false;
-            document.getElementById('regName').value='';
-            document.getElementById('regEmail').value='';
-            document.getElementById('regPhone').value='';
-            document.getElementById('regAddr').value='';
-          });
-        });
+  var name = document.getElementById('regName').value.trim();
+  var email = document.getElementById('regEmail').value.trim().toLowerCase();
+  var phone = document.getElementById('regPhone').value.trim();
+
+  if(!name || !email || !phone){
+    alert("Fill all fields");
+    return;
+  }
+
+  var pwd = makePwd(name);
+
+  auth.createUserWithEmailAndPassword(email, pwd)
+    .then(function(){
+      
+      // Save in Firestore
+      return db.collection('societies').add({
+        name: name.toLowerCase(),
+        email: email,
+        phone: phone,
+        createdAt: Date.now()
+      });
+
+    })
+    .then(function(){
+
+      alert(
+        "Account Created!\n\n" +
+        "Email: " + email + "\n" +
+        "Password: " + pwd + "\n\n" +
+        "Check your email for details."
+      );
+
+      sendEmailToUser(email, pwd);
+
+      goToLogin();
     })
     .catch(function(e){
-      errEl.textContent='Error: '+e.message;
-      btn.textContent='Submit Registration Request';btn.disabled=false;
+      alert(e.message);
     });
 }
 
