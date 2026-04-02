@@ -377,7 +377,18 @@ function doRegister(){
   auth.createUserWithEmailAndPassword(email, pwd)
     .then(function(){
 
-      // 🔥 Send reset email
+      // ✅ STEP 1: SAVE TO FIRESTORE
+      return db.collection('societies').add({
+        name: name.toLowerCase(),
+        email: email,
+        phone: phone,
+        createdAt: Date.now()
+      });
+
+    })
+    .then(function(){
+
+      // ✅ STEP 2: SEND RESET EMAIL
       return auth.sendPasswordResetEmail(email);
 
     })
@@ -385,7 +396,7 @@ function doRegister(){
 
       alert(
         "Account created!\n\n" +
-        "Check your email and set your own password."
+        "Check your email and set your password."
       );
 
       goToLogin();
