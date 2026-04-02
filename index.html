@@ -725,22 +725,24 @@ function doUpload(){
   var blob = new Blob([u8arr], {type: mime});
 
   ref.put(blob)
-    .then(function(snapshot){
-      return snapshot.ref.getDownloadURL();
-    })
-    .then(function(url){
+  .then(function(snapshot){
+    console.log("Upload success");
+    return snapshot.ref.getDownloadURL();
+  })
+  .then(function(url){
+    console.log("URL:", url);
 
-      return db.collection('uploads').add({
-        society: curSociety,
-        image: url,
-        date: document.getElementById('billDate').value,
-        head: document.getElementById('billHead').value,
-        amount: document.getElementById('billAmt').value,
-        narration: document.getElementById('billNarr').value,
-        timestamp: Date.now()
-      });
+    return db.collection('uploads').add({
+      society: curSociety,
+      image: url,
+      date: document.getElementById('billDate').value,
+      head: document.getElementById('billHead').value,
+      amount: document.getElementById('billAmt').value,
+      narration: document.getElementById('billNarr').value,
+      timestamp: Date.now()
+    });
 
-    })
+  })
     .then(function(){
       alert("Uploaded successfully!");
       btn.textContent = "Upload";
