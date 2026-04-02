@@ -264,22 +264,22 @@ firebase.initializeApp({
   apiKey: "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
   authDomain: "society-management-d19f9.firebaseapp.com",
   projectId: "society-management-d19f9",
-  storageBucket: "society-management-d19f9.appspot.com",
+  storageBucket: "society-management-d19f9.appspot.com", // ✅ comma here
   messagingSenderId: "145344389199",
   appId: "1:145344389199:web:a32affa5732fc825460a3a"
 });
 
-// 🔥 Services (define AFTER init)
+// Services
 var db = firebase.firestore();
 var auth = firebase.auth();
 var storage = firebase.storage();
 
-// 🔥 Debug (optional but useful)
+// Debug
 auth.onAuthStateChanged(function(user){
   console.log("Auth state:", user);
 });
 
-// 🔥 Secondary app (for admin create users)
+// Secondary app
 var secondaryApp = firebase.initializeApp({
   apiKey: "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
   authDomain: "society-management-d19f9.firebaseapp.com",
@@ -288,14 +288,13 @@ var secondaryApp = firebase.initializeApp({
 
 var secondaryAuth = secondaryApp.auth();
 
-// 🔥 Your variables
+// Variables
 var curSociety = null;
 var compressedImg = '';
 var galAllPhotos = [];
 var galShownPhotos = [];
 var galCurrentSociety = null;
 var viewerIdx = 0;
-
 // ── PAGE NAVIGATION ──────────────────────────────────────
 function showOnlyPage(id){
   ['pgLogin','pgRegister','pgAdmin','pgSociety'].forEach(function(p){
