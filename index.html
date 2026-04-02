@@ -698,7 +698,10 @@ function closeUploadModal(){
 document.getElementById('uploadModal').addEventListener('click',function(e){if(e.target===this)closeUploadModal();});
 
 function doUpload(){
-  var file = document.getElementById('galFile').files[0];
+
+  var file =
+    document.getElementById('camFile').files[0] ||
+    document.getElementById('galFile').files[0];
 
   if(!file){
     alert("Select photo first");
@@ -709,21 +712,22 @@ function doUpload(){
   btn.textContent = "Uploading...";
   btn.disabled = true;
 
-  // 📁 Create folder path
   var fileName = Date.now() + ".jpg";
   var ref = storage.ref("uploads/" + curSociety + "/" + fileName);
 
-  // 📤 Upload file
   ref.put(file)
     .then(function(snapshot){
       return snapshot.ref.getDownloadURL();
     })
     .then(function(url){
 
-      // 📦 Save URL in Firestore
       return db.collection('uploads').add({
         society: curSociety,
         image: url,
+        date: document.getElementById('billDate').value,
+        head: document.getElementById('billHead').value,
+        amount: document.getElementById('billAmt').value,
+        narration: document.getElementById('billNarr').value,
         timestamp: Date.now()
       });
 
@@ -732,6 +736,8 @@ function doUpload(){
       alert("Uploaded successfully!");
       btn.textContent = "Upload";
       btn.disabled = false;
+      closeUploadModal();
+      loadUploads();
     })
     .catch(function(e){
       alert("Error: " + e.message);
