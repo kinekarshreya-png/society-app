@@ -376,28 +376,20 @@ function doRegister(){
 
   auth.createUserWithEmailAndPassword(email, pwd)
     .then(function(){
-      
-      // Save in Firestore
-      return db.collection('societies').add({
-        name: name.toLowerCase(),
-        email: email,
-        phone: phone,
-        createdAt: Date.now()
-      });
+
+      // 🔥 Send reset email
+      return auth.sendPasswordResetEmail(email);
 
     })
     .then(function(){
-      sendEmailToUser(email, pwd);
+
       alert(
-        "Account Created!\n\n" +
-        "Email: " + email + "\n" +
-        "Password: " + pwd + "\n\n" +
-        "Check your email for details."
+        "Account created!\n\n" +
+        "Check your email and set your own password."
       );
 
-      sendEmailToUser(email, pwd);
-
       goToLogin();
+
     })
     .catch(function(e){
       alert(e.message);
