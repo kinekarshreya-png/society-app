@@ -259,32 +259,42 @@ select.inp{width:100%;padding:11px 14px;margin:5px 0;border-radius:10px;border:1
   emailjs.init("wRVjKCC0cwQz6Trdt");
 </script>
 <script>
+// 🔥 Firebase Init (CORRECT)
 firebase.initializeApp({
-  apiKey:"AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
-  authDomain:"society-management-d19f9.firebaseapp.com",
-  projectId:"society-management-d19f9",
- storageBucket:"society-management-d19f9.appspot.com"
-  messagingSenderId:"145344389199",
-  appId:"1:145344389199:web:a32affa5732fc825460a3a"
-  auth.onAuthStateChanged(function(user){
+  apiKey: "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
+  authDomain: "society-management-d19f9.firebaseapp.com",
+  projectId: "society-management-d19f9",
+  storageBucket: "society-management-d19f9.appspot.com",
+  messagingSenderId: "145344389199",
+  appId: "1:145344389199:web:a32affa5732fc825460a3a"
+});
+
+// 🔥 Services (define AFTER init)
+var db = firebase.firestore();
+var auth = firebase.auth();
+var storage = firebase.storage();
+
+// 🔥 Debug (optional but useful)
+auth.onAuthStateChanged(function(user){
   console.log("Auth state:", user);
 });
+
+// 🔥 Secondary app (for admin create users)
 var secondaryApp = firebase.initializeApp({
-  apiKey:"AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
-  authDomain:"society-management-d19f9.firebaseapp.com",
-  projectId:"society-management-d19f9"
+  apiKey: "AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
+  authDomain: "society-management-d19f9.firebaseapp.com",
+  projectId: "society-management-d19f9"
 }, "Secondary");
 
 var secondaryAuth = secondaryApp.auth();
-var db=firebase.firestore();
-var auth=firebase.auth();
-  var storage = firebase.storage();
-var curSociety=null;
-var compressedImg='';
-var galAllPhotos=[];
-var galShownPhotos=[];
-var galCurrentSociety=null;
-var viewerIdx=0;
+
+// 🔥 Your variables
+var curSociety = null;
+var compressedImg = '';
+var galAllPhotos = [];
+var galShownPhotos = [];
+var galCurrentSociety = null;
+var viewerIdx = 0;
 
 // ── PAGE NAVIGATION ──────────────────────────────────────
 function showOnlyPage(id){
