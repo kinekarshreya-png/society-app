@@ -263,9 +263,11 @@ firebase.initializeApp({
   apiKey:"AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
   authDomain:"society-management-d19f9.firebaseapp.com",
   projectId:"society-management-d19f9",
- storageBucket:"society-management-d19f9.firebasestorage.com"
+ storageBucket:"society-management-d19f9.appspot.com"
   messagingSenderId:"145344389199",
   appId:"1:145344389199:web:a32affa5732fc825460a3a"
+  auth.onAuthStateChanged(function(user){
+  console.log("Auth state:", user);
 });
 var secondaryApp = firebase.initializeApp({
   apiKey:"AIzaSyCY1hdpbGyN7byYyNOg7VHLEzfeadnddGI",
@@ -348,6 +350,7 @@ function doLogin(){
         });
     })
     .catch(function(e){
+      console.log(e);
       btn.textContent='Login';btn.disabled=false;
       if(e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found'){
         errEl.textContent='Wrong email or password.';
