@@ -597,7 +597,21 @@ function loadAllSocieties(){
           '<div class="spass">Password: '+(d.password||'—')+'</div>'+
           '</div>'+
           '<div class="acts">'+
-          '<button class="btn btn-sm btn-export" data-soc="'+dname+'" onclick="doExcel(this)">Excel</button>'+
+          '<button onclick="openExcel()">Download Excel</button>'+
+'<button onclick="window.open(window.location.href, '_blank')">
+Open in Browser
+</button>'+
+<script>
+function openExcel() {
+    if (navigator.userAgent.includes("wv")) {
+        alert("Excel will open in browser");
+        window.open("https://society-management-d19f9.web.app", "_blank");
+    } else {
+        // your existing excel download logic
+        downloadExcel(); 
+    }
+}
+</script>
           '<button class="btn btn-sm btn-purple" data-soc="'+dname+'" onclick="openGalleryPage(this)">Gallery</button>'+
           '<button class="btn btn-sm btn-open" data-soc="'+dname+'" onclick="doOpenSociety(this)">Open</button>'+
           '<button class="btn btn-sm btn-delete" data-id="'+did+'" onclick="doDeleteSociety(this)">Delete</button>'+
