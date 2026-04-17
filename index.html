@@ -1473,7 +1473,12 @@ function doExcel(btn) {
       var ws = XLSX.utils.aoa_to_sheet(rows);
       ws['!cols'] = [{wch:5},{wch:13},{wch:24},{wch:13},{wch:30},{wch:20}];
       XLSX.utils.book_append_sheet(wb, ws, socName.substring(0,31));
-      XLSX.writeFile(wb, socName + '_expenses.xlsx');
+      if (window.AndroidBridge) {
+    var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+    window.AndroidBridge.saveExcel(wbout, socName + '_expenses.xlsx');
+} else {
+    XLSX.writeFile(wb, socName + '_expenses.xlsx');
+}
     })
     .catch(function(e){ alert('Export failed: ' + e.message); });
 }
